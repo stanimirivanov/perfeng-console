@@ -1,5 +1,7 @@
 # Console contributor map
 
+Read [contribution rules](CONTRIBUTING.md), [product scope](SPEC.md) and the [dependency admission policy](docs/development/dependency-policy.md).
+
 Start with the issue, [constraints](CONSTRAINTS.md) and the matching entry in the [M05 task index](tasks/todo.md). Read the nearest scoped AGENTS.md before changing a layer. Use [HARNESS.md](HARNESS.md) for ownership, commands and failure handling.
 
 For UI tasks, read the [design implementation guidance](docs/design/material-review/README.md#implementation-guidance) before using the gallery. The approved designs guide workflows, evidence states and keyboard behavior.
