@@ -21,7 +21,7 @@ architecture:
 test:
 	sh harness/test.sh
 
-verify: doctor lint typecheck architecture test component-test build
+verify: doctor contracts-check lint typecheck architecture test component-test build
 
 supply-chain: doctor
 	pnpm audit --audit-level high
@@ -54,3 +54,11 @@ stack-admission:
 .PHONY: harness-self-test
 harness-self-test:
 	node scripts/harness-self-test.mjs
+
+
+.PHONY: contracts-check contracts-generate
+contracts-check:
+	unshare -Urn node --permission --allow-fs-read=. --allow-fs-read="$$(realpath node_modules)" --allow-child-process scripts/contracts-generate.mjs
+
+contracts-generate:
+	unshare -Urn node --permission --allow-fs-read=. --allow-fs-read="$$(realpath node_modules)" --allow-fs-write=src/generated --allow-child-process scripts/contracts-generate.mjs --write

@@ -3,3 +3,6 @@
 Regenerate only from the checksummed, offline reference closure. Keep generator inputs, version and byte provenance reviewable. Never patch generated types to accept an incompatible provider payload.
 
 Read the [layer matrix](../../HARNESS.md) and run `make architecture` after changing dependencies.
+
+Use make contracts-generate after a reviewed pin update, then make contracts-check.
+Read docs/development/contracts.md for provenance and generator adaptations.
