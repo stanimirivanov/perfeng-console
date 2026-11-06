@@ -1,6 +1,6 @@
 # M05 screen information architecture — steps 1 and 2
 
-**For design review.** [Open the standalone HTML gallery](index.html). All snapshots are labeled design fixtures. They have no scripts, provider calls, submission handlers, browser storage, framework code or package dependencies. Open locally. Product screens never link to Lab; only the *review gallery* lists both deliverables.
+**For design review.** [Open the standalone HTML gallery](index.html). All snapshots are labeled design fixtures. They have no scripts, provider calls, submission handlers, browser storage, framework code or package dependencies. Open locally. The historical gallery predates the confirmed layout. Implement Scenario Lab under Verification in the Console, with a distinct Material theme and text label for authorized maintainers.
 
 ## Navigation and release boundaries
 
@@ -64,7 +64,7 @@ The product BFF envelope (planned) carries status, observedAt, validUntil on CUR
 4. Keep baseline lookup and lifecycle together. Put artifact/provenance claims beside Run evidence. Static wireframes abbreviate long digests for scanning and label abbreviations; runtime must allow exact values to be inspected before review.
 5. Prefer native tables and ordered lists at this fidelity. Treat the transition graph as permitted edges, not a diagram of recorded events. The example uses one observed revision and does not synthesize prior steps.
 6. Keep post-pilot proposals visually separate from operational actions. Show only Git review → publication semantics; repo mapping, form fields and status wire formats await PR60–62.
-7. Present the verifier at a different entry point. Keep campaign expectation levels, approvals and findings together, without mixing synthetic rows into the product Runs collection.
+7. Present Verification as a distinctly themed, labeled area inside the Console. Keep campaign expectation levels, approvals and findings together, without mixing synthetic rows into the product Runs collection.
 8. Use one consistent fixture thread from the published search-browser example. Fixture commit labels, session ages, intent actors and prospective receipt values are illustration only. No performance numbers are product claims. Render the health and catalog examples at their imaginary observation time.
 9. Use static fragment links for reviewer-selected states. All action buttons are disabled; “preview” links switch drawings only. A state fragment replaces the received content, including on direct navigation. Gap-only screens show a designed absence, not a fictional inventory.
 10. Keep shell/UI state independent from Angular Material visuals here. Current deliverables stop at navigation, content hierarchy and state behavior. Material components, responsive final styling, keyboard/focus verification and WCAG 2.1 AA review await owner approval.

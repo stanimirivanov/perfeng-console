@@ -64,3 +64,26 @@ test("guide excludes ordinary tests and discards failed or empty publications", 
     rmSync(root, { recursive: true, force: true });
   }
 });
+
+test("source provenance covers shared layers and browser provenance covers lazy chunks", async () => {
+  const { sourceDigest, browserDigest } = await import("../../tools/user-guide/source.mjs");
+  const { mkdirSync, writeFileSync } = await import("node:fs");
+  const root = mkdtempSync(join(tmpdir(), "guide-inputs-"));
+  const cwd = process.cwd();
+  try {
+    process.chdir(root);
+    for (const dir of ["src", "tools", "apps", "dist/apps/console/browser"])
+      mkdirSync(dir, { recursive: true });
+    for (const path of ["pnpm-workspace.yaml", "angular.json", "nx.json", "tsconfig.base.json", "package.json", "pnpm-lock.yaml"])
+      writeFileSync(path, "");
+    const source = sourceDigest();
+    writeFileSync("src/shared.ts", "export const value = 1;");
+    assert.notEqual(sourceDigest(), source);
+    const browser = browserDigest();
+    writeFileSync("dist/apps/console/browser/lazy.js", "export {};");
+    assert.notEqual(browserDigest(), browser);
+  } finally {
+    process.chdir(cwd);
+    rmSync(root, { recursive: true, force: true });
+  }
+});

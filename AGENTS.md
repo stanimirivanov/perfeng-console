@@ -11,4 +11,4 @@ For UI tasks, read the [design implementation guidance](docs/design/material-rev
 
 Keep architecture and sensor changes visible in review. A recurring failure earns a small executable regression and a local instruction where the mistake occurs.
 
-Nx application roots are apps/console and apps/scenario-lab. Keep them independently buildable and prevent cross-app imports. apps/web-e2e owns browser regressions and tagged guide journeys. Read its scoped instructions before changing capture. Run make build and make browser-test after browser changes, and make guide after narrated journey changes. Generated guide output stays outside Git.
+Nx owns one Angular browser application in apps/console. Verification is a distinctly themed, labeled maintainer area; keep runner code, fault adapters and credentials outside the browser. apps/web-e2e owns browser regressions and tagged guide journeys. Read its scoped instructions before changing capture. Run make build and make browser-test after browser changes, and make guide after narrated journey changes. Generated guide output stays outside Git.

@@ -20,7 +20,7 @@ architecture:
 test:
 	sh harness/test.sh
 
-verify: doctor lint typecheck architecture test
+verify: doctor lint typecheck architecture test component-test
 
 supply-chain: doctor
 	pnpm audit --audit-level high
@@ -37,3 +37,7 @@ browser-test:
 
 guide:
 	node tools/user-guide/generate.mjs
+
+.PHONY: component-test
+component-test:
+	node_modules/.bin/ng test console --watch=false

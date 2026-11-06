@@ -16,9 +16,9 @@ Keep the exported HTML, generated Material classes, review CSS/JavaScript, scree
 | Ordinary operations | [Find a Run](lookup.html), [create](create.html), [cancel](cancel.html), [catalog](catalog.html), [baseline lifecycle](baseline.html) | Require complete authorized selections. An absent inventory remains a gap. Review mutations before dispatch; an uncertain result requires reconciliation. |
 | Diagnostics | [Health](health.html), [workers](workers.html), [observability gaps](gaps.html) | Startup readiness, live dependency state and scientific verdicts have different meanings. Static gap definitions survive a provider outage. |
 | Post-pilot | [Service onboarding](onboard.html), [policy proposal](policy.html) | A reviewed Git change and its exact publication are separate milestones. |
-| Optional verifier | [Scenario selection](lab.html), [campaign](campaign.html) | The shell identifies the verifier separately. Ordinary console navigation has no verifier entry. Synthetic observations do not receive real Run links. |
+| Optional verifier | [Scenario selection](lab.html), [campaign](campaign.html) | The historical export uses a separate shell. Implement Verification inside the Console with a distinct Material theme and a persistent maintainer label. Only authorized maintainers see its link. Synthetic observations do not receive real Run links. |
 
-On any screen choose **Fixture state** to preview Example, Empty, Loading, Error, Backend unavailable, or UNKNOWN value. Browser history and bookmarked state fragments work. The review directory links both deliverables only to make this packet browsable. No network source, account, browser storage or real mutation backs any control. Transaction buttons stay disabled. “Preview confirmation” opens an inert review dialog on the rerun, cancel and campaign pages.
+On any screen choose **Fixture state** to preview Example, Empty, Loading, Error, Backend unavailable, or UNKNOWN value. Browser history and bookmarked state fragments work. The gallery predates the single-browser decision; its separate verifier entrance is superseded. No network source, account, browser storage or real mutation backs any control. Transaction buttons stay disabled. “Preview confirmation” opens an inert review dialog on the rerun, cancel and campaign pages.
 
 ## Visual and component decisions
 

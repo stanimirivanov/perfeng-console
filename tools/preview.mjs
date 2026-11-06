@@ -1,32 +1,28 @@
 import { createServer } from "node:http";
 import { readFile } from "node:fs/promises";
 import { resolve, extname } from "node:path";
-const app = process.argv[2] ?? "console";
-if (!["console", "scenario-lab"].includes(app))
-  throw Error("Unknown preview app");
-const port = app === "console" ? 4300 : 4301;
-const root = resolve("dist/apps/" + app + "/browser");
+
+const root = resolve("dist/apps/console/browser");
 createServer(async (req, res) => {
-  const url = new URL(req.url, "http://127.0.0.1:4300");
-  const file = resolve(
-    root,
-    "." +
-      decodeURIComponent(url.pathname === "/" ? "/index.html" : url.pathname),
-  );
+  let path;
+  try {
+    path = decodeURIComponent(new URL(req.url, "http://127.0.0.1").pathname);
+  } catch {
+    res.writeHead(400).end();
+    return;
+  }
+  const file = resolve(root, "." + (["/", "/verification"].includes(path) ? "/index.html" : path));
   if (!file.startsWith(root + "/")) {
     res.writeHead(403).end();
     return;
   }
   try {
     const data = await readFile(file);
-    res.setHeader(
-      "Content-Type",
-      { ".html": "text/html", ".js": "text/javascript", ".css": "text/css" }[
-        extname(file)
-      ] ?? "application/octet-stream",
-    );
+    res.setHeader("Content-Type", {
+      ".html": "text/html", ".js": "text/javascript", ".css": "text/css",
+    }[extname(file)] ?? "application/octet-stream");
     res.end(data);
   } catch {
     res.writeHead(404).end();
   }
-}).listen(port, "127.0.0.1");
+}).listen(4300, "127.0.0.1");

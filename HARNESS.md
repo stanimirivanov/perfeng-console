@@ -91,4 +91,4 @@ Recurring mistakes become focused automated checks, following Mitchell Hashimoto
 
 ## Nx scaffold extension
 
-The application roots now live in apps/console and apps/scenario-lab. make architecture checks their TypeScript dependency boundaries in addition to the original src layer policy. make typecheck covers the harness and E2E helpers; Angular strict template checks run through make build for each app. CI runs both builds, browser tests and the guide publication pipeline. The standalone Scenario Lab shell is a foundation for later simulator work. The preview HTTP server is test-only.
+The Angular app in apps/console owns ordinary operations and the Verification route. The independently installed runner owns execution. Browser regression fixtures simulate only the BFF grant; the loopback preview has no backend and grants no access. make architecture checks literal imports, including type-only and lazy edges. make verify runs Angular unit tests alongside harness checks. The quality workflow also builds the production distribution and exercises Chromium. The guide workflow publishes a separate artifact from passing tagged journeys.

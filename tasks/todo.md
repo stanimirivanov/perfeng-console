@@ -1,4 +1,6 @@
-# M05 task index — product first, verifier independently released
+# M05 task index — product first, non-UI runner independently released
+
+Scenario Lab lives inside the Console under Verification, with a distinct Material theme and a visible maintainer label. Runner installation and acceptance remain independent.
 
 [Plan and release criteria](plan.md) · [Confirmed intent](../docs/intent/perfeng-ui.md) · [Accepted UI stack](../docs/decisions/0002-ui-technology-stack.md). IDs identify proposed PR-sized scopes, not GitHub numbers. Check off only after verifying the full scope. PR1/2 build on existing governance and harness.
 

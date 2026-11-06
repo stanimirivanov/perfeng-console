@@ -50,6 +50,15 @@ function inspectFile(root: string, file: string, owner: string): string[] {
       report(node, 'layer', `${owner} cannot import ${targetOwner}. Use the declared public boundary.`);
     }
   };
+  inspectImports(source, checkSpecifier, report);
+  return errors;
+}
+
+export function inspectImports(
+  source: ts.SourceFile,
+  checkSpecifier: (node: ts.Node, specifier: ts.Node | undefined) => void,
+  report: (node: ts.Node, rule: string, message: string) => void,
+) {
   const visit = (node: ts.Node) => {
     if (ts.isImportDeclaration(node) || (ts.isExportDeclaration(node) && node.moduleSpecifier)) {
       checkSpecifier(node, node.moduleSpecifier);
@@ -67,7 +76,6 @@ function inspectFile(root: string, file: string, owner: string): string[] {
     report(source, 'reference', 'Use declared imports instead of ambient reference directives.');
   }
   visit(source);
-  return errors;
 }
 
 export function scan(root: string): string[] {

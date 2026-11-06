@@ -2,7 +2,7 @@
 
 ## Decision and first release
 
-[Confirmed product intent](../docs/intent/perfeng-ui.md) and [accepted stack ADR](../docs/decisions/0002-ui-technology-stack.md) govern this revision. **Option B** keeps two independently built and qualified deliverables in perfeng-console. The console opens real Runs. An optional maintainer verifier uses separate credentials, executes controlled scenarios against the public platform and links back to the ordinary Run route. Environment owns disposable fault authority. Build, install, start, upgrade and roll back the console with the verifier absent.
+[Confirmed product intent](../docs/intent/perfeng-ui.md) and [accepted stack ADR](../docs/decisions/0002-ui-technology-stack.md) govern this revision. **Option B, revised after the scaffold review:** one Console contains a distinctly themed and text-labeled Verification → Scenario Lab area for authorized maintainers. The optional runner is independently built, installed and qualified. The console opens real Runs. The non-UI verifier uses separate credentials, executes controlled scenarios against the public platform and links back to the ordinary Run route. Environment owns disposable fault authority. Build, install, start, upgrade and roll back the console with the verifier absent.
 
 **Maya's release test:** CI submits as automation and emits a stable, credential-free link. Maya signs in as herself, sees the exact commit, baseline artifact, policy version/digest and comparison used by that completed Run, then requests a real child Run against those references. CP records her identity, service, source and child. The original approval and today's execution permission are distinct. Refuse withdrawn or unavailable references explicitly. Never silently select today's baseline.
 
@@ -19,7 +19,7 @@ IDs PR1–41 retain their original work identities; PR42–63 are additions. Num
 | Maintainer campaigns | PR8–17 offline; PR29–39 disposable execution; PR40/41/57 qualification. Can run in parallel once each listed dependency is ready. | **V — verifier gate** below. Release the verifier against compatible public endpoints independently. |
 | Later product journeys | Supporting catalog/health/baseline views and PR60–62 Git onboarding/policy changes. | Source owner review and publication proof before enabling new selections. No dependency back into P. |
 
-**P — console release receipt (PR56).** A clean product-only build/installation on the selected shared host must contain no verifier executable, optional UI chunk, simulator endpoint, fault credential or adapter. Start with verifier absent. Follow the actual CI-produced link from a workstation, authenticate a named engineer, verify the bound comparison, dispatch once, observe the real child and retrieve its attributable audit receipt after restart. Include cross-service copied link, revoked membership between display/dispatch, forbidden baseline transition, withdrawn baseline, mismatched digest and lost-response same-key retry. Missing run-used evidence may display an honest gap, but cannot pass this representative positive case. Qualify with selected versions, scopes and dated receipt. Live setup and submissions require explicit authorization.
+**P — console release receipt (PR56).** A clean product-only build/installation on the selected shared host must contain no verifier executable, embedded runner endpoint, fault credential or adapter. Start with verifier absent. Follow the actual CI-produced link from a workstation, authenticate a named engineer, verify the bound comparison, dispatch once, observe the real child and retrieve its attributable audit receipt after restart. Include cross-service copied link, revoked membership between display/dispatch, forbidden baseline transition, withdrawn baseline, mismatched digest and lost-response same-key retry. Missing run-used evidence may display an honest gap, but cannot pass this representative positive case. Qualify with selected versions, scopes and dated receipt. Live setup and submissions require explicit authorization.
 
 **V — verifier release receipt (PR57).** Install the optional verifier separately, deny direct use by an ordinary engineer, and prove a maintainer-injected slowdown opens the same product Run page. Qualify the frozen independently reviewed manifests, synthetic labels, denominators and immutable partial/final findings. Tier A uses 600 active seconds, Tier B 3600, with declared repetitions, separately approved mutations and fenced recovery. Report harness integrity, coverage and platform conformance separately. A failed scientific expectation is a retained finding. A verifier outage or rollback cannot break P. Neither release receipt substitutes for the other; P has zero verifier prerequisites.
 
@@ -278,11 +278,11 @@ Paths are relative to the owning repo. [new] identifies proposed paths or comman
 
 - **Origin / owner:** in-scope, `perfeng-console`.
 - **Depends on / parallel with:** PR2 / G3.
-- **Objective & scope:** Declare independent product and optional verifier workspace entry points. The product imports shared contract/presentation types only. Do not implement a dummy verifier.
+- **Objective & scope:** Declare one browser entry and an independent optional non-UI runner entry. The product imports shared contract/presentation types only. Do not implement a dummy verifier.
 - **Layers / files:** package.json, Makefile, harness/boundaries.ts [modified]; tests/harness/distribution.test.ts [new].
 - **Acceptance criteria:**
   - Clean product build, install and startup succeed without any verifier binary, runtime URL, credential or adapter.
-  - Reject a deliberate transitive verifier import, bundled fixture or copied secret in product assets and source maps.
+  - Reject a deliberate transitive runner import, bundled fixture or copied secret in product assets and source maps.
   - Product identity/version can be pinned independently of the verifier.
 - **Harness gate / new tests:** make verify; make browser-test [new in PR2]; make console-isolation-check [new].
 - **Size:** M, 250–450 handwritten LOC including tests. Keep changes independently reversible behind the relevant capability flag.
@@ -901,9 +901,9 @@ Paths are relative to the owning repo. [new] identifies proposed paths or comman
 - **Origin / owner:** in-scope, M05; `perfeng-console`.
 - **OSS prior art / leveraged pattern:** OSS1–OSS5; fixed local service wrapper.
 - **Depends on / parallel with:** PR5, PR11, PR14 / G10.
-- **Objective & scope:** Deliver the optional maintainer UI as a separately packaged entry point. Its fixed authenticated protocol exposes manifest review and expected/actual matrices. Product installation and navigation never import it.
+- **Objective & scope:** Extend the lazy maintainer area inside the Console. Use its own Material theme and persistent Verification label, including overlays. When the runner is absent show Runner unavailable and disable campaign actions. Expose manifest review and expected/actual matrices only through authorized BFF reads. Returning to the ordinary Run page restores the Console theme.
 - **Not in this PR:** cluster mutations or raw filesystem access.
-- **Layers / files:** contracts/simulator.openapi.json [new]; verifier-ui/server/simulator.ts [new]; verifier-ui/browser/scenario-lab.ts [new]; tests/browser/scenario-offline.spec.ts [new].
+- **Layers / files:** contracts/simulator.openapi.json [new]; src/bff/simulator.ts [new]; apps/console/src/verification/scenario-lab.ts [new]; tests/browser/scenario-offline.spec.ts [new].
 - **Contracts & boundaries:** New authenticated simulator protocol, bounded IDs and data; no arbitrary commands.
 - **Acceptance criteria:**
   - S10.1–S10.3/S10.5/S10.6/S10.9 offline paths work.
@@ -919,7 +919,7 @@ Paths are relative to the owning repo. [new] identifies proposed paths or comman
 - **Depends on / parallel with:** PR9, PR15 / G11.
 - **Objective & scope:** Implement simulator step approvals bound to target/manifest/parameters and durable dispatch state.
 - **Not in this PR:** cluster credentials or real fault adapters.
-- **Layers / files:** src/simulator/approval.ts [new]; verifier-ui/browser/step-approval.ts [new]; tests/scenarios/approval.test.ts [new]; tests/browser/approval.spec.ts [new].
+- **Layers / files:** src/simulator/approval.ts [new]; apps/console/src/verification/step-approval.ts [new]; tests/scenarios/approval.test.ts [new]; tests/browser/approval.spec.ts [new].
 - **Contracts & boundaries:** Persisted approvals; single use does not promise exactly-once external effects.
 - **Acceptance criteria:**
   - Expired/replayed/changed/concurrent approvals cannot redispatch.
@@ -1017,7 +1017,7 @@ Paths are relative to the owning repo. [new] identifies proposed paths or comman
 - **Depends on / parallel with:** PR32, PR35, PR37, PR39, PR7, PR54 / G17.
 - **Objective & scope:** Complete the separately authorized optional S10 cluster UI with per-step approval, progress, findings, real Run links and explicit partial receipts.
 - **Not in this PR:** unattended mutations or full platform-health inference.
-- **Layers / files:** verifier-ui/browser/scenario-cluster.ts [new]; verifier-ui/server/simulator.ts [new]; tests/browser/scenario-cluster.spec.ts [new].
+- **Layers / files:** apps/console/src/verification/scenario-cluster.ts [new]; src/bff/simulator.ts [new]; tests/browser/scenario-cluster.spec.ts [new].
 - **Contracts & boundaries:** Additive consumer behavior; no provider semantic change.
 - **Acceptance criteria:**
   - S10.1–S10.9 all cluster paths are covered.

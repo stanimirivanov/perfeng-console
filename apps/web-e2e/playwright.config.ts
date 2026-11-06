@@ -17,11 +17,5 @@ export default defineConfig({
       url: "http://127.0.0.1:4300",
       reuseExistingServer: false,
     },
-    {
-      cwd: new URL("../..", import.meta.url).pathname,
-      command: "node tools/preview.mjs scenario-lab",
-      url: "http://127.0.0.1:4301",
-      reuseExistingServer: false,
-    },
   ],
 });

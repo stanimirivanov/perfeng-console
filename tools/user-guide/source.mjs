@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import { readdirSync, readFileSync, lstatSync } from "node:fs";
 import { join } from "node:path";
-export function sourceDigest() {
+function digest(files) {
   const hash = createHash("sha256");
   function visit(file) {
     if (lstatSync(file).isSymbolicLink())
@@ -10,7 +10,14 @@ export function sourceDigest() {
       for (const name of readdirSync(file).sort()) visit(join(file, name));
     } else hash.update(file).update(readFileSync(file));
   }
-  for (const file of [
+  files.forEach(visit);
+  return hash.digest("hex");
+}
+
+export function sourceDigest() {
+  return digest([
+    "src",
+    "pnpm-workspace.yaml",
     "apps",
     "tools",
     "angular.json",
@@ -18,7 +25,9 @@ export function sourceDigest() {
     "tsconfig.base.json",
     "package.json",
     "pnpm-lock.yaml",
-  ])
-    visit(file);
-  return hash.digest("hex");
+  ]);
+}
+
+export function browserDigest() {
+  return digest(["dist/apps/console/browser"]);
 }

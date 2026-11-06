@@ -24,4 +24,5 @@ test("keyboard skip link reaches the main content", async ({ page }) => {
   await page.keyboard.press("Tab");
   await page.keyboard.press("Enter");
   await expect(page).toHaveURL(/#main$/);
+  await expect(page.getByRole("main")).toBeFocused();
 });

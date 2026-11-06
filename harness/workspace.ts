@@ -1,6 +1,8 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { resolve, relative, dirname } from "node:path";
 import ts from "typescript";
+import { inspectImports } from "./boundaries.ts";
+
 export function checkApp(root: string): string[] {
   const errors: string[] = [];
   function walk(dir: string) {
@@ -22,41 +24,38 @@ export function checkApp(root: string): string[] {
         ts.ScriptTarget.Latest,
         true,
       );
-      const visit = (node: ts.Node) => {
-        if (ts.isImportDeclaration(node) || ts.isExportDeclaration(node)) {
-          const target = node.moduleSpecifier;
-          if (target && ts.isStringLiteral(target)) {
-            const spec = target.text;
-            const allowed = spec.startsWith(".")
-              ? !relative(root, resolve(dirname(file), spec)).startsWith("..")
-              : [
-                  "@angular/core",
-                  "@angular/platform-browser",
-                  "@angular/router",
-                  "@angular/common",
-                  "@angular/material/button",
-                ].includes(spec);
-            if (!allowed)
-              errors.push(file + " forbidden browser dependency " + spec);
-          }
-        }
-        if (
-          ts.isCallExpression(node) &&
-          node.expression.kind === ts.SyntaxKind.ImportKeyword
-        )
-          errors.push(file + " dynamic import requires reviewed boundary");
-        ts.forEachChild(node, visit);
+      const report = (node: ts.Node, rule: string, reason: string) => {
+        const line = tree.getLineAndCharacterOfPosition(node.getStart(tree)).line + 1;
+        errors.push(file + ":" + line + " [" + rule + "] " + reason);
       };
-      visit(tree);
+      // The scaffold uses inline templates and one reviewed global Material theme.
+      const checkResources = (node: ts.Node) => {
+        if (ts.isPropertyAssignment(node) && /^(templateUrl|styleUrls?|styles)$/.test(node.name.getText(tree).replace(/["']/g, "")))
+          report(node, "resource", "Use the reviewed browser template and theme inputs.");
+        ts.forEachChild(node, checkResources);
+      };
+      checkResources(tree);
+      inspectImports(tree, (node, target) => {
+        if (!target || !ts.isStringLiteralLike(target)) {
+          report(node, "import", "Use a statically reviewable module path.");
+          return;
+        }
+        const name = target.text;
+        const internal = name.startsWith("./") || name.startsWith("../");
+        const allowed = internal
+          ? !relative(resolve(root, "src"), resolve(dirname(file), name)).startsWith("..")
+          : ["@angular/core", "@angular/platform-browser", "@angular/router",
+             "@angular/common", "@angular/material/button"].includes(name);
+        if (!allowed || /[%?#\\]/u.test(name))
+          report(node, "dependency", "Forbidden browser dependency " + name);
+      }, report);
     }
   }
   walk(resolve(root, "src"));
   return errors;
 }
 if (process.argv[1]?.endsWith("workspace.ts")) {
-  const errors = ["console", "scenario-lab"].flatMap((app) =>
-    checkApp(resolve("apps", app)),
-  );
+  const errors = checkApp(resolve("apps/console"));
   if (errors.length) {
     console.error(errors.join("\n"));
     process.exitCode = 1;

@@ -19,3 +19,33 @@ test("app source cannot import the other app or node authority", () => {
     rmSync(root, { recursive: true, force: true });
   }
 });
+
+test("lazy imports stay inside browser source, including type and loader edges", () => {
+  const root = mkdtempSync(join(tmpdir(), "browser-edges-"));
+  try {
+    mkdirSync(join(root, "src"));
+    for (const [code, allowed] of [
+      ["import('./verification/lab')", true],
+      ["type Server = typeof import('node:fs')", false],
+      ["import(path)", false],
+      ["import('../project.json')", false],
+      ["require('node:fs')", false],
+    ] as const) {
+      writeFileSync(join(root, "src/main.ts"), code);
+      assert.equal(checkApp(root).length === 0, allowed, code);
+    }
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test("browser resource paths cannot copy server or design files into a build", () => {
+  const root = mkdtempSync(join(tmpdir(), "browser-resources-"));
+  try {
+    mkdirSync(join(root, "src"));
+    writeFileSync(join(root, "src/main.ts"), "@Component({templateUrl: '../../../src/bff/secret.md'}) class Lab {}");
+    assert.ok(checkApp(root).length);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});

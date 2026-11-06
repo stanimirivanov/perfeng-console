@@ -8,9 +8,11 @@ Start with the [agent map](AGENTS.md) or the [harness guide](HARNESS.md).
 
 ## Angular workspace
 
-Nx 24.0.4 orchestrates two separately built Angular 22.2.4 apps on TypeScript 6.0.3. apps/console owns the main UI shell. apps/scenario-lab owns the independent maintainer shell. Simulation execution belongs to later reviewed work. Both display an unconfigured-backend state.
+Nx 24.0.4 builds one Angular 22.2.4 browser app on TypeScript 6.0.3. The Console owns the ordinary Run journey and the lazy Verification → Scenario Lab area. Its violet Material theme and maintainer label distinguish it from ordinary operations. The optional runner remains outside the browser; installing the console never grants fault permissions.
 
-Run make build for both, or NX_DAEMON=false node_modules/.bin/nx build console (or scenario-lab) for one app. Angular's standard application builder produces each distribution. Run make browser-test for regressions and tagged journeys. Explicit browser bootstrap is node_modules/.bin/playwright install chromium.
+The scaffold probes the same-origin BFF at `GET /console/api/verification/access`. Only an explicit 204 response reveals the link, and navigation rechecks the grant. An unavailable or unconfigured BFF keeps the route closed. This is a private UI capability probe, not a public platform endpoint. The server-side session and operation authorization slices remain pending. The loopback preview does not implement this endpoint. Chromium tests intercept it with test-owned grants. Inside the area, the unconfigured runner leaves campaigns disabled.
+
+Run `make verify` for harness and Angular unit tests, `make build` for the Console distribution, and `make browser-test` for Chromium regressions. To install the pinned browser use `node_modules/.bin/playwright install chromium`.
 
 Run make guide to rebuild, execute only @user-guide journeys, and emit dist/user-guide/index.html, screenshots and source provenance. CI uploads this artifact after success. Untagged tests remain ordinary regressions. Failed, skipped or empty guide runs cannot publish. Source changes during capture invalidate the guide. The first chapter explains recognizing the unconfigured platform; future chapters should accompany asserted operator workflows. The owned loopback preview serves static builds and does not implement production BFF/authentication.
 

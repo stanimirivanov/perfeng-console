@@ -1,3 +1,3 @@
 # Perfeng Console
 
-Keep this browser application independently buildable. Use the accepted ADR and pinned contracts. Never import the other application, server credentials, or docs/design assets. Read ../../src/browser/AGENTS.md for implementation guidance.
+Build one browser application. Keep Verification lazy, visibly labeled and themed with local Material tokens. Require fresh same-origin confirmation before entering. The BFF must authorize actual operations. Never import the runner, server secrets or design fixtures. Read [browser guidance](../../src/browser/AGENTS.md).
