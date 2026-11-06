@@ -1,3 +1,9 @@
 node_modules/
 .pnpm-store/
 coverage/
+
+dist/
+.nx/
+test-results/
+playwright-report/
+.angular/

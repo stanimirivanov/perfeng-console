@@ -11,9 +11,11 @@ lint:
 
 typecheck:
 	node_modules/.bin/tsc --project tsconfig.json
+	node_modules/.bin/tsc --project apps/web-e2e/tsconfig.json
 
 architecture:
 	node harness/boundaries.ts
+	node harness/workspace.ts
 
 test:
 	sh harness/test.sh
@@ -25,3 +27,13 @@ supply-chain: doctor
 
 hooks:
 	git config --local core.hooksPath .githooks
+
+.PHONY: build browser-test guide
+build:
+	NX_DAEMON=false node_modules/.bin/nx run-many -t build
+
+browser-test:
+	node_modules/.bin/playwright test -c apps/web-e2e/playwright.config.ts
+
+guide:
+	node tools/user-guide/generate.mjs

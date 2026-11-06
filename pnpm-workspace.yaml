@@ -1,0 +1,13 @@
+minimumReleaseAgeExclude:
+  - "@playwright/test@1.65.0"
+  - playwright-core@1.65.0
+  - playwright@1.65.0
+verifyDepsBeforeRun: false
+allowBuilds:
+  "@parcel/watcher": false
+  esbuild: false
+  lmdb: false
+  msgpackr-extract: false
+  nx: false
+packages:
+  - apps/*

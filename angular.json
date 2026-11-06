@@ -1,0 +1,83 @@
+{
+  "version": 1,
+  "projects": {
+    "console": {
+      "projectType": "application",
+      "root": "apps/console",
+      "sourceRoot": "apps/console/src",
+      "architect": {
+        "build": {
+          "builder": "@angular/build:application",
+          "options": {
+            "browser": "apps/console/src/main.ts",
+            "index": "apps/console/src/index.html",
+            "tsConfig": "apps/console/tsconfig.app.json",
+            "outputPath": "dist/apps/console",
+            "styles": ["apps/console/src/styles.css"]
+          },
+          "configurations": {
+            "production": {
+              "optimization": {
+                "scripts": true,
+                "styles": {
+                  "minify": true,
+                  "inlineCritical": false
+                },
+                "fonts": false
+              },
+              "outputHashing": "all"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "serve": {
+          "builder": "@angular/build:dev-server",
+          "options": {
+            "buildTarget": "console:build",
+            "host": "127.0.0.1",
+            "port": 4300
+          }
+        }
+      }
+    },
+    "scenario-lab": {
+      "projectType": "application",
+      "root": "apps/scenario-lab",
+      "sourceRoot": "apps/scenario-lab/src",
+      "architect": {
+        "build": {
+          "builder": "@angular/build:application",
+          "options": {
+            "browser": "apps/scenario-lab/src/main.ts",
+            "index": "apps/scenario-lab/src/index.html",
+            "tsConfig": "apps/scenario-lab/tsconfig.app.json",
+            "outputPath": "dist/apps/scenario-lab",
+            "styles": ["apps/scenario-lab/src/styles.css"]
+          },
+          "configurations": {
+            "production": {
+              "optimization": {
+                "scripts": true,
+                "styles": {
+                  "minify": true,
+                  "inlineCritical": false
+                },
+                "fonts": false
+              },
+              "outputHashing": "all"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "serve": {
+          "builder": "@angular/build:dev-server",
+          "options": {
+            "buildTarget": "scenario-lab:build",
+            "host": "127.0.0.1",
+            "port": 4301
+          }
+        }
+      }
+    }
+  }
+}

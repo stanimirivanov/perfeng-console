@@ -88,3 +88,7 @@ The scoped files provide guides and the failing checks provide sensors, followin
 The short entry map points to deeper constraints while mechanical checks enforce dependency direction, following the repository-map approach in OpenAI's engineering account. [Harness engineering](https://openai.com/index/harness-engineering/)
 
 Recurring mistakes become focused automated checks, following Mitchell Hashimoto's practice of improving agent instructions and tooling after a concrete failure. [My AI Adoption Journey](https://mitchellh.com/writing/my-ai-adoption-journey)
+
+## Nx scaffold extension
+
+The application roots now live in apps/console and apps/scenario-lab. make architecture checks their TypeScript dependency boundaries in addition to the original src layer policy. make typecheck covers the harness and E2E helpers; Angular strict template checks run through make build for each app. CI runs both builds, browser tests and the guide publication pipeline. The standalone Scenario Lab shell is a foundation for later simulator work. The preview HTTP server is test-only.
