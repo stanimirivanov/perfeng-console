@@ -1,0 +1,13 @@
+
+* {box-sizing:border-box}
+body {margin:0;background:#f2f1ed;color:#222;font:16px/1.45 system-ui,sans-serif}
+main,header,footer {width:min(68rem,100%);margin:auto;padding:1rem 1.25rem}
+header {border-bottom:2px solid #333} nav {display:flex;gap:.6rem 1rem;flex-wrap:wrap} a {color:#263849;text-underline-offset:.2em} a:focus-visible {outline:3px solid #333;outline-offset:3px}
+h1 {font-size:2rem;line-height:1.15;margin:.6rem 0} h2 {font-size:1.15rem;margin:0 0 .55rem} p {margin:.55rem 0} .labels {font-size:.85rem;letter-spacing:.03em;font-weight:650}
+.workspace {display:grid;grid-template-columns:11rem minmax(0,1fr);gap:1.2rem}.rail {border-right:1px solid #8f8f8b;padding:.7rem .8rem .7rem 0}.rail nav {display:grid}.pane {min-width:0;overflow-wrap:anywhere;background:#fff;border:1px solid #747470;padding:1rem;min-height:18rem}.pane section+section {border-top:1px solid #bbb;margin-top:.8rem;padding-top:.8rem}
+dl {display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,13rem),1fr));gap:.6rem;margin:0} dl div {border-left:2px solid #aaa;padding-left:.6rem}dt{font-size:.8rem;color:#444}dd{margin:0;overflow-wrap:anywhere}
+.scroll {overflow-x:auto} table {width:100%;border-collapse:collapse;text-align:left;font-size:.91rem}th,td{border-bottom:1px solid #ccc;padding:.35rem .5rem;vertical-align:top}th{background:#eee}
+button{padding:.45rem .8rem;margin:.4rem .6rem .4rem 0}button:disabled{color:#555}.states {margin:.8rem 0}.state {display:none}.state:target {display:block} .variants:not(:has(.state:target)) .example {display:block}
+.aside {margin:1rem 0;background:#e5e4df;padding:.65rem .8rem;font-size:.9rem}.pane .framehead {padding-bottom:.65rem;border-bottom:1px solid #777;margin-bottom:1rem}
+footer {font-size:.85rem;color:#444} .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,18rem),1fr));gap:.6rem}.cards article{background:white;border:1px solid #888;padding:.85rem}.cards p{font-size:.9rem}
+@media(max-width:640px){.workspace{grid-template-columns:minmax(0,1fr)}.rail{border-right:0;border-bottom:1px solid #aaa}.rail nav{display:flex}.pane{padding:.7rem}main,header,footer{padding:.75rem}}

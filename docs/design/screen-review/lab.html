@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src &apos;none&apos;; style-src &apos;self&apos;; connect-src &apos;none&apos;; form-action &apos;none&apos;; base-uri &apos;none&apos;">
+<title>Scenario selection · Perfeng wireframes</title>
+<link rel="stylesheet" href="wireframes.css">
+<body>
+<header>
+<div class="labels">DESIGN FIXTURE ONLY · STATIC REVIEW</div>
+<a href="index.html">Screen directory</a>
+</header>
+<main>
+<p class="labels">Verifier</p>
+<h1>Scenario selection</h1>
+<p>Which reviewed campaign should a maintainer run?</p>
+<nav class="states" aria-label="Review alternate screen states">
+<a href="#example">Example</a>
+<a href="#empty">Empty</a>
+<a href="#loading">Loading</a>
+<a href="#error">Error</a>
+<a href="#unavailable">Backend unavailable</a>
+<a href="#unknown">UNKNOWN value</a>
+</nav>
+<div class="workspace">
+<aside class="rail">
+<h2>Verifier</h2>
+<nav aria-label="Product sections">
+<a href="lab.html">Scenario selection</a>
+<a href="campaign.html">Campaign findings and approval</a>
+</nav>
+</aside>
+<div class="pane variants">
+<article class="state example" id="example">
+<div class="framehead">
+<strong>Scenario selection</strong> · Example</div>
+<section>
+<h2>Reviewed scenario</h2>
+<dl>
+<div>
+<dt>Scenario / tier</dt>
+<dd>unchanged-repeat / offline</dd>
+</div>
+<div>
+<dt>Purpose</dt>
+<dd>Detect false positives for unchanged synthetic input</dd>
+</div>
+<div>
+<dt>Ground truth</dt>
+<dd>No injected change</dd>
+</div>
+<div>
+<dt>Repetitions</dt>
+<dd>4 (illustrative only)</dd>
+</div>
+<div>
+<dt>Current-phase and research expectations</dt>
+<dd>Separate reviewed sets required</dd>
+</div>
+<div>
+<dt>Review digest</dt>
+<dd>Required before any execution</dd>
+</div>
+</dl>
+</section>
+<section>
+<h2>Campaign</h2>
+<button disabled>Launch reviewed campaign</button>
+<a href="campaign.html">Inspect example findings</a>
+</section>
+</article>
+<article class="state " id="empty">
+<div class="framehead">
+<strong>Scenario selection</strong> · Empty</div>
+<section>
+<h2>Empty</h2>
+<p>No admitted manifests. No launch available.</p>
+</section>
+<button disabled>Launch campaign</button>
+</article>
+<article class="state " id="loading">
+<div class="framehead">
+<strong>Scenario selection</strong> · Loading</div>
+<section>
+<h2>Loading</h2>
+<p>Checking schema and digest-bound review.</p>
+</section>
+<button disabled>Launch campaign</button>
+</article>
+<article class="state " id="error">
+<div class="framehead">
+<strong>Scenario selection</strong> · Error</div>
+<section>
+<h2>Error</h2>
+<p>Tampered or unreviewed manifest rejected before launch.</p>
+</section>
+<button disabled>Launch campaign</button>
+</article>
+<article class="state " id="unavailable">
+<div class="framehead">
+<strong>Scenario selection</strong> · Backend unavailable</div>
+<section>
+<h2>Backend unavailable</h2>
+<p>Simulator unavailable: hide campaign choices. CP outage alone does not erase Tier A capability.</p>
+</section>
+<button disabled>Launch campaign</button>
+</article>
+<article class="state " id="unknown">
+<div class="framehead">
+<strong>Scenario selection</strong> · UNKNOWN value</div>
+<section>
+<h2>UNKNOWN value</h2>
+<p>Review identity UNKNOWN. Block launch.</p>
+</section>
+<dl>
+<div>
+<dt>Review digest</dt>
+<dd>UNKNOWN</dd>
+</div>
+<div>
+<dt>Reason</dt>
+<dd>Scenario cannot execute</dd>
+</div>
+</dl>
+<button disabled>Launch campaign</button>
+</article>
+</div>
+</div>
+<section class="aside">
+<strong>Contract boundary</strong>
+<p>Optional verifier only, PR8/15/57. Simulator fields are proposed, private to its reviewed protocol. Never expose Lab navigation in ordinary console build.</p>
+</section>
+<nav aria-label="Related screen sketches">
+<a href="campaign.html">Campaign findings and approval</a>
+</nav>
+</main>
+<footer>Every value and state on this page is an inert design fixture. Preview links never perform an operation.</footer>
+</body>
+</html>

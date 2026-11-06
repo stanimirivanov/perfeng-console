@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="Content-Security-Policy" content="default-src &apos;none&apos;; script-src &apos;self&apos;; style-src &apos;self&apos;; connect-src &apos;none&apos;; form-action &apos;none&apos;; base-uri &apos;none&apos;"><title>Create a Run · Perfeng design fixtures</title><link rel="stylesheet" href="material.css"><link rel="stylesheet" href="review.css"><script defer src="review.js"></script></head><body><a href="#main" class="skip">Skip to content</a>
+<header>
+<mat-toolbar class="mat-toolbar mat-toolbar-single-row">
+<span class="brand">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">
+<path d="M3 18V8h4v10 M10 18V3h4v15 M17 18v-7h4v7">
+</path>
+</svg>Perfeng Console</span>
+<span class="top-end">Design fixture only</span>
+</mat-toolbar>
+</header>
+<div class="layout">
+<aside class="sidebar">
+<div class="rail-title">Workspace</div>
+<nav aria-label="Workspace navigation">
+<div class="nav-group">
+<div class="group">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">
+<path d="M3 6h18M3 12h12M3 18h16">
+</path>
+</svg>Runs</div>
+<a href="lookup.html">Find a Run</a>
+<a href="create.html" aria-current="page">Create a Run</a>
+</div>
+<div class="nav-group">
+<div class="group">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">
+<path d="m12 3 9 5-9 5-9-5z M3 12l9 5 9-5M3 16l9 5 9-5">
+</path>
+</svg>Resources</div>
+<a href="catalog.html">Catalog and registry</a>
+<a href="baseline.html">Baseline lifecycle</a>
+</div>
+<div class="nav-group">
+<div class="group">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">
+<path d="M2 13h5l3-8 4 14 3-8h5">
+</path>
+</svg>Diagnostics</div>
+<a href="health.html">Platform health</a>
+<a href="workers.html">Native workers</a>
+<a href="gaps.html">Observability gaps</a>
+</div>
+</nav>
+<div class="directory">
+<a href="index.html">Design directory</a>
+</div>
+</aside>
+<main id="main" tabindex="-1">
+<div class="crumb">Runs</div>
+<div class="title-row">
+<div>
+<h1>Create a Run</h1>
+<p class="question">Which approved inputs will I submit as a new intent?</p>
+</div>
+<label class="selector">Fixture state<select id="state">
+<option value="example">Example</option>
+<option value="empty">Empty</option>
+<option value="loading">Loading</option>
+<option value="error">Error</option>
+<option value="unavailable">Backend unavailable</option>
+<option value="unknown">UNKNOWN value</option>
+</select>
+</label>
+</div>
+<div class="content">
+<article id="example" aria-label="Example state" class="state">
+<mat-card appearance="outlined" class="mat-mdc-card mdc-card mat-mdc-card-outlined mdc-card--outlined">
+<mat-card-content class="mat-mdc-card-content">
+<h2>Reviewed request</h2>
+<dl>
+<div>
+<dt>Test suite</dt>
+<dd>search-browser</dd>
+</div>
+<div>
+<dt>Profile</dt>
+<dd>regression</dd>
+</div>
+<div>
+<dt>Candidate gitSha</dt>
+<dd>7a0bc14…</dd>
+</div>
+<div>
+<dt>Candidate image</dt>
+<dd>Immutable image digest required</dd>
+</div>
+<div>
+<dt>Catalogue / environment / policy</dt>
+<dd>Select exact id, version and sha256 for each</dd>
+</div>
+</dl>
+<a matbutton="outlined" href="catalog.html" class="mdc-button mat-mdc-button-base mdc-button--outlined mat-mdc-outlined-button mat-unthemed" mat-ripple-loader-uninitialized="" mat-ripple-loader-class-name="mat-mdc-button-ripple">
+<span class="mat-mdc-button-persistent-ripple mdc-button__ripple">
+</span>
+<span class="mdc-button__label">Inspect immutable selections</span>
+<span class="mat-focus-indicator">
+</span>
+<span class="mat-mdc-button-touch-target">
+</span>
+</a>
+</mat-card-content>
+</mat-card>
+<mat-card appearance="outlined" class="mat-mdc-card mdc-card mat-mdc-card-outlined mdc-card--outlined">
+<mat-card-content class="mat-mdc-card-content">
+<h2>Submit</h2>
+<p>Review all references before issuing one idempotency key per intent.</p>
+<button matbutton="filled" disabled="true" class="mdc-button mat-mdc-button-base mdc-button--unelevated mat-mdc-unelevated-button mat-mdc-button-disabled mat-unthemed" mat-ripple-loader-uninitialized="" mat-ripple-loader-class-name="mat-mdc-button-ripple" mat-ripple-loader-disabled="">
+<span class="mat-mdc-button-persistent-ripple mdc-button__ripple">
+</span>
+<span class="mdc-button__label">Create Run</span>
+<span class="mat-focus-indicator">
+</span>
+<span class="mat-mdc-button-touch-target">
+</span>
+</button>
+</mat-card-content>
+</mat-card>
+</article>
+<article id="empty" aria-label="Empty state" hidden="" class="state">
+<div class="message">
+<span class="badge">Empty</span>
+<mat-card appearance="outlined" class="mat-mdc-card mdc-card mat-mdc-card-outlined mdc-card--outlined">
+<mat-card-content class="mat-mdc-card-content">
+<h2>Empty</h2>
+<p>Start with suite and exact candidate identity.</p>
+</mat-card-content>
+</mat-card>
+<button matbutton="filled" disabled="true" class="mdc-button mat-mdc-button-base mdc-button--unelevated mat-mdc-unelevated-button mat-mdc-button-disabled mat-unthemed" mat-ripple-loader-uninitialized="" mat-ripple-loader-class-name="mat-mdc-button-ripple" mat-ripple-loader-disabled="">
+<span class="mat-mdc-button-persistent-ripple mdc-button__ripple">
+</span>
+<span class="mdc-button__label">Submit Run</span>
+<span class="mat-focus-indicator">
+</span>
+<span class="mat-mdc-button-touch-target">
+</span>
+</button>
+</div>
+</article>
+<article id="loading" aria-label="Loading state" hidden="" class="state">
+<div class="message">
+<span class="badge">Loading</span>
+<mat-card appearance="outlined" class="mat-mdc-card mdc-card mat-mdc-card-outlined mdc-card--outlined">
+<mat-card-content class="mat-mdc-card-content">
+<h2>Loading</h2>
+<p>Validating catalog selections; submit disabled.</p>
+</mat-card-content>
+</mat-card>
+<button matbutton="filled" disabled="true" class="mdc-button mat-mdc-button-base mdc-button--unelevated mat-mdc-unelevated-button mat-mdc-button-disabled mat-unthemed" mat-ripple-loader-uninitialized="" mat-ripple-loader-class-name="mat-mdc-button-ripple" mat-ripple-loader-disabled="">
+<span class="mat-mdc-button-persistent-ripple mdc-button__ripple">
+</span>
+<span class="mdc-button__label">Submit Run</span>
+<span class="mat-focus-indicator">
+</span>
+<span class="mat-mdc-button-touch-target">
+</span>
+</button>
+</div>
+</article>
+<article id="error" aria-label="Error state" hidden="" class="state">
+<div class="message danger">
+<span class="badge">Error</span>
+<mat-card appearance="outlined" class="mat-mdc-card mdc-card mat-mdc-card-outlined mdc-card--outlined">
+<mat-card-content class="mat-mdc-card-content">
+<h2>Error</h2>
+<p>422 validation or same key/body conflict. Show safe field feedback.</p>
+</mat-card-content>
+</mat-card>
+<button matbutton="filled" disabled="true" class="mdc-button mat-mdc-button-base mdc-button--unelevated mat-mdc-unelevated-button mat-mdc-button-disabled mat-unthemed" mat-ripple-loader-uninitialized="" mat-ripple-loader-class-name="mat-mdc-button-ripple" mat-ripple-loader-disabled="">
+<span class="mat-mdc-button-persistent-ripple mdc-button__ripple">
+</span>
+<span class="mdc-button__label">Submit Run</span>
+<span class="mat-focus-indicator">
+</span>
+<span class="mat-mdc-button-touch-target">
+</span>
+</button>
+</div>
+</article>
+<article id="unavailable" aria-label="Backend unavailable state" hidden="" class="state">
+<div class="message danger">
+<span class="badge">Backend unavailable</span>
+<mat-card appearance="outlined" class="mat-mdc-card mdc-card mat-mdc-card-outlined mdc-card--outlined">
+<mat-card-content class="mat-mdc-card-content">
+<h2>Backend unavailable</h2>
+<p>No submission until upstream is reachable.</p>
+</mat-card-content>
+</mat-card>
+<button matbutton="filled" disabled="true" class="mdc-button mat-mdc-button-base mdc-button--unelevated mat-mdc-unelevated-button mat-mdc-button-disabled mat-unthemed" mat-ripple-loader-uninitialized="" mat-ripple-loader-class-name="mat-mdc-button-ripple" mat-ripple-loader-disabled="">
+<span class="mat-mdc-button-persistent-ripple mdc-button__ripple">
+</span>
+<span class="mdc-button__label">Submit Run</span>
+<span class="mat-focus-indicator">
+</span>
+<span class="mat-mdc-button-touch-target">
+</span>
+</button>
+</div>
+</article>
+<article id="unknown" aria-label="UNKNOWN value state" hidden="" class="state">
+<div class="message">
+<span class="badge">UNKNOWN value</span>
+<mat-card appearance="outlined" class="mat-mdc-card mdc-card mat-mdc-card-outlined mdc-card--outlined">
+<mat-card-content class="mat-mdc-card-content">
+<h2>UNKNOWN value</h2>
+<p>Candidate image digest UNKNOWN; block confirmation.</p>
+</mat-card-content>
+</mat-card>
+<dl>
+<div>
+<dt>Candidate image digest</dt>
+<dd>UNKNOWN</dd>
+</div>
+<div>
+<dt>Reason</dt>
+<dd>Required before submission</dd>
+</div>
+</dl>
+<button matbutton="filled" disabled="true" class="mdc-button mat-mdc-button-base mdc-button--unelevated mat-mdc-unelevated-button mat-mdc-button-disabled mat-unthemed" mat-ripple-loader-uninitialized="" mat-ripple-loader-class-name="mat-mdc-button-ripple" mat-ripple-loader-disabled="">
+<span class="mat-mdc-button-persistent-ripple mdc-button__ripple">
+</span>
+<span class="mdc-button__label">Submit Run</span>
+<span class="mat-focus-indicator">
+</span>
+<span class="mat-mdc-button-touch-target">
+</span>
+</button>
+</div>
+</article>
+</div>
+<aside class="source">
+<strong>Contract boundary</strong>
+<p>Catalog completeness requires PR19/21. Free text for exact references is not proof of approval. This creates an independent Run.</p>
+</aside>
+<nav aria-label="Related design fixtures" class="related">
+<a href="lookup.html">Find a Run</a>
+<a href="catalog.html">Catalog and registry</a>
+<a href="run.html">Run detail</a>
+</nav>
+</main>
+</div>
+<div id="announcement" role="status" class="sr">
+</div></body></html>

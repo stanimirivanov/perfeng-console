@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src &apos;none&apos;; style-src &apos;self&apos;; connect-src &apos;none&apos;; form-action &apos;none&apos;; base-uri &apos;none&apos;">
+<title>Find a Run · Perfeng wireframes</title>
+<link rel="stylesheet" href="wireframes.css">
+<body>
+<header>
+<div class="labels">DESIGN FIXTURE ONLY · STATIC REVIEW</div>
+<a href="index.html">Screen directory</a>
+</header>
+<main>
+<p class="labels">Runs</p>
+<h1>Find a Run</h1>
+<p>I have a Run ID. Where is its record?</p>
+<nav class="states" aria-label="Review alternate screen states">
+<a href="#example">Example</a>
+<a href="#empty">Empty</a>
+<a href="#loading">Loading</a>
+<a href="#error">Error</a>
+<a href="#unavailable">Backend unavailable</a>
+<a href="#unknown">UNKNOWN value</a>
+</nav>
+<div class="workspace">
+<aside class="rail">
+<h2>Console</h2>
+<nav aria-label="Product sections">
+<a href="lookup.html">Find a Run</a>
+<a href="create.html">Create a Run</a>
+<a href="catalog.html">Catalog and registry</a>
+<a href="baseline.html">Baseline lifecycle</a>
+<a href="health.html">Platform health</a>
+<a href="workers.html">Native workers</a>
+<a href="gaps.html">Observability gaps</a>
+</nav>
+</aside>
+<div class="pane variants">
+<article class="state example" id="example">
+<div class="framehead">
+<strong>Find a Run</strong> · Example</div>
+<section>
+<h2>Open an exact Run</h2>
+<dl>
+<div>
+<dt>Run ID</dt>
+<dd>perf-20260902-130000-a1b2c3d5</dd>
+</div>
+</dl>
+<a href="run.html">Inspect this example Run</a>
+</section>
+<section>
+<h2>Run history</h2>
+<p>NOT OBSERVABLE · A collection read and scoped pagination are missing (G04).</p>
+</section>
+</article>
+<article class="state " id="empty">
+<div class="framehead">
+<strong>Find a Run</strong> · Empty</div>
+<section>
+<h2>Empty</h2>
+<p>Enter an ID or follow a CI link. No inventory count.</p>
+</section>
+</article>
+<article class="state " id="loading">
+<div class="framehead">
+<strong>Find a Run</strong> · Loading</div>
+<section>
+<h2>Loading</h2>
+<p>Looking up this exact ID; clear the previous result.</p>
+</section>
+</article>
+<article class="state " id="error">
+<div class="framehead">
+<strong>Find a Run</strong> · Error</div>
+<section>
+<h2>Error</h2>
+<p>Scoped not-found or inaccessible. Check the link or ID.</p>
+</section>
+</article>
+<article class="state " id="unavailable">
+<div class="framehead">
+<strong>Find a Run</strong> · Backend unavailable</div>
+<section>
+<h2>Backend unavailable</h2>
+<p>Control plane unavailable. Keep typed input only.</p>
+</section>
+</article>
+<article class="state " id="unknown">
+<div class="framehead">
+<strong>Find a Run</strong> · UNKNOWN value</div>
+<section>
+<h2>UNKNOWN value</h2>
+<p>A missing service binding is UNKNOWN. Do not guess from the ID.</p>
+</section>
+<dl>
+<div>
+<dt>Service binding</dt>
+<dd>UNKNOWN</dd>
+</div>
+<div>
+<dt>Reason</dt>
+<dd>No assumed service from Run ID</dd>
+</div>
+</dl>
+</article>
+</div>
+</div>
+<section class="aside">
+<strong>Contract boundary</strong>
+<p>G04: no Run collection GET, filter, history or trend query. A CI link skips lookup.</p>
+</section>
+<nav aria-label="Related screen sketches">
+<a href="run.html">Run detail</a>
+<a href="create.html">Create a Run</a>
+</nav>
+</main>
+<footer>Every value and state on this page is an inert design fixture. Preview links never perform an operation.</footer>
+</body>
+</html>

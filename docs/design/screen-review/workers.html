@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src &apos;none&apos;; style-src &apos;self&apos;; connect-src &apos;none&apos;; form-action &apos;none&apos;; base-uri &apos;none&apos;">
+<title>Native workers · Perfeng wireframes</title>
+<link rel="stylesheet" href="wireframes.css">
+<body>
+<header>
+<div class="labels">DESIGN FIXTURE ONLY · STATIC REVIEW</div>
+<a href="index.html">Screen directory</a>
+</header>
+<main>
+<p class="labels">Diagnostics</p>
+<h1>Native workers</h1>
+<p>Can I see which worker owns a live attempt or upload reservation?</p>
+<nav class="states" aria-label="Review alternate screen states">
+<a href="#example">Example</a>
+<a href="#empty">Empty</a>
+<a href="#loading">Loading</a>
+<a href="#error">Error</a>
+<a href="#unavailable">Backend unavailable</a>
+<a href="#unknown">UNKNOWN value</a>
+</nav>
+<div class="workspace">
+<aside class="rail">
+<h2>Console</h2>
+<nav aria-label="Product sections">
+<a href="lookup.html">Find a Run</a>
+<a href="create.html">Create a Run</a>
+<a href="catalog.html">Catalog and registry</a>
+<a href="baseline.html">Baseline lifecycle</a>
+<a href="health.html">Platform health</a>
+<a href="workers.html">Native workers</a>
+<a href="gaps.html">Observability gaps</a>
+</nav>
+</aside>
+<div class="pane variants">
+<article class="state example" id="example">
+<div class="framehead">
+<strong>Native workers</strong> · Example</div>
+<section>
+<h2>Operator view</h2>
+<div class="scroll">
+<table>
+<thead>
+<tr>
+<th scope="col">Observation</th>
+<th scope="col">Evidence</th>
+<th scope="col">Required read</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Presence</td>
+<td>NOT OBSERVABLE</td>
+<td>Scoped last-seen inventory</td>
+</tr>
+<tr>
+<td>Lease</td>
+<td>NOT OBSERVABLE</td>
+<td>Attempt and expiry metadata</td>
+</tr>
+<tr>
+<td>Upload reservation</td>
+<td>NOT OBSERVABLE</td>
+<td>Redacted operator reservation read</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<p>Navigation performs zero worker operations. Lease capabilities and signed grants cannot enter this view.</p>
+</article>
+<article class="state " id="empty">
+<div class="framehead">
+<strong>Native workers</strong> · Empty</div>
+<section>
+<h2>Empty</h2>
+<p>Inventory absent: NOT OBSERVABLE. Never infer zero workers.</p>
+</section>
+</article>
+<article class="state " id="loading">
+<div class="framehead">
+<strong>Native workers</strong> · Loading</div>
+<section>
+<h2>Loading</h2>
+<p>Checking supported operator capabilities only.</p>
+</section>
+</article>
+<article class="state " id="error">
+<div class="framehead">
+<strong>Native workers</strong> · Error</div>
+<section>
+<h2>Error</h2>
+<p>Forbidden: do not probe worker credentials or infer existence.</p>
+</section>
+</article>
+<article class="state " id="unavailable">
+<div class="framehead">
+<strong>Native workers</strong> · Backend unavailable</div>
+<section>
+<h2>Backend unavailable</h2>
+<p>Provider unavailable; show no worker or lease rows.</p>
+</section>
+</article>
+<article class="state " id="unknown">
+<div class="framehead">
+<strong>Native workers</strong> · UNKNOWN value</div>
+<section>
+<h2>UNKNOWN value</h2>
+<p>Last-seen age UNKNOWN; avoid an online/offline classification.</p>
+</section>
+<dl>
+<div>
+<dt>Last-seen age</dt>
+<dd>UNKNOWN</dd>
+</div>
+<div>
+<dt>Reason</dt>
+<dd>No authorized inventory read</dd>
+</div>
+</dl>
+</article>
+</div>
+</div>
+<section class="aside">
+<strong>Contract boundary</strong>
+<p>G09 needs scoped operator read projection for presence, age, lease expiry, attempt and reservation status, excluding capabilities/grants.</p>
+</section>
+<nav aria-label="Related screen sketches">
+<a href="health.html">Platform health</a>
+<a href="gaps.html">Observability gaps</a>
+</nav>
+</main>
+<footer>Every value and state on this page is an inert design fixture. Preview links never perform an operation.</footer>
+</body>
+</html>

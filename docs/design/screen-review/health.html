@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src &apos;none&apos;; style-src &apos;self&apos;; connect-src &apos;none&apos;; form-action &apos;none&apos;; base-uri &apos;none&apos;">
+<title>Platform health · Perfeng wireframes</title>
+<link rel="stylesheet" href="wireframes.css">
+<body>
+<header>
+<div class="labels">DESIGN FIXTURE ONLY · STATIC REVIEW</div>
+<a href="index.html">Screen directory</a>
+</header>
+<main>
+<p class="labels">Diagnostics</p>
+<h1>Platform health</h1>
+<p>Is the control plane serving, and what can I actually verify?</p>
+<nav class="states" aria-label="Review alternate screen states">
+<a href="#example">Example</a>
+<a href="#empty">Empty</a>
+<a href="#loading">Loading</a>
+<a href="#error">Error</a>
+<a href="#unavailable">Backend unavailable</a>
+<a href="#unknown">UNKNOWN value</a>
+</nav>
+<div class="workspace">
+<aside class="rail">
+<h2>Console</h2>
+<nav aria-label="Product sections">
+<a href="lookup.html">Find a Run</a>
+<a href="create.html">Create a Run</a>
+<a href="catalog.html">Catalog and registry</a>
+<a href="baseline.html">Baseline lifecycle</a>
+<a href="health.html">Platform health</a>
+<a href="workers.html">Native workers</a>
+<a href="gaps.html">Observability gaps</a>
+</nav>
+</aside>
+<div class="pane variants">
+<article class="state example" id="example">
+<div class="framehead">
+<strong>Platform health</strong> · Example</div>
+<section>
+<h2>Serving signals</h2>
+<dl>
+<div>
+<dt>Liveness</dt>
+<dd>200 · ok</dd>
+</div>
+<div>
+<dt>Readiness</dt>
+<dd>200 · ok (startup signal)</dd>
+</div>
+<div>
+<dt>perfeng_control_plane_ready</dt>
+<dd>1</dd>
+</div>
+<div>
+<dt>perfeng_control_plane_http_requests_in_flight</dt>
+<dd>2</dd>
+</div>
+</dl>
+</section>
+<section>
+<h2>Dependency state</h2>
+<div class="scroll">
+<table>
+<thead>
+<tr>
+<th scope="col">Dependency</th>
+<th scope="col">Observation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Database</td>
+<td>NOT OBSERVABLE</td>
+</tr>
+<tr>
+<td>Artifact store</td>
+<td>NOT OBSERVABLE</td>
+</tr>
+<tr>
+<td>Runner dispatch</td>
+<td>NOT OBSERVABLE</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</article>
+<article class="state " id="empty">
+<div class="framehead">
+<strong>Platform health</strong> · Empty</div>
+<section>
+<h2>Empty</h2>
+<p>No metric samples in this observation window.</p>
+</section>
+</article>
+<article class="state " id="loading">
+<div class="framehead">
+<strong>Platform health</strong> · Loading</div>
+<section>
+<h2>Loading</h2>
+<p>Probing operational endpoints independently.</p>
+</section>
+</article>
+<article class="state " id="error">
+<div class="framehead">
+<strong>Platform health</strong> · Error</div>
+<section>
+<h2>Error</h2>
+<p>Malformed metrics response. Reject affected series.</p>
+</section>
+</article>
+<article class="state " id="unavailable">
+<div class="framehead">
+<strong>Platform health</strong> · Backend unavailable</div>
+<section>
+<h2>Backend unavailable</h2>
+<p>Show CP unavailable and clear samples; no last-good green cards.</p>
+</section>
+</article>
+<article class="state " id="unknown">
+<div class="framehead">
+<strong>Platform health</strong> · UNKNOWN value</div>
+<section>
+<h2>UNKNOWN value</h2>
+<p>Database and artifact-store health UNKNOWN; ready is a startup signal.</p>
+</section>
+<dl>
+<div>
+<dt>Storage dependency</dt>
+<dd>UNKNOWN</dd>
+</div>
+<div>
+<dt>Reason</dt>
+<dd>Startup ready signal is insufficient</dd>
+</div>
+</dl>
+</article>
+</div>
+</div>
+<section class="aside">
+<strong>Contract boundary</strong>
+<p>G01 typed operational API pending. G02 dependency state/deployed version absent. Service metrics do not describe workload performance.</p>
+</section>
+<nav aria-label="Related screen sketches">
+<a href="gaps.html">Observability gaps</a>
+<a href="workers.html">Native workers</a>
+</nav>
+</main>
+<footer>Every value and state on this page is an inert design fixture. Preview links never perform an operation.</footer>
+</body>
+</html>

@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src &apos;none&apos;; style-src &apos;self&apos;; connect-src &apos;none&apos;; form-action &apos;none&apos;; base-uri &apos;none&apos;">
+<title>Review rerun · Perfeng wireframes</title>
+<link rel="stylesheet" href="wireframes.css">
+<body>
+<header>
+<div class="labels">DESIGN FIXTURE ONLY · STATIC REVIEW</div>
+<a href="index.html">Screen directory</a>
+</header>
+<main>
+<p class="labels">Runs</p>
+<h1>Review rerun</h1>
+<p>Can I repeat this Run with the same commit, suite and approved reference?</p>
+<nav class="states" aria-label="Review alternate screen states">
+<a href="#example">Example</a>
+<a href="#empty">Empty</a>
+<a href="#loading">Loading</a>
+<a href="#error">Error</a>
+<a href="#unavailable">Backend unavailable</a>
+<a href="#unknown">UNKNOWN value</a>
+</nav>
+<div class="workspace">
+<aside class="rail">
+<h2>Console</h2>
+<nav aria-label="Product sections">
+<a href="lookup.html">Find a Run</a>
+<a href="create.html">Create a Run</a>
+<a href="catalog.html">Catalog and registry</a>
+<a href="baseline.html">Baseline lifecycle</a>
+<a href="health.html">Platform health</a>
+<a href="workers.html">Native workers</a>
+<a href="gaps.html">Observability gaps</a>
+</nav>
+</aside>
+<div class="pane variants">
+<article class="state example" id="example">
+<div class="framehead">
+<strong>Review rerun</strong> · Example</div>
+<section>
+<h2>Immutable source selection</h2>
+<dl>
+<div>
+<dt>Source Run</dt>
+<dd>perf-20260902-130000-a1b2c3d5</dd>
+</div>
+<div>
+<dt>Service / requester (planned)</dt>
+<dd>Search / Maya</dd>
+</div>
+<div>
+<dt>Suite / profile</dt>
+<dd>search-browser / regression</dd>
+</div>
+<div>
+<dt>Candidate revision</dt>
+<dd>7a0bc14…</dd>
+</div>
+<div>
+<dt>Historical baseline</dt>
+<dd>approved-search-browser @ 1.0.0</dd>
+</div>
+<div>
+<dt>Baseline artifact SHA-256 (shortened)</dt>
+<dd>9430060da3f6…</dd>
+</div>
+<div>
+<dt>Policy SHA-256 (shortened)</dt>
+<dd>566a9d13e277…</dd>
+</div>
+</dl>
+</section>
+<section>
+<h2>Review intent</h2>
+<p>A new intent requests one real child Run. Recheck current service rights and source approval on the server. PR49–51 required.</p>
+<button disabled>Confirm rerun</button>
+<a href="receipt.html">Preview accepted receipt</a>
+</section>
+</article>
+<article class="state " id="empty">
+<div class="framehead">
+<strong>Review rerun</strong> · Empty</div>
+<section>
+<h2>Empty</h2>
+<p>No source chosen. Return to Run detail.</p>
+</section>
+<button disabled>Confirm rerun</button>
+</article>
+<article class="state " id="loading">
+<div class="framehead">
+<strong>Review rerun</strong> · Loading</div>
+<section>
+<h2>Loading</h2>
+<p>Revalidating exact references and Maya’s permission.</p>
+</section>
+<button disabled>Confirm rerun</button>
+</article>
+<article class="state " id="error">
+<div class="framehead">
+<strong>Review rerun</strong> · Error</div>
+<section>
+<h2>Error</h2>
+<p>Reference withdrawn or grant revoked. Explain refusal; offer return to source.</p>
+</section>
+<button disabled>Confirm rerun</button>
+</article>
+<article class="state " id="unavailable">
+<div class="framehead">
+<strong>Review rerun</strong> · Backend unavailable</div>
+<section>
+<h2>Backend unavailable</h2>
+<p>Disable dispatch. If delivery already attempted, reconcile outcome before retry.</p>
+</section>
+<button disabled>Confirm rerun</button>
+</article>
+<article class="state " id="unknown">
+<div class="framehead">
+<strong>Review rerun</strong> · UNKNOWN value</div>
+<section>
+<h2>UNKNOWN value</h2>
+<p>Baseline identity UNKNOWN; rerun cannot be safely submitted.</p>
+</section>
+<dl>
+<div>
+<dt>Exact approved reference</dt>
+<dd>UNKNOWN</dd>
+</div>
+<div>
+<dt>Reason</dt>
+<dd>Historical selector missing</dd>
+</div>
+</dl>
+<button disabled>Confirm rerun</button>
+</article>
+</div>
+</div>
+<section class="aside">
+<strong>Contract boundary</strong>
+<p>PR49/51/54 exact rerun + lineage and current authority; native createRun has no source-run or explicit baseline binding.</p>
+</section>
+<nav aria-label="Related screen sketches">
+<a href="receipt.html">Rerun receipt</a>
+<a href="report.html">Baseline comparison and report</a>
+<a href="run.html">Run detail</a>
+</nav>
+</main>
+<footer>Every value and state on this page is an inert design fixture. Preview links never perform an operation.</footer>
+</body>
+</html>

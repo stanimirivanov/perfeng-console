@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src &apos;none&apos;; style-src &apos;self&apos;; connect-src &apos;none&apos;; form-action &apos;none&apos;; base-uri &apos;none&apos;">
+<title>Observability gaps · Perfeng wireframes</title>
+<link rel="stylesheet" href="wireframes.css">
+<body>
+<header>
+<div class="labels">DESIGN FIXTURE ONLY · STATIC REVIEW</div>
+<a href="index.html">Screen directory</a>
+</header>
+<main>
+<p class="labels">Diagnostics</p>
+<h1>Observability gaps</h1>
+<p>Which missing capability prevents this answer, and who owns it?</p>
+<nav class="states" aria-label="Review alternate screen states">
+<a href="#example">Example</a>
+<a href="#empty">Empty</a>
+<a href="#loading">Loading</a>
+<a href="#error">Error</a>
+<a href="#unavailable">Backend unavailable</a>
+<a href="#unknown">UNKNOWN value</a>
+</nav>
+<div class="workspace">
+<aside class="rail">
+<h2>Console</h2>
+<nav aria-label="Product sections">
+<a href="lookup.html">Find a Run</a>
+<a href="create.html">Create a Run</a>
+<a href="catalog.html">Catalog and registry</a>
+<a href="baseline.html">Baseline lifecycle</a>
+<a href="health.html">Platform health</a>
+<a href="workers.html">Native workers</a>
+<a href="gaps.html">Observability gaps</a>
+</nav>
+</aside>
+<div class="pane variants">
+<article class="state example" id="example">
+<div class="framehead">
+<strong>Observability gaps</strong> · Example</div>
+<section>
+<h2>Coverage inventory</h2>
+<div class="scroll">
+<table>
+<thead>
+<tr>
+<th scope="col">ID</th>
+<th scope="col">Missing observation</th>
+<th scope="col">Owner</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>G01</td>
+<td>Operational/catalog OpenAPI</td>
+<td>Contracts + CP</td>
+</tr>
+<tr>
+<td>G02</td>
+<td>Dynamic dependency state and release identity</td>
+<td>CP</td>
+</tr>
+<tr>
+<td>G03</td>
+<td>Registry publication attestation</td>
+<td>CP</td>
+</tr>
+<tr>
+<td>G04</td>
+<td>Scoped Run/baseline lists</td>
+<td>CP</td>
+</tr>
+<tr>
+<td>G05</td>
+<td>Durable Run events and execution identity</td>
+<td>CP</td>
+</tr>
+<tr>
+<td>G06</td>
+<td>Authorized artifact bytes and run-used policy</td>
+<td>CP + contracts</td>
+</tr>
+<tr>
+<td>G07</td>
+<td>Verified provenance and approved source binding</td>
+<td>CP</td>
+</tr>
+<tr>
+<td>G08</td>
+<td>Overall verdict, WARN semantics, diagnostics</td>
+<td>Analysis + contracts</td>
+</tr>
+<tr>
+<td>G09</td>
+<td>Operator-safe worker, lease and reservation reads</td>
+<td>CP</td>
+</tr>
+<tr>
+<td>G10</td>
+<td>Historical metrics and reanalysis</td>
+<td>CP + analysis</td>
+</tr>
+<tr>
+<td>G11</td>
+<td>Statistical/localization evidence</td>
+<td>Analysis</td>
+</tr>
+<tr>
+<td>G12</td>
+<td>CP-mediated Argus selection evidence</td>
+<td>CP + Argus</td>
+</tr>
+<tr>
+<td>G13</td>
+<td>Measurement completeness and qualification</td>
+<td>Runners + environment</td>
+</tr>
+<tr>
+<td>G14</td>
+<td>Production recovery/retention evidence</td>
+<td>M06 owners</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<p>Static review metadata. A provider outage changes live overlays only.</p>
+</article>
+<article class="state " id="empty">
+<div class="framehead">
+<strong>Observability gaps</strong> · Empty</div>
+<section>
+<h2>Empty</h2>
+<p>No entries match this filter; not proof of complete platform.</p>
+</section>
+</article>
+<article class="state " id="loading">
+<div class="framehead">
+<strong>Observability gaps</strong> · Loading</div>
+<section>
+<h2>Loading</h2>
+<p>Static inventory remains readable; live overlays loading.</p>
+</section>
+</article>
+<article class="state " id="error">
+<div class="framehead">
+<strong>Observability gaps</strong> · Error</div>
+<section>
+<h2>Error</h2>
+<p>Unmapped field. Flag traceability error rather than invent a gap ID.</p>
+</section>
+</article>
+<article class="state " id="unavailable">
+<div class="framehead">
+<strong>Observability gaps</strong> · Backend unavailable</div>
+<section>
+<h2>Backend unavailable</h2>
+<p>Static gap definitions remain visible; live overlays are unavailable.</p>
+</section>
+<section>
+<h2>Static gap definitions</h2>
+<div class="scroll">
+<table>
+<thead>
+<tr>
+<th scope="col">Gap</th>
+<th scope="col">Needed observation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>G01</td>
+<td>Operational/catalog OpenAPI</td>
+</tr>
+<tr>
+<td>G02</td>
+<td>Dynamic dependency state and release identity</td>
+</tr>
+<tr>
+<td>G03</td>
+<td>Registry publication attestation</td>
+</tr>
+<tr>
+<td>G04</td>
+<td>Scoped Run/baseline lists</td>
+</tr>
+<tr>
+<td>G05</td>
+<td>Durable Run events and execution identity</td>
+</tr>
+<tr>
+<td>G06</td>
+<td>Authorized artifact bytes and run-used policy</td>
+</tr>
+<tr>
+<td>G07</td>
+<td>Verified provenance and approved source binding</td>
+</tr>
+<tr>
+<td>G08</td>
+<td>Overall verdict, WARN semantics, diagnostics</td>
+</tr>
+<tr>
+<td>G09</td>
+<td>Operator-safe worker, lease and reservation reads</td>
+</tr>
+<tr>
+<td>G10</td>
+<td>Historical metrics and reanalysis</td>
+</tr>
+<tr>
+<td>G11</td>
+<td>Statistical/localization evidence</td>
+</tr>
+<tr>
+<td>G12</td>
+<td>CP-mediated Argus selection evidence</td>
+</tr>
+<tr>
+<td>G13</td>
+<td>Measurement completeness and qualification</td>
+</tr>
+<tr>
+<td>G14</td>
+<td>Production recovery/retention evidence</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</article>
+<article class="state " id="unknown">
+<div class="framehead">
+<strong>Observability gaps</strong> · UNKNOWN value</div>
+<section>
+<h2>UNKNOWN value</h2>
+<p>Deployment evidence UNKNOWN until the responsible provider supplies it.</p>
+</section>
+<dl>
+<div>
+<dt>Deployment verification</dt>
+<dd>UNKNOWN</dd>
+</div>
+<div>
+<dt>Reason</dt>
+<dd>Static audit metadata only</dd>
+</div>
+</dl>
+</article>
+</div>
+</div>
+<section class="aside">
+<strong>Contract boundary</strong>
+<p>Gap inventory is design metadata. Implementation, deployment, live proof and scientific adequacy are separate dimensions.</p>
+</section>
+<nav aria-label="Related screen sketches">
+<a href="run.html">Run detail</a>
+<a href="health.html">Platform health</a>
+<a href="workers.html">Native workers</a>
+</nav>
+</main>
+<footer>Every value and state on this page is an inert design fixture. Preview links never perform an operation.</footer>
+</body>
+</html>

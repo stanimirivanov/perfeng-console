@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="Content-Security-Policy" content="default-src &apos;none&apos;; script-src &apos;self&apos;; style-src &apos;self&apos;; connect-src &apos;none&apos;; form-action &apos;none&apos;; base-uri &apos;none&apos;"><title>Catalog and registry · Perfeng design fixtures</title><link rel="stylesheet" href="material.css"><link rel="stylesheet" href="review.css"><script defer src="review.js"></script></head><body><a href="#main" class="skip">Skip to content</a>
+<header>
+<mat-toolbar class="mat-toolbar mat-toolbar-single-row">
+<span class="brand">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">
+<path d="M3 18V8h4v10 M10 18V3h4v15 M17 18v-7h4v7">
+</path>
+</svg>Perfeng Console</span>
+<span class="top-end">Design fixture only</span>
+</mat-toolbar>
+</header>
+<div class="layout">
+<aside class="sidebar">
+<div class="rail-title">Workspace</div>
+<nav aria-label="Workspace navigation">
+<div class="nav-group">
+<div class="group">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">
+<path d="M3 6h18M3 12h12M3 18h16">
+</path>
+</svg>Runs</div>
+<a href="lookup.html">Find a Run</a>
+<a href="create.html">Create a Run</a>
+</div>
+<div class="nav-group">
+<div class="group">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">
+<path d="m12 3 9 5-9 5-9-5z M3 12l9 5 9-5M3 16l9 5 9-5">
+</path>
+</svg>Resources</div>
+<a href="catalog.html" aria-current="page">Catalog and registry</a>
+<a href="baseline.html">Baseline lifecycle</a>
+</div>
+<div class="nav-group">
+<div class="group">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">
+<path d="M2 13h5l3-8 4 14 3-8h5">
+</path>
+</svg>Diagnostics</div>
+<a href="health.html">Platform health</a>
+<a href="workers.html">Native workers</a>
+<a href="gaps.html">Observability gaps</a>
+</div>
+</nav>
+<div class="directory">
+<a href="index.html">Design directory</a>
+</div>
+</aside>
+<main id="main" tabindex="-1">
+<div class="crumb">Resources</div>
+<div class="title-row">
+<div>
+<h1>Catalog and registry</h1>
+<p class="question">Which published selections can my principal use?</p>
+</div>
+<label class="selector">Fixture state<select id="state">
+<option value="example">Example</option>
+<option value="empty">Empty</option>
+<option value="loading">Loading</option>
+<option value="error">Error</option>
+<option value="unavailable">Backend unavailable</option>
+<option value="unknown">UNKNOWN value</option>
+</select>
+</label>
+</div>
+<div class="content">
+<article id="example" aria-label="Example state" class="state">
+<mat-card appearance="outlined" class="mat-mdc-card mdc-card mat-mdc-card-outlined mdc-card--outlined">
+<mat-card-content class="mat-mdc-card-content">
+<h2>Authorized snapshot</h2>
+<dl>
+<div>
+<dt>Snapshot reference</dt>
+<dd>catalog-1</dd>
+</div>
+<div>
+<dt>Pages received</dt>
+<dd>2 / 2</dd>
+</div>
+<div>
+<dt>Principal</dt>
+<dd>argus-service</dd>
+</div>
+</dl>
+</mat-card-content>
+</mat-card>
+<mat-card appearance="outlined" class="mat-mdc-card mdc-card mat-mdc-card-outlined mdc-card--outlined">
+<mat-card-content class="mat-mdc-card-content">
+<h2>Published selections</h2>
+<div class="scroll">
+<table aria-label="Published selections">
+<thead>
+<tr>
+<th scope="col">Kind</th>
+<th scope="col">Name</th>
+<th scope="col">Revision</th>
+<th scope="col">State</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>workload</td>
+<td>checkout</td>
+<td>1</td>
+<td>
+<span class="badge ok">ACTIVE</span>
+</td>
+</tr>
+<tr>
+<td>profile</td>
+<td>checkout-smoke</td>
+<td>1</td>
+<td>
+<span class="badge ok">ACTIVE</span>
+</td>
+</tr>
+<tr>
+<td>environment</td>
+<td>staging</td>
+<td>1</td>
+<td>
+<span class="badge ok">ACTIVE</span>
+</td>
+</tr>
+<tr>
+<td>policy</td>
+<td>checkout-policy</td>
+<td>1</td>
+<td>
+<span class="badge ok">ACTIVE</span>
+</td>
+</tr>
+<tr>
+<td>owner-route</td>
+<td>checkout-owner</td>
+<td>1</td>
+<td>
+<span class="badge ok">ACTIVE</span>
+</td>
+</tr>
+<tr>
+<td>baseline</td>
+<td>approved-baseline</td>
+<td>1</td>
+<td>
+<span class="badge ok">APPROVED</span>
+</td>
+</tr>
+<tr>
+<td>baseline</td>
+<td>candidate-baseline</td>
+<td>1</td>
+<td>CANDIDATE</td>
+</tr>
+<tr>
+<td>baseline</td>
+<td>retired-baseline</td>
+<td>1</td>
+<td>
+<span class="badge info">RETIRED</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</mat-card-content>
+</mat-card>
+<p>Wireframe depicts the fixture at observation time. Registry attestation remains NOT OBSERVABLE.</p>
+</article>
+<article id="empty" aria-label="Empty state" hidden="" class="state">
+<div class="message">
+<span class="badge">Empty</span>
+<mat-card appearance="outlined" class="mat-mdc-card mdc-card mat-mdc-card-outlined mdc-card--outlined">
+<mat-card-content class="mat-mdc-card-content">
+<h2>Empty</h2>
+<p>Validated complete snapshot, totalItems = 0. No selectable resources.</p>
+</mat-card-content>
+</mat-card>
+</div>
+</article>
+<article id="loading" aria-label="Loading state" hidden="" class="state">
+<div class="message">
+<span class="badge">Loading</span>
+<mat-card appearance="outlined" class="mat-mdc-card mdc-card mat-mdc-card-outlined mdc-card--outlined">
+<mat-card-content class="mat-mdc-card-content">
+<h2>Loading</h2>
+<p>Collecting all pages; keep rows hidden until closure verified.</p>
+</mat-card-content>
+</mat-card>
+</div>
+</article>
+<article id="error" aria-label="Error state" hidden="" class="state">
+<div class="message danger">
+<span class="badge">Error</span>
+<mat-card appearance="outlined" class="mat-mdc-card mdc-card mat-mdc-card-outlined mdc-card--outlined">
+<mat-card-content class="mat-mdc-card-content">
+<h2>Error</h2>
+<p>Cursor expired or page digest conflicts. Discard all pages and restart.</p>
+</mat-card-content>
+</mat-card>
+</div>
+</article>
+<article id="unavailable" aria-label="Backend unavailable state" hidden="" class="state">
+<div class="message danger">
+<span class="badge">Backend unavailable</span>
+<mat-card appearance="outlined" class="mat-mdc-card mdc-card mat-mdc-card-outlined mdc-card--outlined">
+<mat-card-content class="mat-mdc-card-content">
+<h2>Backend unavailable</h2>
+<p>Clear rows and disable choices.</p>
+</mat-card-content>
+</mat-card>
+</div>
+</article>
+<article id="unknown" aria-label="UNKNOWN value state" hidden="" class="state">
+<div class="message">
+<span class="badge">UNKNOWN value</span>
+<mat-card appearance="outlined" class="mat-mdc-card mdc-card mat-mdc-card-outlined mdc-card--outlined">
+<mat-card-content class="mat-mdc-card-content">
+<h2>UNKNOWN value</h2>
+<p>Registry attestation UNKNOWN despite a valid catalog snapshot.</p>
+</mat-card-content>
+</mat-card>
+<dl>
+<div>
+<dt>Attestation</dt>
+<dd>UNKNOWN</dd>
+</div>
+<div>
+<dt>Reason</dt>
+<dd>A valid page cannot prove registry authenticity</dd>
+</div>
+</dl>
+</div>
+</article>
+</div>
+<aside class="source">
+<strong>Contract boundary</strong>
+<p>G01 typed HTTP contract pending; G03 registry freshness/attestation. Only full coherent same-principal snapshot selectable.</p>
+</aside>
+<nav aria-label="Related design fixtures" class="related">
+<a href="create.html">Create a Run</a>
+<a href="baseline.html">Baseline lifecycle</a>
+<a href="onboard.html">Service onboarding proposal</a>
+<a href="gaps.html">Observability gaps</a>
+</nav>
+</main>
+</div>
+<div id="announcement" role="status" class="sr">
+</div></body></html>

@@ -2,4 +2,6 @@
 
 Render accessible, escaped view models. Read only same-origin BFF routes. Clear expired provider values. Keep bearer credentials, storage grants, server imports and shell authority out of the browser.
 
+Build production components from [ADR 0002](../../docs/decisions/0002-ui-technology-stack.md) and the pinned contracts. Preserve the approved workflows, evidence states, and keyboard and focus behavior. Do not copy the gallery’s exported markup, styles, scripts or fixture data into the application. See the [design implementation guidance](../../docs/design/material-review/README.md#implementation-guidance).
+
 Read the [layer matrix](../../HARNESS.md) and run `make architecture` after changing dependencies.

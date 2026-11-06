@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="Content-Security-Policy" content="default-src &apos;none&apos;; script-src &apos;self&apos;; style-src &apos;self&apos;; connect-src &apos;none&apos;; form-action &apos;none&apos;; base-uri &apos;none&apos;"><title>Run detail · Perfeng design fixtures</title><link rel="stylesheet" href="material.css"><link rel="stylesheet" href="review.css"><script defer src="review.js"></script></head><body><a href="#main" class="skip">Skip to content</a>
+<header>
+<mat-toolbar class="mat-toolbar mat-toolbar-single-row">
+<span class="brand">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">
+<path d="M3 18V8h4v10 M10 18V3h4v15 M17 18v-7h4v7">
+</path>
+</svg>Perfeng Console</span>
+<span class="top-end">Design fixture only</span>
+</mat-toolbar>
+</header>
+<div class="layout">
+<aside class="sidebar">
+<div class="rail-title">Workspace</div>
+<nav aria-label="Workspace navigation">
+<div class="nav-group">
+<div class="group">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">
+<path d="M3 6h18M3 12h12M3 18h16">
+</path>
+</svg>Runs</div>
+<a href="lookup.html">Find a Run</a>
+<a href="create.html">Create a Run</a>
+</div>
+<div class="nav-group">
+<div class="group">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">
+<path d="m12 3 9 5-9 5-9-5z M3 12l9 5 9-5M3 16l9 5 9-5">
+</path>
+</svg>Resources</div>
+<a href="catalog.html">Catalog and registry</a>
+<a href="baseline.html">Baseline lifecycle</a>
+</div>
+<div class="nav-group">
+<div class="group">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">
+<path d="M2 13h5l3-8 4 14 3-8h5">
+</path>
+</svg>Diagnostics</div>
+<a href="health.html">Platform health</a>
+<a href="workers.html">Native workers</a>
+<a href="gaps.html">Observability gaps</a>
+</div>
+</nav>
+<div class="directory">
+<a href="index.html">Design directory</a>
+</div>
+</aside>
+<main id="main" tabindex="-1">
+<div class="crumb">Runs</div>
+<div class="title-row">
+<div>
+<h1>Run detail</h1>
+<p class="question">What ran, did execution complete, and what evidence can I inspect?</p>
+</div>
+<label class="selector">Fixture state<select id="state">
+<option value="example">Example</option>
+<option value="empty">Empty</option>
+<option value="loading">Loading</option>
+<option value="error">Error</option>
+<option value="unavailable">Backend unavailable</option>
+<option value="unknown">UNKNOWN value</option>
+</select>
+</label>
+</div>
+<div class="content">
+<article id="example" aria-label="Example state" class="state">
+<div class="summary">
+<h2>search-browser</h2>
+<span class="badge ok">Execution · COMPLETED</span>
+<p>The run completed. Inspect the failing regression rule separately.</p>
+<a href="report.html" matbutton="filled" class="mdc-button mat-mdc-button-base mdc-button--unelevated mat-mdc-unelevated-button mat-unthemed" mat-ripple-loader-uninitialized="" mat-ripple-loader-class-name="mat-mdc-button-ripple">
+<span class="mat-mdc-button-persistent-ripple mdc-button__ripple">
+</span>
+<span class="mdc-button__label">Open baseline comparison</span>
+<span class="mat-focus-indicator">
+</span>
+<span class="mat-mdc-button-touch-target">
+</span>
+</a>
+</div>
+<mat-card appearance="outlined" class="mat-mdc-card mdc-card mat-mdc-card-outlined mdc-card--outlined">
+<mat-card-content class="mat-mdc-card-content">
+<h2>Execution</h2>
+<dl>
+<div>
+<dt>Run ID</dt>
+<dd>perf-20260902-130000-a1b2c3d5</dd>
+</div>
+<div>
+<dt>Current state</dt>
+<dd>COMPLETED</dd>
+</div>
+<div>
+<dt>Revision</dt>
+<dd>9</dd>
+</div>
+<div>
+<dt>Suite</dt>
+<dd>search-browser</dd>
+</div>
+<div>
+<dt>Candidate commit (abbreviated)</dt>
+<dd>7a0bc14…</dd>
+</div>
+<div>
+<dt>Profile</dt>
+<dd>regression</dd>
+</div>
+<div>
+<dt>Failure</dt>
+<dd>None reported</dd>
+</div>
+</dl>
+</mat-card-content>
+</mat-card>
+<mat-card appearance="outlined" class="mat-mdc-card mdc-card mat-mdc-card-outlined mdc-card--outlined">
+<mat-card-content class="mat-mdc-card-content">
+<h2>Comparison</h2>
+<p>Execution completed. The report separately records a failing regression rule.</p>
+<a matbutton="outlined" href="report.html" class="mdc-button mat-mdc-button-base mdc-button--outlined mat-mdc-outlined-button mat-unthemed" mat-ripple-loader-uninitialized="" mat-ripple-loader-class-name="mat-mdc-button-ripple">
+<span class="mat-mdc-button-persistent-ripple mdc-button__ripple">
+</span>
+<span class="mdc-button__label">Inspect approved baseline comparison</span>
+<span class="mat-focus-indicator">
+</span>
+<span class="mat-mdc-button-touch-target">
+</span>
+</a>
+</mat-card-content>
+</mat-card>
+<mat-card appearance="outlined" class="mat-mdc-card mdc-card mat-mdc-card-outlined mdc-card--outlined">
+<mat-card-content class="mat-mdc-card-content">
+<h2>Observed revisions</h2>
+<div class="scroll">
+<table aria-label="Observed revisions">
+<thead>
+<tr>
+<th scope="col">Revision</th>
+<th scope="col">State</th>
+<th scope="col">Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>9</td>
+<td>COMPLETED</td>
+<td>Latest snapshot only</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Durable event history and stage durations: NOT OBSERVABLE (G05).</p>
+</mat-card-content>
+</mat-card>
+<mat-card appearance="outlined" class="mat-mdc-card mdc-card mat-mdc-card-outlined mdc-card--outlined">
+<mat-card-content class="mat-mdc-card-content">
+<h2>Allowed next states</h2>
+<p>Terminal state. No outgoing transitions.</p>
+</mat-card-content>
+</mat-card>
+<mat-card appearance="outlined" class="mat-mdc-card mdc-card mat-mdc-card-outlined mdc-card--outlined">
+<mat-card-content class="mat-mdc-card-content">
+<h2>Artifact claims</h2>
+<div class="scroll">
+<table aria-label="Artifact claims">
+<thead>
+<tr>
+<th scope="col">ID (shortened)</th>
+<th scope="col">Kind</th>
+<th scope="col">Format</th>
+<th scope="col">Claimed SHA-256 (shortened)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>44444444…</td>
+<td>normalized</td>
+<td>normalized-result/v1</td>
+<td>586619a56a91…</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>A registered checksum is a claim. Protected bytes and verified provenance need PR25–28.</p>
+</mat-card-content>
+</mat-card>
+<mat-card appearance="outlined" class="mat-mdc-card mdc-card mat-mdc-card-outlined mdc-card--outlined">
+<mat-card-content class="mat-mdc-card-content">
+<h2>Provenance</h2>
+<div class="scroll">
+<table aria-label="Provenance">
+<thead>
+<tr>
+<th scope="col">Stage</th>
+<th scope="col">Proof</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Raw</td>
+<td>NOT OBSERVABLE · verified content read required</td>
+</tr>
+<tr>
+<td>Normalized</td>
+<td>Registered reference; verify bytes before linking</td>
+</tr>
+<tr>
+<td>Report</td>
+<td>PR46–48 bind candidate, reference and policy</td>
+</tr>
+</tbody>
+</table>
+</div>
+</mat-card-content>
+</mat-card>
+<mat-card appearance="outlined" class="mat-mdc-card mdc-card mat-mdc-card-outlined mdc-card--outlined">
+<mat-card-content class="mat-mdc-card-content">
+<h2>Run actions</h2>
+<a matbutton="outlined" href="rerun.html" class="mdc-button mat-mdc-button-base mdc-button--outlined mat-mdc-outlined-button mat-unthemed" mat-ripple-loader-uninitialized="" mat-ripple-loader-class-name="mat-mdc-button-ripple">
+<span class="mat-mdc-button-persistent-ripple mdc-button__ripple">
+</span>
+<span class="mdc-button__label">Inspect rerun review</span>
+<span class="mat-focus-indicator">
+</span>
+<span class="mat-mdc-button-touch-target">
+</span>
+</a>
+</mat-card-content>
+</mat-card>
+</article>
+<article id="empty" aria-label="Empty state" hidden="" class="state">
+<div class="message">
+<span class="badge">Empty</span>
+<mat-card appearance="outlined" class="mat-mdc-card mdc-card mat-mdc-card-outlined mdc-card--outlined">
+<mat-card-content class="mat-mdc-card-content">
+<h2>Empty</h2>
+<p>No ID selected. Open Find a Run.</p>
+</mat-card-content>
+</mat-card>
+</div>
+</article>
+<article id="loading" aria-label="Loading state" hidden="" class="state">
+<div class="message">
+<span class="badge">Loading</span>
+<mat-card appearance="outlined" class="mat-mdc-card mdc-card mat-mdc-card-outlined mdc-card--outlined">
+<mat-card-content class="mat-mdc-card-content">
+<h2>Loading</h2>
+<p>Fetching scoped Run and artifact metadata independently.</p>
+</mat-card-content>
+</mat-card>
+</div>
+</article>
+<article id="error" aria-label="Error state" hidden="" class="state">
+<div class="message danger">
+<span class="badge">Error</span>
+<mat-card appearance="outlined" class="mat-mdc-card mdc-card mat-mdc-card-outlined mdc-card--outlined">
+<mat-card-content class="mat-mdc-card-content">
+<h2>Error</h2>
+<p>Access denied or incompatible revision. Hide affected evidence and actions.</p>
+</mat-card-content>
+</mat-card>
+</div>
+</article>
+<article id="unavailable" aria-label="Backend unavailable state" hidden="" class="state">
+<div class="message danger">
+<span class="badge">Backend unavailable</span>
+<mat-card appearance="outlined" class="mat-mdc-card mdc-card mat-mdc-card-outlined mdc-card--outlined">
+<mat-card-content class="mat-mdc-card-content">
+<h2>Backend unavailable</h2>
+<p>Clear Run, timeline and artifact rows; disable cancel/rerun.</p>
+</mat-card-content>
+</mat-card>
+</div>
+</article>
+<article id="unknown" aria-label="UNKNOWN value state" hidden="" class="state">
+<div class="message">
+<span class="badge">UNKNOWN value</span>
+<mat-card appearance="outlined" class="mat-mdc-card mdc-card mat-mdc-card-outlined mdc-card--outlined">
+<mat-card-content class="mat-mdc-card-content">
+<h2>UNKNOWN value</h2>
+<p>Finish time absent on an active Run. Duration UNKNOWN; never invent an event.</p>
+</mat-card-content>
+</mat-card>
+<dl>
+<div>
+<dt>Execution identity</dt>
+<dd>UNKNOWN</dd>
+</div>
+<div>
+<dt>Reason</dt>
+<dd>Public Run has no execution identity field</dd>
+</div>
+</dl>
+</div>
+</article>
+</div>
+<aside class="source">
+<strong>Contract boundary</strong>
+<p>G05 durable events and execution identity absent. Session observations are incomplete; transition graph is permitted topology only. PR43/45/53 cross-principal CI landing. G06 content proof.</p>
+</aside>
+<nav aria-label="Related design fixtures" class="related">
+<a href="report.html">Baseline comparison and report</a>
+<a href="rerun.html">Review rerun</a>
+<a href="cancel.html">Review cancellation</a>
+<a href="baseline.html">Baseline lifecycle</a>
+<a href="gaps.html">Observability gaps</a>
+</nav>
+</main>
+</div>
+<div id="announcement" role="status" class="sr">
+</div></body></html>

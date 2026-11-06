@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src &apos;none&apos;; style-src &apos;self&apos;; connect-src &apos;none&apos;; form-action &apos;none&apos;; base-uri &apos;none&apos;">
+<title>Rerun receipt · Perfeng wireframes</title>
+<link rel="stylesheet" href="wireframes.css">
+<body>
+<header>
+<div class="labels">DESIGN FIXTURE ONLY · STATIC REVIEW</div>
+<a href="index.html">Screen directory</a>
+</header>
+<main>
+<p class="labels">Runs</p>
+<h1>Rerun receipt</h1>
+<p>Who requested the child Run, and did this intent already take effect?</p>
+<nav class="states" aria-label="Review alternate screen states">
+<a href="#example">Example</a>
+<a href="#empty">Empty</a>
+<a href="#loading">Loading</a>
+<a href="#error">Error</a>
+<a href="#unavailable">Backend unavailable</a>
+<a href="#unknown">UNKNOWN value</a>
+</nav>
+<div class="workspace">
+<aside class="rail">
+<h2>Console</h2>
+<nav aria-label="Product sections">
+<a href="lookup.html">Find a Run</a>
+<a href="create.html">Create a Run</a>
+<a href="catalog.html">Catalog and registry</a>
+<a href="baseline.html">Baseline lifecycle</a>
+<a href="health.html">Platform health</a>
+<a href="workers.html">Native workers</a>
+<a href="gaps.html">Observability gaps</a>
+</nav>
+</aside>
+<div class="pane variants">
+<article class="state example" id="example">
+<div class="framehead">
+<strong>Rerun receipt</strong> · Example</div>
+<section>
+<h2>Accepted intent · proposed read</h2>
+<dl>
+<div>
+<dt>Requesting actor</dt>
+<dd>Maya</dd>
+</div>
+<div>
+<dt>Service</dt>
+<dd>Search</dd>
+</div>
+<div>
+<dt>Source Run</dt>
+<dd>perf-20260902-130000-a1b2c3d5</dd>
+</div>
+<div>
+<dt>Child Run</dt>
+<dd>perf-20261106-140000-cafebabe</dd>
+</div>
+<div>
+<dt>Decision time</dt>
+<dd>2026-11-06 14:00 UTC</dd>
+</div>
+</dl>
+<a href="child.html">Inspect child Run</a>
+</section>
+<p>PR49–51 design target. Current Run metadata cannot prove this attribution.</p>
+</article>
+<article class="state " id="empty">
+<div class="framehead">
+<strong>Rerun receipt</strong> · Empty</div>
+<section>
+<h2>Empty</h2>
+<p>No receipt requested yet.</p>
+</section>
+</article>
+<article class="state " id="loading">
+<div class="framehead">
+<strong>Rerun receipt</strong> · Loading</div>
+<section>
+<h2>Loading</h2>
+<p>Waiting for authoritative receipt. Do not send another intent.</p>
+</section>
+</article>
+<article class="state " id="error">
+<div class="framehead">
+<strong>Rerun receipt</strong> · Error</div>
+<section>
+<h2>Error</h2>
+<p>Key conflict or inaccessible receipt. Preserve reviewed intent for reconciliation.</p>
+</section>
+</article>
+<article class="state " id="unavailable">
+<div class="framehead">
+<strong>Rerun receipt</strong> · Backend unavailable</div>
+<section>
+<h2>Backend unavailable</h2>
+<p>Receipt service unavailable; clear live actor and child values.</p>
+</section>
+</article>
+<article class="state " id="unknown">
+<div class="framehead">
+<strong>Rerun receipt</strong> · UNKNOWN value</div>
+<section>
+<h2>UNKNOWN value</h2>
+<p>Lost response. Outcome UNKNOWN; reconcile the original key/body, never issue a fresh key automatically.</p>
+</section>
+<dl>
+<div>
+<dt>Mutation outcome</dt>
+<dd>UNKNOWN</dd>
+</div>
+<div>
+<dt>Reason</dt>
+<dd>Original intent retained</dd>
+</div>
+</dl>
+</article>
+</div>
+</div>
+<section class="aside">
+<strong>Contract boundary</strong>
+<p>GAP: no native rerun audit read. A Run or baseline event alone cannot attribute a rerun to Maya.</p>
+</section>
+<nav aria-label="Related screen sketches">
+<a href="child.html">Child Run</a>
+<a href="rerun.html">Review rerun</a>
+<a href="run.html">Run detail</a>
+</nav>
+</main>
+<footer>Every value and state on this page is an inert design fixture. Preview links never perform an operation.</footer>
+</body>
+</html>
