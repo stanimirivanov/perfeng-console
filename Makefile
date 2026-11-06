@@ -16,11 +16,12 @@ typecheck:
 architecture:
 	node harness/boundaries.ts
 	node harness/workspace.ts
+	node harness/assets.ts
 
 test:
 	sh harness/test.sh
 
-verify: doctor lint typecheck architecture test component-test
+verify: doctor lint typecheck architecture test component-test build
 
 supply-chain: doctor
 	pnpm audit --audit-level high
@@ -30,7 +31,8 @@ hooks:
 
 .PHONY: build browser-test guide
 build:
-	NX_DAEMON=false node_modules/.bin/nx run-many -t build
+	NX_DAEMON=false node_modules/.bin/nx run-many -t build --output-style=stream
+	node harness/assets.ts --distribution
 
 browser-test:
 	node_modules/.bin/playwright test -c apps/web-e2e/playwright.config.ts
@@ -40,9 +42,15 @@ guide:
 
 .PHONY: component-test
 component-test:
+	rm -f dist/angular-tests.json
 	node_modules/.bin/ng test console --watch=false
+	node scripts/angular-accounting.ts
 
 .PHONY: stack-admission
 stack-admission:
 	node_modules/.bin/ng build console --browser=apps/web-e2e/admission/main.ts --ts-config=apps/web-e2e/admission/tsconfig.json --output-path=dist/admission
 	node_modules/.bin/playwright test -c apps/web-e2e/admission/playwright.config.ts
+
+.PHONY: harness-self-test
+harness-self-test:
+	node scripts/harness-self-test.mjs

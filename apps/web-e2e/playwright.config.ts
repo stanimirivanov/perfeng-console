@@ -9,7 +9,7 @@ export default defineConfig({
     viewport: { width: 1280, height: 800 },
     serviceWorkers: "block",
   },
-  reporter: [["list"], ["./user-guide/reporter.ts"]],
+  reporter: [["./accounting.ts"], ["list"], ["./user-guide/reporter.ts"]],
   webServer: [
     {
       cwd: new URL("../..", import.meta.url).pathname,

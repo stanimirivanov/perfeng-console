@@ -27,6 +27,7 @@ jobs:
       - run: node_modules/.bin/playwright install --with-deps chromium
       - run: make browser-test
       - run: make stack-admission
+      - run: make harness-self-test
   supply-chain:
     runs-on: ubuntu-24.04
     timeout-minutes: 10

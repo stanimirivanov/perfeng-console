@@ -37,7 +37,8 @@
           "options": {
             "buildTarget": "console:build",
             "tsConfig": "apps/console/tsconfig.spec.json",
-            "include": ["**/*.spec.ts"]
+            "include": ["**/*.spec.ts"],
+            "runnerConfig": "apps/console/vitest.config.mts"
           }
         },
         "serve": {
