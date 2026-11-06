@@ -1,0 +1,10 @@
+#!/bin/sh
+# Verify the staged tree even when a tracked file is partially staged.
+set -eu
+root=$(git rev-parse --show-toplevel)
+index_tree=$(mktemp -d)
+trap 'rm -rf -- "$index_tree"' EXIT
+git checkout-index --all --prefix="$index_tree/"
+ln -s "$root/node_modules" "$index_tree/node_modules"
+cd "$index_tree"
+make verify
