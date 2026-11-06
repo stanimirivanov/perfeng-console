@@ -58,7 +58,7 @@ harness-self-test:
 
 .PHONY: contracts-check contracts-generate
 contracts-check:
-	unshare -Urn node --permission --allow-fs-read=. --allow-fs-read="$$(realpath node_modules)" --allow-child-process scripts/contracts-generate.mjs
+	sh scripts/contracts-offline.sh --permission --allow-fs-read=. --allow-fs-read="$$(realpath node_modules)" --allow-child-process scripts/contracts-generate.mjs
 
 contracts-generate:
-	unshare -Urn node --permission --allow-fs-read=. --allow-fs-read="$$(realpath node_modules)" --allow-fs-write=src/generated --allow-child-process scripts/contracts-generate.mjs --write
+	sh scripts/contracts-offline.sh --permission --allow-fs-read=. --allow-fs-read="$$(realpath node_modules)" --allow-fs-write=src/generated --allow-child-process scripts/contracts-generate.mjs --write
