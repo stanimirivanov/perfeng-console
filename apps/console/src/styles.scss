@@ -1,0 +1,32 @@
+@use "@angular/material" as mat;
+body {
+  margin: 2rem;
+  font: 1rem/1.5 system-ui;
+  color: #16332d;
+}
+a {
+  color: #07584e;
+}
+button:focus-visible,
+a:focus-visible {
+  outline: 3px solid #824100;
+  outline-offset: 3px;
+}
+
+nav { display: flex; gap: 1rem; margin: 1rem 0; }
+
+html {
+  @include mat.theme((color: mat.$cyan-palette, typography: system-ui, density: 0));
+}
+
+.verification-area {
+  @include mat.theme((color: mat.$violet-palette, typography: system-ui, density: 0));
+  display: block;
+  padding: 1.5rem;
+  border-inline-start: .4rem solid var(--mat-sys-primary);
+  background: var(--mat-sys-primary-container);
+  color: var(--mat-sys-on-primary-container);
+
+  a { color: inherit; }
+  .workspace-label { font-weight: 650; }
+}

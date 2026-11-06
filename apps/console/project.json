@@ -1,0 +1,20 @@
+{
+  "name": "console",
+  "projectType": "application",
+  "sourceRoot": "apps/console/src",
+  "tags": ["scope:console", "type:browser"],
+  "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "ng build console"
+      }
+    },
+    "serve": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "ng serve console"
+      }
+    }
+  }
+}

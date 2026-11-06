@@ -1,0 +1,7 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "../../dist/tsc/console"
+  },
+  "files": ["src/main.ts"]
+}

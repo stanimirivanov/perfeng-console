@@ -88,3 +88,7 @@ The scoped files provide guides and the failing checks provide sensors, followin
 The short entry map points to deeper constraints while mechanical checks enforce dependency direction, following the repository-map approach in OpenAI's engineering account. [Harness engineering](https://openai.com/index/harness-engineering/)
 
 Recurring mistakes become focused automated checks, following Mitchell Hashimoto's practice of improving agent instructions and tooling after a concrete failure. [My AI Adoption Journey](https://mitchellh.com/writing/my-ai-adoption-journey)
+
+## Nx scaffold extension
+
+The Angular app in apps/console owns ordinary operations and the Verification route. The independently installed runner owns execution. Browser regression fixtures simulate only the BFF grant; the loopback preview has no backend and grants no access. make architecture checks literal imports, including type-only and lazy edges. make verify runs Angular unit tests alongside harness checks. The quality workflow also builds the production distribution and exercises Chromium. The guide workflow publishes a separate artifact from passing tagged journeys.
