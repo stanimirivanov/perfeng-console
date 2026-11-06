@@ -92,3 +92,12 @@ Recurring mistakes become focused automated checks, following Mitchell Hashimoto
 ## Nx scaffold extension
 
 The Angular app in apps/console owns ordinary operations and the Verification route. The independently installed runner owns execution. Browser regression fixtures simulate only the BFF grant; the loopback preview has no backend and grants no access. make architecture checks literal imports, including type-only and lazy edges. make verify runs Angular unit tests alongside harness checks. The quality workflow also builds the production distribution and exercises Chromium. The guide workflow publishes a separate artifact from passing tagged journeys.
+
+## Stack admission
+
+Run make stack-admission to compile the isolated pinned-stack fixture and exercise
+Material overlays in Chromium under the BFF-owned nonce renderer. CI's browser job
+runs it after the product browser suite. The fixture is outside the production entry;
+the dedicated test config discovers only its own stack.spec.ts. The root policy allows
+NgRx/Effect and TestBed only in Angular spec files until production consumers are reviewed.
+See docs/development/stack-admission.md for the gate receipt and remaining obligations.

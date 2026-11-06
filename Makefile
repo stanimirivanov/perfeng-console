@@ -41,3 +41,8 @@ guide:
 .PHONY: component-test
 component-test:
 	node_modules/.bin/ng test console --watch=false
+
+.PHONY: stack-admission
+stack-admission:
+	node_modules/.bin/ng build console --browser=apps/web-e2e/admission/main.ts --ts-config=apps/web-e2e/admission/tsconfig.json --output-path=dist/admission
+	node_modules/.bin/playwright test -c apps/web-e2e/admission/playwright.config.ts

@@ -2,7 +2,9 @@ import { createServer } from "node:http";
 import { readFile } from "node:fs/promises";
 import { resolve, extname } from "node:path";
 
-const root = resolve("dist/apps/console/browser");
+import { renderConsoleHtml } from "../src/bff/csp.ts";
+
+const root = resolve(process.env.PERFENG_ADMISSION === "1" ? "dist/admission/browser" : "dist/apps/console/browser");
 createServer(async (req, res) => {
   let path;
   try {
@@ -21,7 +23,11 @@ createServer(async (req, res) => {
     res.setHeader("Content-Type", {
       ".html": "text/html", ".js": "text/javascript", ".css": "text/css",
     }[extname(file)] ?? "application/octet-stream");
-    res.end(data);
+    if (extname(file) === ".html") {
+      const page = renderConsoleHtml(data.toString());
+      for (const [name, value] of Object.entries(page.headers)) res.setHeader(name, value);
+      res.end(page.html);
+    } else res.end(data);
   } catch {
     res.writeHead(404).end();
   }

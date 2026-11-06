@@ -92,3 +92,13 @@ On 2026-11-06 the project owner accepted Angular 22.2.4 with TypeScript 6.0.3 an
 [matrices]: https://github.com/stanimirivanov/perfeng-console/blob/35e0f32abd90e44d33298037d66ad7e3aa780c18/tasks/plan.md#L795-L806
 [report]: https://github.com/stanimirivanov/perfeng-console/blob/35e0f32abd90e44d33298037d66ad7e3aa780c18/tasks/plan.md#L548-L561
 [cluster]: https://github.com/stanimirivanov/perfeng-console/blob/35e0f32abd90e44d33298037d66ad7e3aa780c18/tasks/plan.md#L748-L757
+
+## M05-PR1 admission update — 2026-11-06
+
+The owner authorized the scoped style-nonce exception after Chromium blocked four
+Material style insertions under style-src self. The renderer binds fresh random
+nonces to the header and Angular root and forbids cached HTML reuse.
+Positive, mismatched-nonce and reload tests now exercise the actual response.
+The isolated dialog build qualifies pinned NgRx/Effect compilation and Material
+keyboard/focus under CSP. See [admission evidence](../development/stack-admission.md)
+for measurements and remaining product acceptance gates.
