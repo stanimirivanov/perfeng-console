@@ -45,6 +45,6 @@ The isolated build is 399.76 kB initial / 101.08 kB estimated transfer in the ob
 
 ## Remaining acceptance boundaries
 
-PR2 owns complete asset-closure enforcement, invalid-template/failing-component aggregate probes and all-runner skip accounting. PR8 owns digest-bound expectation admission. Full WCAG conformance, real session expiry, authenticated credential-canary checks, report polling and live-update accessibility remain future runtime acceptance. The keyboard/name/focus checks here qualify the admission fixture only. No live cluster or platform mutation ran.
+PR2 adds reviewed asset-input restrictions, known secret/fixture distribution canaries, invalid-template/failing-component aggregate probes and all-runner skip accounting. New asset mechanisms still require their own negative fixtures. PR8 owns digest-bound expectation admission. Full WCAG conformance, real session expiry, authenticated credential-canary checks, report polling and live-update accessibility remain future runtime acceptance. The keyboard/name/focus checks here qualify the admission fixture only. No live cluster or platform mutation ran.
 
 Official Angular guidance requires a fresh server-generated nonce for dynamically inserted styles. ADR 0002 remains the source for the narrow exception. The policy contains no unsafe-inline or unsafe-eval. No API credentials or runner were introduced.

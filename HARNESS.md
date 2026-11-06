@@ -101,3 +101,28 @@ runs it after the product browser suite. The fixture is outside the production e
 the dedicated test config discovers only its own stack.spec.ts. The root policy allows
 NgRx/Effect and TestBed only in Angular spec files until production consumers are reviewed.
 See docs/development/stack-admission.md for the gate receipt and remaining obligations.
+
+## M05-PR2 failure propagation
+
+make verify now includes the production AOT build and its distribution scan.
+Angular's JSON reporter is deleted before each component run and must report a
+nonempty suite with every test passed and no skipped/todo cases. Vitest retries
+are disabled. Playwright accounting retains every attempt and rejects skipped,
+empty or retried runs independently of guide tags. Node accounting stays separate.
+Official interfaces: https://vitest.dev/guide/reporters#json-reporter and
+https://playwright.dev/docs/api/class-reporter.
+
+make harness-self-test copies source into a temporary directory, links the installed
+toolchain and proves actual command failures for invalid template bindings,
+component assertions, Angular skips and Playwright skips/failures. It never edits
+the working checkout and removes the temporary fixture on completion.
+CI runs it in the browser job with installed pinned Chromium.
+
+Browser build inputs are explicitly reviewed in harness/assets.ts. The current
+scaffold permits inline component templates, one local Material Sass import and
+no copied asset scripts. Extending that boundary needs focused negative tests.
+The distribution guard scans lazy chunks, maps and other emitted files for known
+secret/fixture markers. This is a regression sensor, not a general secret detector.
+No production fixture, arbitrary Sass import or server resource is permitted.
+The strict-template mechanism is documented at
+https://angular.dev/tools/cli/template-typecheck.

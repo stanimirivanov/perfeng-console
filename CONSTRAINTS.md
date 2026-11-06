@@ -41,8 +41,10 @@ Configuration proposals flow through reviewed Git changes and exact published id
 
 Existing gates enforce selected source boundaries, strict TypeScript/templates, harness tests,
 Angular tests and browser regressions. They establish scaffold behavior only.
-PR2 owns full compiler/build/test accounting, asset closure and CSP integration.
-PR8 owns frozen expectation admission. Neither future gate is currently enforced.
+PR2 enforces production AOT, runner accounting, reviewed build inputs, built-asset
+canaries and failure propagation. CSP nonce and keyboard fixtures run in Chromium.
+Extending assets beyond the reviewed inputs requires additional boundary tests.
+PR8 owns frozen expectation admission. Expectation admission remains pending PR8.
 Real service authorization, independent oracle, approval journaling, complete accessibility
 and positive end-to-end receipts require their owning plan slices.
 A failed admission test blocks stack admission even if unrelated harness checks pass.

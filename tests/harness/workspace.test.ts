@@ -49,3 +49,25 @@ test("browser resource paths cannot copy server or design files into a build", (
     rmSync(root, { recursive: true, force: true });
   }
 });
+
+test("global Sass cannot import a BFF resource or external stylesheet", async () => {
+  const { checkStyles } = await import("../../harness/assets.ts");
+  assert.deepEqual(checkStyles('@use "@angular/material" as mat; body { color: red; }'), []);
+  assert.ok(checkStyles('@use "../../../src/bff/secret";').length);
+  assert.ok(checkStyles('body { background: url("https://example.com/image"); }').length);
+});
+
+test("built assets reject secret and fixture canaries even outside TypeScript", async () => {
+  const { checkDistribution } = await import("../../harness/assets.ts");
+  const root = mkdtempSync(join(tmpdir(), "distribution-"));
+  try {
+    writeFileSync(join(root, "lazy.js"), "export {};");
+    checkDistribution(root);
+    writeFileSync(join(root, "lazy.js.map"), "PERFENG_SECRET_CANARY");
+    assert.throws(() => checkDistribution(root), /Forbidden secret/);
+    writeFileSync(join(root, "lazy.js.map"), "Design fixture only");
+    assert.throws(() => checkDistribution(root), /Forbidden secret/);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
