@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="Content-Security-Policy" content="default-src &apos;none&apos;; script-src &apos;self&apos;; style-src &apos;self&apos;; connect-src &apos;none&apos;; form-action &apos;none&apos;; base-uri &apos;none&apos;"><title>Observability gaps · Perfeng design fixtures</title><link rel="stylesheet" href="material.css"><link rel="stylesheet" href="review.css"><script defer src="review.js"></script></head><body><a href="#main" class="skip">Skip to content</a>
+<header>
+<mat-toolbar class="mat-toolbar mat-toolbar-single-row">
+<span class="brand">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">
+<path d="M3 18V8h4v10 M10 18V3h4v15 M17 18v-7h4v7">
+</path>
+</svg>Perfeng Console</span>
+<span class="top-end">Design fixture only</span>
+</mat-toolbar>
+</header>
+<div class="layout">
+<aside class="sidebar">
+<div class="rail-title">Workspace</div>
+<nav aria-label="Workspace navigation">
+<div class="nav-group">
+<div class="group">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">
+<path d="M3 6h18M3 12h12M3 18h16">
+</path>
+</svg>Runs</div>
+<a href="lookup.html">Find a Run</a>
+<a href="create.html">Create a Run</a>
+</div>
+<div class="nav-group">
+<div class="group">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">
+<path d="m12 3 9 5-9 5-9-5z M3 12l9 5 9-5M3 16l9 5 9-5">
+</path>
+</svg>Resources</div>
+<a href="catalog.html">Catalog and registry</a>
+<a href="baseline.html">Baseline lifecycle</a>
+</div>
+<div class="nav-group">
+<div class="group">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">
+<path d="M2 13h5l3-8 4 14 3-8h5">
+</path>
+</svg>Diagnostics</div>
+<a href="health.html">Platform health</a>
+<a href="workers.html">Native workers</a>
+<a href="gaps.html" aria-current="page">Observability gaps</a>
+</div>
+</nav>
+<div class="directory">
+<a href="index.html">Design directory</a>
+</div>
+</aside>
+<main id="main" tabindex="-1">
+<div class="crumb">Diagnostics</div>
+<div class="title-row">
+<div>
+<h1>Observability gaps</h1>
+<p class="question">Which missing capability prevents this answer, and who owns it?</p>
+</div>
+<label class="selector">Fixture state<select id="state">
+<option value="example">Example</option>
+<option value="empty">Empty</option>
+<option value="loading">Loading</option>
+<option value="error">Error</option>
+<option value="unavailable">Backend unavailable</option>
+<option value="unknown">UNKNOWN value</option>
+</select>
+</label>
+</div>
+<div class="content">
+<article id="example" aria-label="Example state" class="state">
+<mat-card appearance="outlined" class="mat-mdc-card mdc-card mat-mdc-card-outlined mdc-card--outlined">
+<mat-card-content class="mat-mdc-card-content">
+<h2>Coverage inventory</h2>
+<div class="scroll">
+<table aria-label="Coverage inventory">
+<thead>
+<tr>
+<th scope="col">ID</th>
+<th scope="col">Missing observation</th>
+<th scope="col">Owner</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>G01</td>
+<td>Operational/catalog OpenAPI</td>
+<td>Contracts + CP</td>
+</tr>
+<tr>
+<td>G02</td>
+<td>Dynamic dependency state and release identity</td>
+<td>CP</td>
+</tr>
+<tr>
+<td>G03</td>
+<td>Registry publication attestation</td>
+<td>CP</td>
+</tr>
+<tr>
+<td>G04</td>
+<td>Scoped Run/baseline lists</td>
+<td>CP</td>
+</tr>
+<tr>
+<td>G05</td>
+<td>Durable Run events and execution identity</td>
+<td>CP</td>
+</tr>
+<tr>
+<td>G06</td>
+<td>Authorized artifact bytes and run-used policy</td>
+<td>CP + contracts</td>
+</tr>
+<tr>
+<td>G07</td>
+<td>Verified provenance and approved source binding</td>
+<td>CP</td>
+</tr>
+<tr>
+<td>G08</td>
+<td>Overall verdict, WARN semantics, diagnostics</td>
+<td>Analysis + contracts</td>
+</tr>
+<tr>
+<td>G09</td>
+<td>Operator-safe worker, lease and reservation reads</td>
+<td>CP</td>
+</tr>
+<tr>
+<td>G10</td>
+<td>Historical metrics and reanalysis</td>
+<td>CP + analysis</td>
+</tr>
+<tr>
+<td>G11</td>
+<td>Statistical/localization evidence</td>
+<td>Analysis</td>
+</tr>
+<tr>
+<td>G12</td>
+<td>CP-mediated Argus selection evidence</td>
+<td>CP + Argus</td>
+</tr>
+<tr>
+<td>G13</td>
+<td>Measurement completeness and qualification</td>
+<td>Runners + environment</td>
+</tr>
+<tr>
+<td>G14</td>
+<td>Production recovery/retention evidence</td>
+<td>M06 owners</td>
+</tr>
+</tbody>
+</table>
+</div>
+</mat-card-content>
+</mat-card>
+<p>Static review metadata. A provider outage changes live overlays only.</p>
+</article>
+<article id="empty" aria-label="Empty state" hidden="" class="state">
+<div class="message">
+<span class="badge">Empty</span>
+<mat-card appearance="outlined" class="mat-mdc-card mdc-card mat-mdc-card-outlined mdc-card--outlined">
+<mat-card-content class="mat-mdc-card-content">
+<h2>Empty</h2>
+<p>No entries match this filter; not proof of complete platform.</p>
+</mat-card-content>
+</mat-card>
+</div>
+</article>
+<article id="loading" aria-label="Loading state" hidden="" class="state">
+<div class="message">
+<span class="badge">Loading</span>
+<mat-card appearance="outlined" class="mat-mdc-card mdc-card mat-mdc-card-outlined mdc-card--outlined">
+<mat-card-content class="mat-mdc-card-content">
+<h2>Loading</h2>
+<p>Static inventory remains readable; live overlays loading.</p>
+</mat-card-content>
+</mat-card>
+</div>
+</article>
+<article id="error" aria-label="Error state" hidden="" class="state">
+<div class="message danger">
+<span class="badge">Error</span>
+<mat-card appearance="outlined" class="mat-mdc-card mdc-card mat-mdc-card-outlined mdc-card--outlined">
+<mat-card-content class="mat-mdc-card-content">
+<h2>Error</h2>
+<p>Unmapped field. Flag traceability error rather than invent a gap ID.</p>
+</mat-card-content>
+</mat-card>
+</div>
+</article>
+<article id="unavailable" aria-label="Backend unavailable state" hidden="" class="state">
+<div class="message danger">
+<span class="badge">Backend unavailable</span>
+<mat-card appearance="outlined" class="mat-mdc-card mdc-card mat-mdc-card-outlined mdc-card--outlined">
+<mat-card-content class="mat-mdc-card-content">
+<h2>Backend unavailable</h2>
+<p>Static gap definitions remain visible; live overlays are unavailable.</p>
+</mat-card-content>
+</mat-card>
+<mat-card appearance="outlined" class="mat-mdc-card mdc-card mat-mdc-card-outlined mdc-card--outlined">
+<mat-card-content class="mat-mdc-card-content">
+<h2>Static gap definitions</h2>
+<div class="scroll">
+<table aria-label="Static gap definitions">
+<thead>
+<tr>
+<th scope="col">Gap</th>
+<th scope="col">Needed observation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>G01</td>
+<td>Operational/catalog OpenAPI</td>
+</tr>
+<tr>
+<td>G02</td>
+<td>Dynamic dependency state and release identity</td>
+</tr>
+<tr>
+<td>G03</td>
+<td>Registry publication attestation</td>
+</tr>
+<tr>
+<td>G04</td>
+<td>Scoped Run/baseline lists</td>
+</tr>
+<tr>
+<td>G05</td>
+<td>Durable Run events and execution identity</td>
+</tr>
+<tr>
+<td>G06</td>
+<td>Authorized artifact bytes and run-used policy</td>
+</tr>
+<tr>
+<td>G07</td>
+<td>Verified provenance and approved source binding</td>
+</tr>
+<tr>
+<td>G08</td>
+<td>Overall verdict, WARN semantics, diagnostics</td>
+</tr>
+<tr>
+<td>G09</td>
+<td>Operator-safe worker, lease and reservation reads</td>
+</tr>
+<tr>
+<td>G10</td>
+<td>Historical metrics and reanalysis</td>
+</tr>
+<tr>
+<td>G11</td>
+<td>Statistical/localization evidence</td>
+</tr>
+<tr>
+<td>G12</td>
+<td>CP-mediated Argus selection evidence</td>
+</tr>
+<tr>
+<td>G13</td>
+<td>Measurement completeness and qualification</td>
+</tr>
+<tr>
+<td>G14</td>
+<td>Production recovery/retention evidence</td>
+</tr>
+</tbody>
+</table>
+</div>
+</mat-card-content>
+</mat-card>
+</div>
+</article>
+<article id="unknown" aria-label="UNKNOWN value state" hidden="" class="state">
+<div class="message">
+<span class="badge">UNKNOWN value</span>
+<mat-card appearance="outlined" class="mat-mdc-card mdc-card mat-mdc-card-outlined mdc-card--outlined">
+<mat-card-content class="mat-mdc-card-content">
+<h2>UNKNOWN value</h2>
+<p>Deployment evidence UNKNOWN until the responsible provider supplies it.</p>
+</mat-card-content>
+</mat-card>
+<dl>
+<div>
+<dt>Deployment verification</dt>
+<dd>UNKNOWN</dd>
+</div>
+<div>
+<dt>Reason</dt>
+<dd>Static audit metadata only</dd>
+</div>
+</dl>
+</div>
+</article>
+</div>
+<aside class="source">
+<strong>Contract boundary</strong>
+<p>Gap inventory is design metadata. Implementation, deployment, live proof and scientific adequacy are separate dimensions.</p>
+</aside>
+<nav aria-label="Related design fixtures" class="related">
+<a href="run.html">Run detail</a>
+<a href="health.html">Platform health</a>
+<a href="workers.html">Native workers</a>
+</nav>
+</main>
+</div>
+<div id="announcement" role="status" class="sr">
+</div></body></html>

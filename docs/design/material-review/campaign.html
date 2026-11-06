@@ -1,0 +1,336 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="Content-Security-Policy" content="default-src &apos;none&apos;; script-src &apos;self&apos;; style-src &apos;self&apos;; connect-src &apos;none&apos;; form-action &apos;none&apos;; base-uri &apos;none&apos;"><title>Campaign findings and approval · Perfeng design fixtures</title><link rel="stylesheet" href="material.css"><link rel="stylesheet" href="review.css"><script defer src="review.js"></script></head><body><a href="#main" class="skip">Skip to content</a>
+<header>
+<mat-toolbar class="mat-toolbar mat-toolbar-single-row">
+<span class="brand">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">
+<path d="M3 18V8h4v10 M10 18V3h4v15 M17 18v-7h4v7">
+</path>
+</svg>Perfeng Verifier</span>
+<span class="top-end">Design fixture only</span>
+</mat-toolbar>
+</header>
+<div class="layout">
+<aside class="sidebar">
+<div class="rail-title">Workspace</div>
+<nav aria-label="Workspace navigation">
+<div class="nav-group">
+<div class="group">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">
+<path d="M9 3h6M10 3v7l-6 9q-1 2 1 2h14q2 0 1-2l-6-9V3M8 16h8">
+</path>
+</svg>Verifier</div>
+<a href="lab.html">Scenario selection</a>
+<a href="campaign.html" aria-current="page">Campaign findings and approval</a>
+</div>
+</nav>
+<div class="directory">
+<a href="index.html">Design directory</a>
+</div>
+</aside>
+<main id="main" tabindex="-1">
+<div class="crumb">Verifier</div>
+<div class="title-row">
+<div>
+<h1>Campaign findings and approval</h1>
+<p class="question">What differed from expectation, and which exact step requires approval?</p>
+</div>
+<label class="selector">Fixture state<select id="state">
+<option value="example">Example</option>
+<option value="empty">Empty</option>
+<option value="loading">Loading</option>
+<option value="error">Error</option>
+<option value="unavailable">Backend unavailable</option>
+<option value="unknown">UNKNOWN value</option>
+</select>
+</label>
+</div>
+<div class="content">
+<article id="example" aria-label="Example state" class="state">
+<mat-card appearance="outlined" class="mat-mdc-card mdc-card mat-mdc-card-outlined mdc-card--outlined">
+<mat-card-content class="mat-mdc-card-content">
+<h2>Offline · synthetic</h2>
+<div class="scroll">
+<table aria-label="Offline · synthetic">
+<thead>
+<tr>
+<th scope="col">Expectation level</th>
+<th scope="col">Intended</th>
+<th scope="col">Observed</th>
+<th scope="col">Evaluation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Current phase</td>
+<td>Rule PASS</td>
+<td>Rule FAIL</td>
+<td>FINDING</td>
+</tr>
+<tr>
+<td>Research target</td>
+<td>Rule PASS</td>
+<td>Rule FAIL</td>
+<td>FINDING</td>
+</tr>
+</tbody>
+</table>
+</div>
+</mat-card-content>
+</mat-card>
+<mat-card appearance="outlined" class="mat-mdc-card mdc-card mat-mdc-card-outlined mdc-card--outlined">
+<mat-card-content class="mat-mdc-card-content">
+<h2>Detection matrix</h2>
+<div class="scroll">
+<table aria-label="Detection matrix">
+<thead>
+<tr>
+<th scope="col">Effect / noise</th>
+<th scope="col">TP</th>
+<th scope="col">TN</th>
+<th scope="col">FP</th>
+<th scope="col">FN</th>
+<th scope="col">Abstain</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0% / declared low CV</td>
+<td>0</td>
+<td>3</td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>4 declared, 4 executed. FPR 1/4. TPR UNKNOWN (no positives). Synthetic inputs have no Run link.</p>
+</mat-card-content>
+</mat-card>
+<mat-card appearance="outlined" class="mat-mdc-card mdc-card mat-mdc-card-outlined mdc-card--outlined">
+<mat-card-content class="mat-mdc-card-content">
+<h2>Synthetic receipt</h2>
+<dl>
+<div>
+<dt>Harness integrity</dt>
+<dd>VALID</dd>
+</div>
+<div>
+<dt>Execution coverage</dt>
+<dd>COMPLETE · 4 of 4</dd>
+</div>
+<div>
+<dt>Current-phase conformance</dt>
+<dd>FINDINGS</dd>
+</div>
+<div>
+<dt>Research-target conformance</dt>
+<dd>FINDINGS</dd>
+</div>
+<div>
+<dt>Budget</dt>
+<dd>600 active seconds</dd>
+</div>
+</dl>
+</mat-card-content>
+</mat-card>
+<mat-card appearance="outlined" class="mat-mdc-card mdc-card mat-mdc-card-outlined mdc-card--outlined">
+<mat-card-content class="mat-mdc-card-content">
+<h2>Separate cluster-step example</h2>
+<dl>
+<div>
+<dt>Target</dt>
+<dd>Disposable search SUT · fixture instance 02</dd>
+</div>
+<div>
+<dt>Operation</dt>
+<dd>Inject +5 ms application delay</dd>
+</div>
+<div>
+<dt>Expected effect</dt>
+<dd>Controlled latency change; observed p95 is not guaranteed</dd>
+</div>
+<div>
+<dt>Intent binding</dt>
+<dd>Campaign + manifest digest + step + exact target + parameters</dd>
+</div>
+<div>
+<dt>Expiry</dt>
+<dd>2026-11-06 14:02 UTC · illustrative only</dd>
+</div>
+<div>
+<dt>Recovery</dt>
+<dd>Separate approval to restore prior delay</dd>
+</div>
+</dl>
+<p>Confirm only this step. The server must validate the current target, digest and time.</p>
+<button matbutton="filled" disabled="true" class="mdc-button mat-mdc-button-base mdc-button--unelevated mat-mdc-unelevated-button mat-mdc-button-disabled mat-unthemed" mat-ripple-loader-uninitialized="" mat-ripple-loader-class-name="mat-mdc-button-ripple" mat-ripple-loader-disabled="">
+<span class="mat-mdc-button-persistent-ripple mdc-button__ripple">
+</span>
+<span class="mdc-button__label">Approve this step</span>
+<span class="mat-focus-indicator">
+</span>
+<span class="mat-mdc-button-touch-target">
+</span>
+</button>
+<a matbutton="outlined" href="run.html" class="mdc-button mat-mdc-button-base mdc-button--outlined mat-mdc-outlined-button mat-unthemed" mat-ripple-loader-uninitialized="" mat-ripple-loader-class-name="mat-mdc-button-ripple">
+<span class="mat-mdc-button-persistent-ripple mdc-button__ripple">
+</span>
+<span class="mdc-button__label">Inspect the same ordinary Run view (cluster fixture only)</span>
+<span class="mat-focus-indicator">
+</span>
+<span class="mat-mdc-button-touch-target">
+</span>
+</a>
+</mat-card-content>
+</mat-card>
+<div class="dialog-demo">
+<button matbutton="outlined" type="button" data-open-dialog="" class="mdc-button mat-mdc-button-base mdc-button--outlined mat-mdc-outlined-button mat-unthemed" mat-ripple-loader-uninitialized="" mat-ripple-loader-class-name="mat-mdc-button-ripple">
+<span class="mat-mdc-button-persistent-ripple mdc-button__ripple">
+</span>
+<span class="mdc-button__label">Preview confirmation</span>
+<span class="mat-focus-indicator">
+</span>
+<span class="mat-mdc-button-touch-target">
+</span>
+</button>
+<dialog aria-labelledby="confirm-heading">
+<p class="minor">Design fixture only</p>
+<h2 id="confirm-heading">Disposable step review</h2>
+<p>Inspect the disposable target, parameters, review digest and expiry. Recovery requires a separate approval.</p>
+<button matbutton="filled" type="button" data-close-dialog="" class="mdc-button mat-mdc-button-base mdc-button--unelevated mat-mdc-unelevated-button mat-unthemed" mat-ripple-loader-uninitialized="" mat-ripple-loader-class-name="mat-mdc-button-ripple">
+<span class="mat-mdc-button-persistent-ripple mdc-button__ripple">
+</span>
+<span class="mdc-button__label">Return to review</span>
+<span class="mat-focus-indicator">
+</span>
+<span class="mat-mdc-button-touch-target">
+</span>
+</button>
+</dialog>
+</div>
+</article>
+<article id="empty" aria-label="Empty state" hidden="" class="state">
+<div class="message">
+<span class="badge">Empty</span>
+<mat-card appearance="outlined" class="mat-mdc-card mdc-card mat-mdc-card-outlined mdc-card--outlined">
+<mat-card-content class="mat-mdc-card-content">
+<h2>Empty</h2>
+<p>No repetitions executed. Conformance undetermined.</p>
+</mat-card-content>
+</mat-card>
+<button matbutton="filled" disabled="true" class="mdc-button mat-mdc-button-base mdc-button--unelevated mat-mdc-unelevated-button mat-mdc-button-disabled mat-unthemed" mat-ripple-loader-uninitialized="" mat-ripple-loader-class-name="mat-mdc-button-ripple" mat-ripple-loader-disabled="">
+<span class="mat-mdc-button-persistent-ripple mdc-button__ripple">
+</span>
+<span class="mdc-button__label">Approve step</span>
+<span class="mat-focus-indicator">
+</span>
+<span class="mat-mdc-button-touch-target">
+</span>
+</button>
+</div>
+</article>
+<article id="loading" aria-label="Loading state" hidden="" class="state">
+<div class="message">
+<span class="badge">Loading</span>
+<mat-card appearance="outlined" class="mat-mdc-card mdc-card mat-mdc-card-outlined mdc-card--outlined">
+<mat-card-content class="mat-mdc-card-content">
+<h2>Loading</h2>
+<p>Collecting a new scoped observation; no optimistic result.</p>
+</mat-card-content>
+</mat-card>
+<button matbutton="filled" disabled="true" class="mdc-button mat-mdc-button-base mdc-button--unelevated mat-mdc-unelevated-button mat-mdc-button-disabled mat-unthemed" mat-ripple-loader-uninitialized="" mat-ripple-loader-class-name="mat-mdc-button-ripple" mat-ripple-loader-disabled="">
+<span class="mat-mdc-button-persistent-ripple mdc-button__ripple">
+</span>
+<span class="mdc-button__label">Approve step</span>
+<span class="mat-focus-indicator">
+</span>
+<span class="mat-mdc-button-touch-target">
+</span>
+</button>
+</div>
+</article>
+<article id="error" aria-label="Error state" hidden="" class="state">
+<div class="message danger">
+<span class="badge">Error</span>
+<mat-card appearance="outlined" class="mat-mdc-card mdc-card mat-mdc-card-outlined mdc-card--outlined">
+<mat-card-content class="mat-mdc-card-content">
+<h2>Error</h2>
+<p>Uncertain mutation after interruption; no redispatch until reconciled.</p>
+</mat-card-content>
+</mat-card>
+<button matbutton="filled" disabled="true" class="mdc-button mat-mdc-button-base mdc-button--unelevated mat-mdc-unelevated-button mat-mdc-button-disabled mat-unthemed" mat-ripple-loader-uninitialized="" mat-ripple-loader-class-name="mat-mdc-button-ripple" mat-ripple-loader-disabled="">
+<span class="mat-mdc-button-persistent-ripple mdc-button__ripple">
+</span>
+<span class="mdc-button__label">Approve step</span>
+<span class="mat-focus-indicator">
+</span>
+<span class="mat-mdc-button-touch-target">
+</span>
+</button>
+</div>
+</article>
+<article id="unavailable" aria-label="Backend unavailable state" hidden="" class="state">
+<div class="message danger">
+<span class="badge">Backend unavailable</span>
+<mat-card appearance="outlined" class="mat-mdc-card mdc-card mat-mdc-card-outlined mdc-card--outlined">
+<mat-card-content class="mat-mdc-card-content">
+<h2>Backend unavailable</h2>
+<p>Clear live simulator status; separately opened historical receipts retain original date.</p>
+</mat-card-content>
+</mat-card>
+<button matbutton="filled" disabled="true" class="mdc-button mat-mdc-button-base mdc-button--unelevated mat-mdc-unelevated-button mat-mdc-button-disabled mat-unthemed" mat-ripple-loader-uninitialized="" mat-ripple-loader-class-name="mat-mdc-button-ripple" mat-ripple-loader-disabled="">
+<span class="mat-mdc-button-persistent-ripple mdc-button__ripple">
+</span>
+<span class="mdc-button__label">Approve step</span>
+<span class="mat-focus-indicator">
+</span>
+<span class="mat-mdc-button-touch-target">
+</span>
+</button>
+</div>
+</article>
+<article id="unknown" aria-label="UNKNOWN value state" hidden="" class="state">
+<div class="message">
+<span class="badge">UNKNOWN value</span>
+<mat-card appearance="outlined" class="mat-mdc-card mdc-card mat-mdc-card-outlined mdc-card--outlined">
+<mat-card-content class="mat-mdc-card-content">
+<h2>UNKNOWN value</h2>
+<p>Zero denominator yields UNKNOWN rate. Report abstentions and planned count.</p>
+</mat-card-content>
+</mat-card>
+<dl>
+<div>
+<dt>True positive rate</dt>
+<dd>UNKNOWN</dd>
+</div>
+<div>
+<dt>Reason</dt>
+<dd>Zero positives in synthetic cell</dd>
+</div>
+</dl>
+<button matbutton="filled" disabled="true" class="mdc-button mat-mdc-button-base mdc-button--unelevated mat-mdc-unelevated-button mat-mdc-button-disabled mat-unthemed" mat-ripple-loader-uninitialized="" mat-ripple-loader-class-name="mat-mdc-button-ripple" mat-ripple-loader-disabled="">
+<span class="mat-mdc-button-persistent-ripple mdc-button__ripple">
+</span>
+<span class="mdc-button__label">Approve step</span>
+<span class="mat-focus-indicator">
+</span>
+<span class="mat-mdc-button-touch-target">
+</span>
+</button>
+</div>
+</article>
+</div>
+<aside class="source">
+<strong>Contract boundary</strong>
+<p>PR9–17/40/41/57. No platform verdict derived by the UI; partial export is historical. No synthetic Run links.</p>
+</aside>
+<nav aria-label="Related design fixtures" class="related">
+<a href="lab.html">Scenario selection</a>
+<a href="run.html">Run detail</a>
+</nav>
+</main>
+</div>
+<div id="announcement" role="status" class="sr">
+</div></body></html>

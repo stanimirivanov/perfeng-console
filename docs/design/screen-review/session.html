@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src &apos;none&apos;; style-src &apos;self&apos;; connect-src &apos;none&apos;; form-action &apos;none&apos;; base-uri &apos;none&apos;">
+<title>Sign in · Perfeng wireframes</title>
+<link rel="stylesheet" href="wireframes.css">
+<body>
+<header>
+<div class="labels">DESIGN FIXTURE ONLY · STATIC REVIEW</div>
+<a href="index.html">Screen directory</a>
+</header>
+<main>
+<p class="labels">Access</p>
+<h1>Sign in</h1>
+<p>Can I open the Run from this CI link as myself?</p>
+<nav class="states" aria-label="Review alternate screen states">
+<a href="#example">Example</a>
+<a href="#empty">Empty</a>
+<a href="#loading">Loading</a>
+<a href="#error">Error</a>
+<a href="#unavailable">Backend unavailable</a>
+<a href="#unknown">UNKNOWN value</a>
+</nav>
+<div class="workspace">
+<aside class="rail">
+<h2>Console</h2>
+<nav aria-label="Product sections">
+<a href="session.html">Sign in</a>
+</nav>
+</aside>
+<div class="pane variants">
+<article class="state example" id="example">
+<div class="framehead">
+<strong>Sign in</strong> · Example</div>
+<section>
+<h2>Continue to the CI Run</h2>
+<dl>
+<div>
+<dt>Return after sign-in</dt>
+<dd>Run perf-20260902-130000-a1b2c3d5</dd>
+</div>
+<div>
+<dt>Scope</dt>
+<dd>Access checked by the provider</dd>
+</div>
+</dl>
+<button disabled>Sign in</button>
+</section>
+<section>
+<h2>Local operator mode</h2>
+<p>Pair with the local console. Code input is never a provider token.</p>
+<button disabled>Pair</button>
+</section>
+</article>
+<article class="state " id="empty">
+<div class="framehead">
+<strong>Sign in</strong> · Empty</div>
+<section>
+<h2>Empty</h2>
+<p>No session yet. Continue to sign-in; retain the allowlisted Run route.</p>
+</section>
+</article>
+<article class="state " id="loading">
+<div class="framehead">
+<strong>Sign in</strong> · Loading</div>
+<section>
+<h2>Loading</h2>
+<p>Checking session; withhold Run identity until authorized.</p>
+</section>
+</article>
+<article class="state " id="error">
+<div class="framehead">
+<strong>Sign in</strong> · Error</div>
+<section>
+<h2>Error</h2>
+<p>Session expired or return route rejected. Offer fresh sign-in without revealing the resource.</p>
+</section>
+</article>
+<article class="state " id="unavailable">
+<div class="framehead">
+<strong>Sign in</strong> · Backend unavailable</div>
+<section>
+<h2>Backend unavailable</h2>
+<p>BFF unreachable. Sign-in and Run contents unavailable.</p>
+</section>
+</article>
+<article class="state " id="unknown">
+<div class="framehead">
+<strong>Sign in</strong> · UNKNOWN value</div>
+<section>
+<h2>UNKNOWN value</h2>
+<p>Service access has not been established. Do not enable the Run.</p>
+</section>
+<dl>
+<div>
+<dt>Service grants</dt>
+<dd>UNKNOWN</dd>
+</div>
+<div>
+<dt>Reason</dt>
+<dd>Pending verified session</dd>
+</div>
+</dl>
+</article>
+</div>
+</div>
+<section class="aside">
+<strong>Contract boundary</strong>
+<p>PR5 local pairing; PR43/52 shared identity and service access. CP decides scope.</p>
+</section>
+<nav aria-label="Related screen sketches">
+<a href="run.html">Run detail</a>
+<a href="lookup.html">Find a Run</a>
+</nav>
+</main>
+<footer>Every value and state on this page is an inert design fixture. Preview links never perform an operation.</footer>
+</body>
+</html>

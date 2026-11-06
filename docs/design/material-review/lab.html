@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="Content-Security-Policy" content="default-src &apos;none&apos;; script-src &apos;self&apos;; style-src &apos;self&apos;; connect-src &apos;none&apos;; form-action &apos;none&apos;; base-uri &apos;none&apos;"><title>Scenario selection · Perfeng design fixtures</title><link rel="stylesheet" href="material.css"><link rel="stylesheet" href="review.css"><script defer src="review.js"></script></head><body><a href="#main" class="skip">Skip to content</a>
+<header>
+<mat-toolbar class="mat-toolbar mat-toolbar-single-row">
+<span class="brand">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">
+<path d="M3 18V8h4v10 M10 18V3h4v15 M17 18v-7h4v7">
+</path>
+</svg>Perfeng Verifier</span>
+<span class="top-end">Design fixture only</span>
+</mat-toolbar>
+</header>
+<div class="layout">
+<aside class="sidebar">
+<div class="rail-title">Workspace</div>
+<nav aria-label="Workspace navigation">
+<div class="nav-group">
+<div class="group">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">
+<path d="M9 3h6M10 3v7l-6 9q-1 2 1 2h14q2 0 1-2l-6-9V3M8 16h8">
+</path>
+</svg>Verifier</div>
+<a href="lab.html" aria-current="page">Scenario selection</a>
+<a href="campaign.html">Campaign findings and approval</a>
+</div>
+</nav>
+<div class="directory">
+<a href="index.html">Design directory</a>
+</div>
+</aside>
+<main id="main" tabindex="-1">
+<div class="crumb">Verifier</div>
+<div class="title-row">
+<div>
+<h1>Scenario selection</h1>
+<p class="question">Which reviewed campaign should a maintainer run?</p>
+</div>
+<label class="selector">Fixture state<select id="state">
+<option value="example">Example</option>
+<option value="empty">Empty</option>
+<option value="loading">Loading</option>
+<option value="error">Error</option>
+<option value="unavailable">Backend unavailable</option>
+<option value="unknown">UNKNOWN value</option>
+</select>
+</label>
+</div>
+<div class="content">
+<article id="example" aria-label="Example state" class="state">
+<mat-card appearance="outlined" class="mat-mdc-card mdc-card mat-mdc-card-outlined mdc-card--outlined">
+<mat-card-content class="mat-mdc-card-content">
+<h2>Reviewed scenario</h2>
+<dl>
+<div>
+<dt>Scenario / tier</dt>
+<dd>unchanged-repeat / offline</dd>
+</div>
+<div>
+<dt>Purpose</dt>
+<dd>Detect false positives for unchanged synthetic input</dd>
+</div>
+<div>
+<dt>Ground truth</dt>
+<dd>No injected change</dd>
+</div>
+<div>
+<dt>Repetitions</dt>
+<dd>4 (illustrative only)</dd>
+</div>
+<div>
+<dt>Current-phase and research expectations</dt>
+<dd>Separate reviewed sets required</dd>
+</div>
+<div>
+<dt>Review digest</dt>
+<dd>Required before any execution</dd>
+</div>
+</dl>
+</mat-card-content>
+</mat-card>
+<mat-card appearance="outlined" class="mat-mdc-card mdc-card mat-mdc-card-outlined mdc-card--outlined">
+<mat-card-content class="mat-mdc-card-content">
+<h2>Campaign</h2>
+<button matbutton="filled" disabled="true" class="mdc-button mat-mdc-button-base mdc-button--unelevated mat-mdc-unelevated-button mat-mdc-button-disabled mat-unthemed" mat-ripple-loader-uninitialized="" mat-ripple-loader-class-name="mat-mdc-button-ripple" mat-ripple-loader-disabled="">
+<span class="mat-mdc-button-persistent-ripple mdc-button__ripple">
+</span>
+<span class="mdc-button__label">Launch reviewed campaign</span>
+<span class="mat-focus-indicator">
+</span>
+<span class="mat-mdc-button-touch-target">
+</span>
+</button>
+<a matbutton="outlined" href="campaign.html" class="mdc-button mat-mdc-button-base mdc-button--outlined mat-mdc-outlined-button mat-unthemed" mat-ripple-loader-uninitialized="" mat-ripple-loader-class-name="mat-mdc-button-ripple">
+<span class="mat-mdc-button-persistent-ripple mdc-button__ripple">
+</span>
+<span class="mdc-button__label">Inspect example findings</span>
+<span class="mat-focus-indicator">
+</span>
+<span class="mat-mdc-button-touch-target">
+</span>
+</a>
+</mat-card-content>
+</mat-card>
+</article>
+<article id="empty" aria-label="Empty state" hidden="" class="state">
+<div class="message">
+<span class="badge">Empty</span>
+<mat-card appearance="outlined" class="mat-mdc-card mdc-card mat-mdc-card-outlined mdc-card--outlined">
+<mat-card-content class="mat-mdc-card-content">
+<h2>Empty</h2>
+<p>No admitted manifests. No launch available.</p>
+</mat-card-content>
+</mat-card>
+<button matbutton="filled" disabled="true" class="mdc-button mat-mdc-button-base mdc-button--unelevated mat-mdc-unelevated-button mat-mdc-button-disabled mat-unthemed" mat-ripple-loader-uninitialized="" mat-ripple-loader-class-name="mat-mdc-button-ripple" mat-ripple-loader-disabled="">
+<span class="mat-mdc-button-persistent-ripple mdc-button__ripple">
+</span>
+<span class="mdc-button__label">Launch campaign</span>
+<span class="mat-focus-indicator">
+</span>
+<span class="mat-mdc-button-touch-target">
+</span>
+</button>
+</div>
+</article>
+<article id="loading" aria-label="Loading state" hidden="" class="state">
+<div class="message">
+<span class="badge">Loading</span>
+<mat-card appearance="outlined" class="mat-mdc-card mdc-card mat-mdc-card-outlined mdc-card--outlined">
+<mat-card-content class="mat-mdc-card-content">
+<h2>Loading</h2>
+<p>Checking schema and digest-bound review.</p>
+</mat-card-content>
+</mat-card>
+<button matbutton="filled" disabled="true" class="mdc-button mat-mdc-button-base mdc-button--unelevated mat-mdc-unelevated-button mat-mdc-button-disabled mat-unthemed" mat-ripple-loader-uninitialized="" mat-ripple-loader-class-name="mat-mdc-button-ripple" mat-ripple-loader-disabled="">
+<span class="mat-mdc-button-persistent-ripple mdc-button__ripple">
+</span>
+<span class="mdc-button__label">Launch campaign</span>
+<span class="mat-focus-indicator">
+</span>
+<span class="mat-mdc-button-touch-target">
+</span>
+</button>
+</div>
+</article>
+<article id="error" aria-label="Error state" hidden="" class="state">
+<div class="message danger">
+<span class="badge">Error</span>
+<mat-card appearance="outlined" class="mat-mdc-card mdc-card mat-mdc-card-outlined mdc-card--outlined">
+<mat-card-content class="mat-mdc-card-content">
+<h2>Error</h2>
+<p>Tampered or unreviewed manifest rejected before launch.</p>
+</mat-card-content>
+</mat-card>
+<button matbutton="filled" disabled="true" class="mdc-button mat-mdc-button-base mdc-button--unelevated mat-mdc-unelevated-button mat-mdc-button-disabled mat-unthemed" mat-ripple-loader-uninitialized="" mat-ripple-loader-class-name="mat-mdc-button-ripple" mat-ripple-loader-disabled="">
+<span class="mat-mdc-button-persistent-ripple mdc-button__ripple">
+</span>
+<span class="mdc-button__label">Launch campaign</span>
+<span class="mat-focus-indicator">
+</span>
+<span class="mat-mdc-button-touch-target">
+</span>
+</button>
+</div>
+</article>
+<article id="unavailable" aria-label="Backend unavailable state" hidden="" class="state">
+<div class="message danger">
+<span class="badge">Backend unavailable</span>
+<mat-card appearance="outlined" class="mat-mdc-card mdc-card mat-mdc-card-outlined mdc-card--outlined">
+<mat-card-content class="mat-mdc-card-content">
+<h2>Backend unavailable</h2>
+<p>Simulator unavailable: hide campaign choices. CP outage alone does not erase Tier A capability.</p>
+</mat-card-content>
+</mat-card>
+<button matbutton="filled" disabled="true" class="mdc-button mat-mdc-button-base mdc-button--unelevated mat-mdc-unelevated-button mat-mdc-button-disabled mat-unthemed" mat-ripple-loader-uninitialized="" mat-ripple-loader-class-name="mat-mdc-button-ripple" mat-ripple-loader-disabled="">
+<span class="mat-mdc-button-persistent-ripple mdc-button__ripple">
+</span>
+<span class="mdc-button__label">Launch campaign</span>
+<span class="mat-focus-indicator">
+</span>
+<span class="mat-mdc-button-touch-target">
+</span>
+</button>
+</div>
+</article>
+<article id="unknown" aria-label="UNKNOWN value state" hidden="" class="state">
+<div class="message">
+<span class="badge">UNKNOWN value</span>
+<mat-card appearance="outlined" class="mat-mdc-card mdc-card mat-mdc-card-outlined mdc-card--outlined">
+<mat-card-content class="mat-mdc-card-content">
+<h2>UNKNOWN value</h2>
+<p>Review identity UNKNOWN. Block launch.</p>
+</mat-card-content>
+</mat-card>
+<dl>
+<div>
+<dt>Review digest</dt>
+<dd>UNKNOWN</dd>
+</div>
+<div>
+<dt>Reason</dt>
+<dd>Scenario cannot execute</dd>
+</div>
+</dl>
+<button matbutton="filled" disabled="true" class="mdc-button mat-mdc-button-base mdc-button--unelevated mat-mdc-unelevated-button mat-mdc-button-disabled mat-unthemed" mat-ripple-loader-uninitialized="" mat-ripple-loader-class-name="mat-mdc-button-ripple" mat-ripple-loader-disabled="">
+<span class="mat-mdc-button-persistent-ripple mdc-button__ripple">
+</span>
+<span class="mdc-button__label">Launch campaign</span>
+<span class="mat-focus-indicator">
+</span>
+<span class="mat-mdc-button-touch-target">
+</span>
+</button>
+</div>
+</article>
+</div>
+<aside class="source">
+<strong>Contract boundary</strong>
+<p>Optional verifier only, PR8/15/57. Simulator fields are proposed, private to its reviewed protocol. Never expose Lab navigation in ordinary console build.</p>
+</aside>
+<nav aria-label="Related design fixtures" class="related">
+<a href="campaign.html">Campaign findings and approval</a>
+</nav>
+</main>
+</div>
+<div id="announcement" role="status" class="sr">
+</div></body></html>

@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src &apos;none&apos;; style-src &apos;self&apos;; connect-src &apos;none&apos;; form-action &apos;none&apos;; base-uri &apos;none&apos;">
+<title>Child Run · Perfeng wireframes</title>
+<link rel="stylesheet" href="wireframes.css">
+<body>
+<header>
+<div class="labels">DESIGN FIXTURE ONLY · STATIC REVIEW</div>
+<a href="index.html">Screen directory</a>
+</header>
+<main>
+<p class="labels">Runs</p>
+<h1>Child Run</h1>
+<p>Did the real follow-up execution run against the same evidence?</p>
+<nav class="states" aria-label="Review alternate screen states">
+<a href="#example">Example</a>
+<a href="#empty">Empty</a>
+<a href="#loading">Loading</a>
+<a href="#error">Error</a>
+<a href="#unavailable">Backend unavailable</a>
+<a href="#unknown">UNKNOWN value</a>
+</nav>
+<div class="workspace">
+<aside class="rail">
+<h2>Console</h2>
+<nav aria-label="Product sections">
+<a href="lookup.html">Find a Run</a>
+<a href="create.html">Create a Run</a>
+<a href="catalog.html">Catalog and registry</a>
+<a href="baseline.html">Baseline lifecycle</a>
+<a href="health.html">Platform health</a>
+<a href="workers.html">Native workers</a>
+<a href="gaps.html">Observability gaps</a>
+</nav>
+</aside>
+<div class="pane variants">
+<article class="state example" id="example">
+<div class="framehead">
+<strong>Child Run</strong> · Example</div>
+<section>
+<h2>Execution</h2>
+<dl>
+<div>
+<dt>Run ID</dt>
+<dd>perf-20261106-140000-cafebabe</dd>
+</div>
+<div>
+<dt>Current state</dt>
+<dd>RUNNING</dd>
+</div>
+<div>
+<dt>Revision</dt>
+<dd>4</dd>
+</div>
+<div>
+<dt>Suite</dt>
+<dd>search-browser</dd>
+</div>
+<div>
+<dt>Candidate commit (abbreviated)</dt>
+<dd>7a0bc14…</dd>
+</div>
+<div>
+<dt>Profile</dt>
+<dd>regression</dd>
+</div>
+<div>
+<dt>Failure</dt>
+<dd>None reported</dd>
+</div>
+</dl>
+</section>
+<section>
+<h2>Comparison</h2>
+<p>Child analysis pending.</p>
+<a href="receipt.html">View source lineage receipt</a>
+</section>
+<section>
+<h2>Observed revisions</h2>
+<div class="scroll">
+<table>
+<thead>
+<tr>
+<th scope="col">Revision</th>
+<th scope="col">State</th>
+<th scope="col">Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>4</td>
+<td>RUNNING</td>
+<td>Latest snapshot only</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Durable event history and stage durations: NOT OBSERVABLE (G05).</p>
+</section>
+<section>
+<h2>Allowed next states</h2>
+<p>COLLECTING, INFRASTRUCTURE_FAILURE, CANCELLING</p>
+</section>
+<section>
+<h2>Artifact claims</h2>
+<div class="scroll">
+<table>
+<thead>
+<tr>
+<th scope="col">ID (shortened)</th>
+<th scope="col">Kind</th>
+<th scope="col">Format</th>
+<th scope="col">Claimed SHA-256 (shortened)</th>
+</tr>
+</thead>
+<tbody>
+</tbody>
+</table>
+</div>
+<p>A registered checksum is a claim. Protected bytes and verified provenance need PR25–28.</p>
+</section>
+<section>
+<h2>Provenance</h2>
+<div class="scroll">
+<table>
+<thead>
+<tr>
+<th scope="col">Stage</th>
+<th scope="col">Proof</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Raw</td>
+<td>NOT OBSERVABLE · verified content read required</td>
+</tr>
+<tr>
+<td>Normalized</td>
+<td>Registered reference; verify bytes before linking</td>
+</tr>
+<tr>
+<td>Report</td>
+<td>PR46–48 bind candidate, reference and policy</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section>
+<h2>Run actions</h2>
+<a href="cancel.html">Inspect cancellation review</a>
+</section>
+</article>
+<article class="state " id="empty">
+<div class="framehead">
+<strong>Child Run</strong> · Empty</div>
+<section>
+<h2>Empty</h2>
+<p>No child ID known. Return to receipt.</p>
+</section>
+</article>
+<article class="state " id="loading">
+<div class="framehead">
+<strong>Child Run</strong> · Loading</div>
+<section>
+<h2>Loading</h2>
+<p>Looking up child by its accepted ID.</p>
+</section>
+</article>
+<article class="state " id="error">
+<div class="framehead">
+<strong>Child Run</strong> · Error</div>
+<section>
+<h2>Error</h2>
+<p>Receipt and returned child ID disagree. Refuse association.</p>
+</section>
+</article>
+<article class="state " id="unavailable">
+<div class="framehead">
+<strong>Child Run</strong> · Backend unavailable</div>
+<section>
+<h2>Backend unavailable</h2>
+<p>Clear child data; preserve static navigation.</p>
+</section>
+</article>
+<article class="state " id="unknown">
+<div class="framehead">
+<strong>Child Run</strong> · UNKNOWN value</div>
+<section>
+<h2>UNKNOWN value</h2>
+<p>Lineage UNKNOWN without a verified receipt.</p>
+</section>
+<dl>
+<div>
+<dt>Lineage</dt>
+<dd>UNKNOWN</dd>
+</div>
+<div>
+<dt>Reason</dt>
+<dd>Requires verified audit receipt</dd>
+</div>
+</dl>
+</article>
+</div>
+</div>
+<section class="aside">
+<strong>Contract boundary</strong>
+<p>Fixture navigation target only. There is one canonical Run screen, not a second product route type.</p>
+</section>
+<nav aria-label="Related screen sketches">
+<a href="receipt.html">Rerun receipt</a>
+<a href="run.html">Run detail</a>
+</nav>
+</main>
+<footer>Every value and state on this page is an inert design fixture. Preview links never perform an operation.</footer>
+</body>
+</html>

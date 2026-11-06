@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src &apos;none&apos;; style-src &apos;self&apos;; connect-src &apos;none&apos;; form-action &apos;none&apos;; base-uri &apos;none&apos;">
+<title>Campaign findings and approval · Perfeng wireframes</title>
+<link rel="stylesheet" href="wireframes.css">
+<body>
+<header>
+<div class="labels">DESIGN FIXTURE ONLY · STATIC REVIEW</div>
+<a href="index.html">Screen directory</a>
+</header>
+<main>
+<p class="labels">Verifier</p>
+<h1>Campaign findings and approval</h1>
+<p>What differed from expectation, and which exact step requires approval?</p>
+<nav class="states" aria-label="Review alternate screen states">
+<a href="#example">Example</a>
+<a href="#empty">Empty</a>
+<a href="#loading">Loading</a>
+<a href="#error">Error</a>
+<a href="#unavailable">Backend unavailable</a>
+<a href="#unknown">UNKNOWN value</a>
+</nav>
+<div class="workspace">
+<aside class="rail">
+<h2>Verifier</h2>
+<nav aria-label="Product sections">
+<a href="lab.html">Scenario selection</a>
+<a href="campaign.html">Campaign findings and approval</a>
+</nav>
+</aside>
+<div class="pane variants">
+<article class="state example" id="example">
+<div class="framehead">
+<strong>Campaign findings and approval</strong> · Example</div>
+<section>
+<h2>Offline · synthetic</h2>
+<div class="scroll">
+<table>
+<thead>
+<tr>
+<th scope="col">Expectation level</th>
+<th scope="col">Intended</th>
+<th scope="col">Observed</th>
+<th scope="col">Evaluation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Current phase</td>
+<td>Rule PASS</td>
+<td>Rule FAIL</td>
+<td>FINDING</td>
+</tr>
+<tr>
+<td>Research target</td>
+<td>Rule PASS</td>
+<td>Rule FAIL</td>
+<td>FINDING</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section>
+<h2>Detection matrix</h2>
+<div class="scroll">
+<table>
+<thead>
+<tr>
+<th scope="col">Effect / noise</th>
+<th scope="col">TP</th>
+<th scope="col">TN</th>
+<th scope="col">FP</th>
+<th scope="col">FN</th>
+<th scope="col">Abstain</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0% / declared low CV</td>
+<td>0</td>
+<td>3</td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>4 declared, 4 executed. FPR 1/4. TPR UNKNOWN (no positives). Synthetic inputs have no Run link.</p>
+</section>
+<section>
+<h2>Synthetic receipt</h2>
+<dl>
+<div>
+<dt>Harness integrity</dt>
+<dd>VALID</dd>
+</div>
+<div>
+<dt>Execution coverage</dt>
+<dd>COMPLETE · 4 of 4</dd>
+</div>
+<div>
+<dt>Current-phase conformance</dt>
+<dd>FINDINGS</dd>
+</div>
+<div>
+<dt>Research-target conformance</dt>
+<dd>FINDINGS</dd>
+</div>
+<div>
+<dt>Budget</dt>
+<dd>600 active seconds</dd>
+</div>
+</dl>
+</section>
+<section>
+<h2>Separate cluster-step example</h2>
+<dl>
+<div>
+<dt>Target</dt>
+<dd>Disposable search SUT · fixture instance 02</dd>
+</div>
+<div>
+<dt>Operation</dt>
+<dd>Inject +5 ms application delay</dd>
+</div>
+<div>
+<dt>Expected effect</dt>
+<dd>Controlled latency change; observed p95 is not guaranteed</dd>
+</div>
+<div>
+<dt>Intent binding</dt>
+<dd>Campaign + manifest digest + step + exact target + parameters</dd>
+</div>
+<div>
+<dt>Expiry</dt>
+<dd>2026-11-06 14:02 UTC · illustrative only</dd>
+</div>
+<div>
+<dt>Recovery</dt>
+<dd>Separate approval to restore prior delay</dd>
+</div>
+</dl>
+<p>Confirm only this step. The server must validate the current target, digest and time.</p>
+<button disabled>Approve this step</button>
+<a href="run.html">Inspect the same ordinary Run view (cluster fixture only)</a>
+</section>
+</article>
+<article class="state " id="empty">
+<div class="framehead">
+<strong>Campaign findings and approval</strong> · Empty</div>
+<section>
+<h2>Empty</h2>
+<p>No repetitions executed. Conformance undetermined.</p>
+</section>
+<button disabled>Approve step</button>
+</article>
+<article class="state " id="loading">
+<div class="framehead">
+<strong>Campaign findings and approval</strong> · Loading</div>
+<section>
+<h2>Loading</h2>
+<p>Collecting a new scoped observation; no optimistic result.</p>
+</section>
+<button disabled>Approve step</button>
+</article>
+<article class="state " id="error">
+<div class="framehead">
+<strong>Campaign findings and approval</strong> · Error</div>
+<section>
+<h2>Error</h2>
+<p>Uncertain mutation after interruption; no redispatch until reconciled.</p>
+</section>
+<button disabled>Approve step</button>
+</article>
+<article class="state " id="unavailable">
+<div class="framehead">
+<strong>Campaign findings and approval</strong> · Backend unavailable</div>
+<section>
+<h2>Backend unavailable</h2>
+<p>Clear live simulator status; separately opened historical receipts retain original date.</p>
+</section>
+<button disabled>Approve step</button>
+</article>
+<article class="state " id="unknown">
+<div class="framehead">
+<strong>Campaign findings and approval</strong> · UNKNOWN value</div>
+<section>
+<h2>UNKNOWN value</h2>
+<p>Zero denominator yields UNKNOWN rate. Report abstentions and planned count.</p>
+</section>
+<dl>
+<div>
+<dt>True positive rate</dt>
+<dd>UNKNOWN</dd>
+</div>
+<div>
+<dt>Reason</dt>
+<dd>Zero positives in synthetic cell</dd>
+</div>
+</dl>
+<button disabled>Approve step</button>
+</article>
+</div>
+</div>
+<section class="aside">
+<strong>Contract boundary</strong>
+<p>PR9–17/40/41/57. No platform verdict derived by the UI; partial export is historical. No synthetic Run links.</p>
+</section>
+<nav aria-label="Related screen sketches">
+<a href="lab.html">Scenario selection</a>
+<a href="run.html">Run detail</a>
+</nav>
+</main>
+<footer>Every value and state on this page is an inert design fixture. Preview links never perform an operation.</footer>
+</body>
+</html>

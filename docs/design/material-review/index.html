@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="Content-Security-Policy" content="default-src &apos;none&apos;; script-src &apos;self&apos;; style-src &apos;self&apos;; connect-src &apos;none&apos;; form-action &apos;none&apos;; base-uri &apos;none&apos;"><title>Screen designs · Perfeng design fixtures</title><link rel="stylesheet" href="material.css"><link rel="stylesheet" href="review.css"><script defer src="review.js"></script></head><body><a href="#main" class="skip">Skip to content</a>
+<header>
+<mat-toolbar class="mat-toolbar mat-toolbar-single-row">
+<span class="brand">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">
+<path d="M3 18V8h4v10 M10 18V3h4v15 M17 18v-7h4v7">
+</path>
+</svg>Perfeng Console</span>
+<span class="top-end">Design fixture only</span>
+</mat-toolbar>
+</header>
+<div class="layout">
+<aside class="sidebar">
+<div class="rail-title">Workspace</div>
+<nav aria-label="Workspace navigation">
+<div class="nav-group">
+<div class="group">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">
+<path d="M3 6h18M3 12h12M3 18h16">
+</path>
+</svg>Runs</div>
+<a href="lookup.html">Find a Run</a>
+<a href="create.html">Create a Run</a>
+</div>
+<div class="nav-group">
+<div class="group">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">
+<path d="m12 3 9 5-9 5-9-5z M3 12l9 5 9-5M3 16l9 5 9-5">
+</path>
+</svg>Resources</div>
+<a href="catalog.html">Catalog and registry</a>
+<a href="baseline.html">Baseline lifecycle</a>
+</div>
+<div class="nav-group">
+<div class="group">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">
+<path d="M2 13h5l3-8 4 14 3-8h5">
+</path>
+</svg>Diagnostics</div>
+<a href="health.html">Platform health</a>
+<a href="workers.html">Native workers</a>
+<a href="gaps.html">Observability gaps</a>
+</div>
+</nav>
+<div class="directory">
+<a href="index.html">Design directory</a>
+</div>
+</aside>
+<main id="main" tabindex="-1">
+<div class="crumb">Design review</div>
+<div class="index-head">
+<h1>Screen designs</h1>
+<p><strong>Implementation guideline.</strong> Use these screens to guide layout and interaction. Do not copy the exported markup, styles, scripts or fixture data into the application.</p>
+<p class="question">Review the console and the independently released verifier.</p>
+</div>
+<div class="summary">
+<span class="minor">Service engineer journey</span>
+<h2>From CI evidence to an audited rerun</h2>
+<p>Open a real Run, inspect its bound reference, then follow the newly requested execution.</p>
+<a href="session.html" matbutton="filled" class="mdc-button mat-mdc-button-base mdc-button--unelevated mat-mdc-unelevated-button mat-unthemed" mat-ripple-loader-uninitialized="" mat-ripple-loader-class-name="mat-mdc-button-ripple">
+<span class="mat-mdc-button-persistent-ripple mdc-button__ripple">
+</span>
+<span class="mdc-button__label">Start at sign-in</span>
+<span class="mat-focus-indicator">
+</span>
+<span class="mat-mdc-button-touch-target">
+</span>
+</a>
+<a href="report.html" matbutton="outlined" class="mdc-button mat-mdc-button-base mdc-button--outlined mat-mdc-outlined-button mat-unthemed" mat-ripple-loader-uninitialized="" mat-ripple-loader-class-name="mat-mdc-button-ripple">
+<span class="mat-mdc-button-persistent-ripple mdc-button__ripple">
+</span>
+<span class="mdc-button__label">Preview comparison</span>
+<span class="mat-focus-indicator">
+</span>
+<span class="mat-mdc-button-touch-target">
+</span>
+</a>
+</div>
+<section class="directory-group">
+<h2>Access and execution</h2>
+<div class="directory-grid">
+<a href="session.html" class="tile">
+<strong>Sign in</strong>
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">
+<path d="M4 12h15m-6-6 6 6-6 6">
+</path>
+</svg>
+</a>
+<a href="lookup.html" class="tile">
+<strong>Find a Run</strong>
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">
+<path d="M4 12h15m-6-6 6 6-6 6">
+</path>
+</svg>
+</a>
+<a href="create.html" class="tile">
+<strong>Create a Run</strong>
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">
+<path d="M4 12h15m-6-6 6 6-6 6">
+</path>
+</svg>
+</a>
+<a href="cancel.html" class="tile">
+<strong>Review cancellation</strong>
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">
+<path d="M4 12h15m-6-6 6 6-6 6">
+</path>
+</svg>
+</a>
+</div>
+</section>
+<section class="directory-group">
+<h2>Maya’s CI Run</h2>
+<div class="directory-grid">
+<a href="run.html" class="tile">
+<strong>Run detail</strong>
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">
+<path d="M4 12h15m-6-6 6 6-6 6">
+</path>
+</svg>
+</a>
+<a href="report.html" class="tile">
+<strong>Baseline comparison and report</strong>
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">
+<path d="M4 12h15m-6-6 6 6-6 6">
+</path>
+</svg>
+</a>
+<a href="rerun.html" class="tile">
+<strong>Review rerun</strong>
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">
+<path d="M4 12h15m-6-6 6 6-6 6">
+</path>
+</svg>
+</a>
+<a href="receipt.html" class="tile">
+<strong>Rerun receipt</strong>
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">
+<path d="M4 12h15m-6-6 6 6-6 6">
+</path>
+</svg>
+</a>
+<a href="child.html" class="tile">
+<strong>Child Run</strong>
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">
+<path d="M4 12h15m-6-6 6 6-6 6">
+</path>
+</svg>
+</a>
+</div>
+</section>
+<section class="directory-group">
+<h2>Resources and diagnostics</h2>
+<div class="directory-grid">
+<a href="catalog.html" class="tile">
+<strong>Catalog and registry</strong>
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">
+<path d="M4 12h15m-6-6 6 6-6 6">
+</path>
+</svg>
+</a>
+<a href="baseline.html" class="tile">
+<strong>Baseline lifecycle</strong>
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">
+<path d="M4 12h15m-6-6 6 6-6 6">
+</path>
+</svg>
+</a>
+<a href="health.html" class="tile">
+<strong>Platform health</strong>
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">
+<path d="M4 12h15m-6-6 6 6-6 6">
+</path>
+</svg>
+</a>
+<a href="workers.html" class="tile">
+<strong>Native workers</strong>
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">
+<path d="M4 12h15m-6-6 6 6-6 6">
+</path>
+</svg>
+</a>
+<a href="gaps.html" class="tile">
+<strong>Observability gaps</strong>
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">
+<path d="M4 12h15m-6-6 6 6-6 6">
+</path>
+</svg>
+</a>
+</div>
+</section>
+<section class="directory-group">
+<h2>Post-pilot proposals</h2>
+<div class="directory-grid">
+<a href="onboard.html" class="tile">
+<strong>Service onboarding proposal</strong>
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">
+<path d="M4 12h15m-6-6 6 6-6 6">
+</path>
+</svg>
+</a>
+<a href="policy.html" class="tile">
+<strong>Policy change proposal</strong>
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">
+<path d="M4 12h15m-6-6 6 6-6 6">
+</path>
+</svg>
+</a>
+</div>
+</section>
+<section class="directory-group">
+<h2>Maintainer verifier</h2>
+<div class="directory-grid">
+<a href="lab.html" class="tile">
+<strong>Scenario selection</strong>
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">
+<path d="M4 12h15m-6-6 6 6-6 6">
+</path>
+</svg>
+</a>
+<a href="campaign.html" class="tile">
+<strong>Campaign findings and approval</strong>
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">
+<path d="M4 12h15m-6-6 6 6-6 6">
+</path>
+</svg>
+</a>
+</div>
+</section>
+</main>
+</div>
+<div id="announcement" role="status" class="sr">
+</div></body></html>

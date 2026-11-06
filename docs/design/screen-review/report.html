@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src &apos;none&apos;; style-src &apos;self&apos;; connect-src &apos;none&apos;; form-action &apos;none&apos;; base-uri &apos;none&apos;">
+<title>Baseline comparison and report · Perfeng wireframes</title>
+<link rel="stylesheet" href="wireframes.css">
+<body>
+<header>
+<div class="labels">DESIGN FIXTURE ONLY · STATIC REVIEW</div>
+<a href="index.html">Screen directory</a>
+</header>
+<main>
+<p class="labels">Runs</p>
+<h1>Baseline comparison and report</h1>
+<p>Is the candidate worse than the exact baseline used for this Run?</p>
+<nav class="states" aria-label="Review alternate screen states">
+<a href="#example">Example</a>
+<a href="#empty">Empty</a>
+<a href="#loading">Loading</a>
+<a href="#error">Error</a>
+<a href="#unavailable">Backend unavailable</a>
+<a href="#unknown">UNKNOWN value</a>
+</nav>
+<div class="workspace">
+<aside class="rail">
+<h2>Console</h2>
+<nav aria-label="Product sections">
+<a href="lookup.html">Find a Run</a>
+<a href="create.html">Create a Run</a>
+<a href="catalog.html">Catalog and registry</a>
+<a href="baseline.html">Baseline lifecycle</a>
+<a href="health.html">Platform health</a>
+<a href="workers.html">Native workers</a>
+<a href="gaps.html">Observability gaps</a>
+</nav>
+</aside>
+<div class="pane variants">
+<article class="state example" id="example">
+<div class="framehead">
+<strong>Baseline comparison and report</strong> · Example</div>
+<section>
+<h2>1 · Identity</h2>
+<dl>
+<div>
+<dt>Test</dt>
+<dd>search-browser</dd>
+</div>
+<div>
+<dt>Run</dt>
+<dd>perf-20260902-130000-a1b2c3d5</dd>
+</div>
+<div>
+<dt>Candidate commit</dt>
+<dd>7a0bc14…</dd>
+</div>
+<div>
+<dt>Reference (planned bound projection)</dt>
+<dd>approved-search-browser @ 1.0.0</dd>
+</div>
+<div>
+<dt>Policy</dt>
+<dd>search-browser @ 1.0.0</dd>
+</div>
+<div>
+<dt>Mode</dt>
+<dd>inform · blocking false</dd>
+</div>
+</dl>
+</section>
+<section>
+<h2>2 · Requirement Evaluation</h2>
+<div class="scroll">
+<table>
+<thead>
+<tr>
+<th scope="col">Rule / statistic</th>
+<th scope="col">Bound</th>
+<th scope="col">Observed</th>
+<th scope="col">SLO</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>search-latency / mean</td>
+<td>≤ 200 ms</td>
+<td>140 ms</td>
+<td>PASS</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section>
+<h2>3 · Regression Evaluation</h2>
+<div class="scroll">
+<table>
+<thead>
+<tr>
+<th scope="col">Metric</th>
+<th scope="col">Reference</th>
+<th scope="col">Candidate</th>
+<th scope="col">Relative change</th>
+<th scope="col">Verdict</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ui.search.action_to_visible_ms</td>
+<td>100 ms</td>
+<td>140 ms</td>
+<td>+40%</td>
+<td>FAIL</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Lower is better. Practical threshold +10% from the example policy. Point comparison; no significance estimate.</p>
+</section>
+<section>
+<h2>4 · Measurement Quality</h2>
+<dl>
+<div>
+<dt>Quality</dt>
+<dd>PASS</dd>
+</div>
+<div>
+<dt>Samples</dt>
+<dd>2</dd>
+</div>
+<div>
+<dt>CV</dt>
+<dd>UNKNOWN · not supplied</dd>
+</div>
+</dl>
+</section>
+<section>
+<h2>5 · Diagnostic Changes</h2>
+<p>UNKNOWN · no diagnostic measurements in analysis/v1.</p>
+</section>
+<section>
+<h2>6 · Final Result</h2>
+<dl>
+<div>
+<dt>Overall</dt>
+<dd>UNKNOWN · no aggregate field</dd>
+</div>
+<div>
+<dt>Rule result</dt>
+<dd>Quality PASS · SLO PASS · regression FAIL</dd>
+</div>
+</dl>
+<a href="rerun.html">Review a real rerun</a>
+</section>
+</article>
+<article class="state " id="empty">
+<div class="framehead">
+<strong>Baseline comparison and report</strong> · Empty</div>
+<section>
+<h2>Empty</h2>
+<p>No report yet. Execution state alone cannot predict its verdict.</p>
+</section>
+<section>
+<h2>Identity</h2>
+<p>—</p>
+</section>
+<section>
+<h2>Requirement Evaluation</h2>
+<p>—</p>
+</section>
+<section>
+<h2>Regression Evaluation</h2>
+<p>—</p>
+</section>
+<section>
+<h2>Measurement Quality</h2>
+<p>—</p>
+</section>
+<section>
+<h2>Diagnostic Changes</h2>
+<p>—</p>
+</section>
+<section>
+<h2>Final Result</h2>
+<p>—</p>
+</section>
+</article>
+<article class="state " id="loading">
+<div class="framehead">
+<strong>Baseline comparison and report</strong> · Loading</div>
+<section>
+<h2>Loading</h2>
+<p>Resolving run-used policy, reference and candidate digests.</p>
+</section>
+<section>
+<h2>Identity</h2>
+<p>—</p>
+</section>
+<section>
+<h2>Requirement Evaluation</h2>
+<p>—</p>
+</section>
+<section>
+<h2>Regression Evaluation</h2>
+<p>—</p>
+</section>
+<section>
+<h2>Measurement Quality</h2>
+<p>—</p>
+</section>
+<section>
+<h2>Diagnostic Changes</h2>
+<p>—</p>
+</section>
+<section>
+<h2>Final Result</h2>
+<p>—</p>
+</section>
+</article>
+<article class="state " id="error">
+<div class="framehead">
+<strong>Baseline comparison and report</strong> · Error</div>
+<section>
+<h2>Error</h2>
+<p>Mismatch between Run and artifact identity. Reject the affected comparison.</p>
+</section>
+<section>
+<h2>Identity</h2>
+<p>—</p>
+</section>
+<section>
+<h2>Requirement Evaluation</h2>
+<p>—</p>
+</section>
+<section>
+<h2>Regression Evaluation</h2>
+<p>—</p>
+</section>
+<section>
+<h2>Measurement Quality</h2>
+<p>—</p>
+</section>
+<section>
+<h2>Diagnostic Changes</h2>
+<p>—</p>
+</section>
+<section>
+<h2>Final Result</h2>
+<p>—</p>
+</section>
+</article>
+<article class="state " id="unavailable">
+<div class="framehead">
+<strong>Baseline comparison and report</strong> · Backend unavailable</div>
+<section>
+<h2>Backend unavailable</h2>
+<p>Clear all six sections’ live values; disable rerun.</p>
+</section>
+<section>
+<h2>Identity</h2>
+<p>—</p>
+</section>
+<section>
+<h2>Requirement Evaluation</h2>
+<p>—</p>
+</section>
+<section>
+<h2>Regression Evaluation</h2>
+<p>—</p>
+</section>
+<section>
+<h2>Measurement Quality</h2>
+<p>—</p>
+</section>
+<section>
+<h2>Diagnostic Changes</h2>
+<p>—</p>
+</section>
+<section>
+<h2>Final Result</h2>
+<p>—</p>
+</section>
+</article>
+<article class="state " id="unknown">
+<div class="framehead">
+<strong>Baseline comparison and report</strong> · UNKNOWN value</div>
+<section>
+<h2>UNKNOWN value</h2>
+<p>Per-rule result present, overall result UNKNOWN. No severity roll-up.</p>
+</section>
+<dl>
+<div>
+<dt>Overall result</dt>
+<dd>UNKNOWN</dd>
+</div>
+<div>
+<dt>Reason</dt>
+<dd>Rule-level regression FAIL can still be visible</dd>
+</div>
+</dl>
+<section>
+<h2>Identity</h2>
+<p>perf-20260902-130000-a1b2c3d5</p>
+</section>
+<section>
+<h2>Requirement Evaluation</h2>
+<p>search-latency · PASS · 140 ms</p>
+</section>
+<section>
+<h2>Regression Evaluation</h2>
+<p>FAIL · 100 ms reference, 140 ms candidate</p>
+</section>
+<section>
+<h2>Measurement Quality</h2>
+<p>PASS · 2 samples · CV UNKNOWN</p>
+</section>
+<section>
+<h2>Diagnostic Changes</h2>
+<p>UNKNOWN · no measurements supplied</p>
+</section>
+<section>
+<h2>Final Result</h2>
+<p>Overall UNKNOWN</p>
+</section>
+</article>
+</div>
+</div>
+<section class="aside">
+<strong>Contract boundary</strong>
+<p>PR25–28/46–48 protected native comparison/policy evidence pending. Integration getPerformanceAnalysis requires issuer + requestId and scoped association; not a general Run report. No native overall verdict/diagnostics.</p>
+</section>
+<nav aria-label="Related screen sketches">
+<a href="run.html">Run detail</a>
+<a href="rerun.html">Review rerun</a>
+<a href="baseline.html">Baseline lifecycle</a>
+<a href="gaps.html">Observability gaps</a>
+</nav>
+</main>
+<footer>Every value and state on this page is an inert design fixture. Preview links never perform an operation.</footer>
+</body>
+</html>
