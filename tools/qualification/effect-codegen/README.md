@@ -37,4 +37,4 @@ Generation writes only this disposable fixture's outputs. Existing checked-in ra
 - `receipt.json` binds versions, tarball integrity, lock and artifact hashes and explicitly marks unexecuted gates.
 - `metadata.json` is the exact official npm metadata inspected for the selected generator.
 
-The authoritative status and limitations are in [the C5b receipt](../../../../docs/development/effect-codegen-qualification.md).
+The authoritative status and limitations are in [the C5b receipt](../../../docs/development/effect-codegen-qualification.md).
