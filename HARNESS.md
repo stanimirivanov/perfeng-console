@@ -152,3 +152,18 @@ Explicit regeneration refuses edited previous output and unowned files, then
 removes unchanged retired outputs. A local exclusive lock prevents concurrent
 writers; interruption or a failed check requires review rather than forced cleanup.
 This guard does not activate the blocked Effect candidate or retire Ajv.
+
+## Fixed-origin upstream transport
+
+The BFF currently exposes one typed Run read at its upstream boundary.
+Deployment configuration provides the approved HTTPS origin, CA file and
+bearer file. Load the files at transport construction and reconstruct the
+transport to rotate either. On Linux with procfs, use canonical absolute
+paths under root- or service-user-owned directories without group or other
+write access. The files must be private, singly linked regular files owned
+by the effective service user. Keep them outside source and build output.
+
+The defaults cap the whole read at three seconds and one MiB. The transport
+uses explicit TLS trust, refuses redirects, and returns bounded reason codes
+for failures. The integration test uses OpenSSL and loopback HTTPS. Session
+binding and safe browser presentation belong to later slices.
