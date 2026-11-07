@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
-import { closeSync, existsSync, lstatSync, mkdirSync, openSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
-import { dirname, join, posix } from "node:path";
+import { closeSync, existsSync, lstatSync, mkdirSync, openSync, readFileSync, realpathSync, readdirSync, rmSync, writeFileSync } from "node:fs";
+import { dirname, join, posix, resolve } from "node:path";
 
 const ledgerName = "generated-manifest.json";
 const lockName = ".generation.lock";
@@ -15,7 +15,7 @@ function validateName(name: string) {
 
 export function synchronizeOutputs(root: string, outputs: ReadonlyMap<string, string>, write: boolean) {
   const rootInfo = lstatSync(root);
-  if (!rootInfo.isDirectory() || rootInfo.isSymbolicLink()) throw Error("Unsafe generated root.");
+  if (!rootInfo.isDirectory() || rootInfo.isSymbolicLink() || realpathSync(root) !== resolve(root)) throw Error("Unsafe generated root.");
   let lock: number | undefined;
   if (write) lock = openSync(join(root, lockName), "wx", 0o600);
   else if (existsSync(join(root, lockName))) throw Error("Generation is in progress.");

@@ -67,7 +67,7 @@ src/generated/generated-manifest.json separates compiler-owned output from AGENT
 Checking compares the complete output set. Regeneration preflights all existing
 files before changing any of them, refuses unowned or edited files, and removes
 only unchanged previously owned outputs that have been retired. Unsafe ledger
-paths and symlinks fail closed. The write command uses an exclusive local lock;
+paths and symlinks, including output-root ancestors, fail closed. The write command uses an exclusive local lock;
 a leftover lock after interruption must be inspected explicitly.
 The manifest itself is generated and byte-compared, never hand-maintained.
 C7 candidate adoption and source-attestation requirements remain separately pending.

@@ -59,3 +59,13 @@ test("a symlinked output root never creates a lock or writes into its target", (
     assert.equal(existsSync(join(actual, "new.ts")), false);
   } finally { rmSync(area, { recursive: true, force: true }); }
 });
+
+test("symlinked ancestors do not authorize writes through an ordinary root directory", () => {
+  const area = mkdtempSync(join(tmpdir(), "generated-ancestor-"));
+  try {
+    mkdirSync(join(area, "actual", "generated"), { recursive: true });
+    symlinkSync(join(area, "actual"), join(area, "source"));
+    assert.throws(() => synchronizeOutputs(join(area, "source", "generated"), new Map([["new.ts", "new"]]), true), /root/);
+    assert.equal(existsSync(join(area, "actual", "generated", "new.ts")), false);
+  } finally { rmSync(area, { recursive: true, force: true }); }
+});
