@@ -16,6 +16,7 @@ typecheck:
 architecture:
 	node harness/boundaries.ts
 	node harness/workspace.ts
+	node harness/ownership.ts
 	node harness/assets.ts
 
 test:

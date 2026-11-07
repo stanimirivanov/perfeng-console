@@ -1,0 +1,25 @@
+{
+  "date": "2026-11-07",
+  "effect": "4.1.2",
+  "typescript": "6.0.3",
+  "playwright": "1.65.0",
+  "browser": {
+    "status": "partial_qualification",
+    "passed": 6,
+    "failed": 0
+  },
+  "bff": {
+    "status": "blocked",
+    "passed": 0,
+    "failed": 3
+  },
+  "production_changed": false,
+  "make_verify": "passed",
+  "sha256": {
+    "README.md": "7a7c94e3310cb6e2109c2f1cd08fd4a22c47a3e6631d375131c897b5a3da5bf4",
+    "bff.test.mjs": "097fdef6254e339ccc6aaeba31ae6a9a7da9b9369d6f33dd6cbfb1ac08c9c1d1",
+    "browser.ts": "81fc29cf8d15a149b5ec0372f3707b9545246dd7b7c9a298c85b3094f8dd16a4",
+    "qualification.test.mjs": "96d42494f6ccb651811ac9efe1b71ddd7059c910f8425906fad119dd832bf439",
+    "tsconfig.json": "e54011324b522c27d334265cc7c117b0a29efc956938c9273071c6f5da5f2495"
+  }
+}

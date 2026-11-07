@@ -14,3 +14,40 @@ For UI tasks, read the [design implementation guidance](docs/design/material-rev
 Keep architecture and sensor changes visible in review. A recurring failure earns a small executable regression and a local instruction where the mistake occurs.
 
 Nx owns one Angular browser application in apps/console. Verification is a distinctly themed, labeled maintainer area; keep runner code, fault adapters and credentials outside the browser. apps/web-e2e owns browser regressions and tagged guide journeys. Read its scoped instructions before changing capture. Run make build and make browser-test after browser changes, and make guide after narrated journey changes. Generated guide output stays outside Git.
+
+## Commands
+
+Use the repository gates for the build (`make build`), tests (`make test`),
+type checking (`make typecheck`), and lint (`make lint`). Run `make verify`
+before handoff. Run `make supply-chain` for delivery.
+
+## Architecture and code style
+
+Read [runtime ownership](docs/development/runtime-ownership.md) before adding state,
+I/O, concurrency or resource lifetimes. Angular owns rendering and local interaction;
+SignalStore owns shared observations; Effect owns scoped asynchronous operations.
+Keep pure transformations in plain TypeScript. Use the owning layer guide for details.
+
+[Harness rules](docs/development/harness-rules.md) specify the required sensors and
+explicitly identify pending enforcement. Existing passing gates do not admit a new
+adapter or prove the full ownership model. Preserve generated contracts and Ajv.
+
+## Review checklist
+
+- Identify the state writer, operation owner, runtime scope and authority boundary.
+- Verify teardown, late-result rejection and safe failure projection where relevant.
+- Preserve credential, TLS, deadline, response-limit and contract guarantees.
+- Add a negative fixture with each new mechanical rule; report enforcement gaps.
+- Explain security rationale and subtle invariants without restating code.
+- Run the applicable gates and distinguish planned rules from verified behavior.
+
+## Reference files
+
+- [Runtime and state ownership](docs/development/runtime-ownership.md)
+- [Harness rule specification](docs/development/harness-rules.md)
+- [BFF ownership](src/bff/AGENTS.md)
+- [Browser ownership](src/browser/AGENTS.md)
+- [Fixed-origin acceptance](HARNESS.md#fixed-origin-upstream-transport)
+
+Qualified BFF examples: [lazy reader](src/bff/run-reader.ts) and
+[composition boundary](src/bff/transport.ts). Browser integration remains a later slice.
