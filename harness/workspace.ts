@@ -46,6 +46,7 @@ export function checkApp(root: string): string[] {
           ? !relative(resolve(root, "src"), resolve(dirname(file), name)).startsWith("..")
           : ["@angular/core", "@angular/platform-browser", "@angular/router",
              "@angular/common", "@angular/material/button",
+             ...(["main.ts", "session-client.ts"].includes(relative(resolve(root, "src"), file)) ? ["effect"] : []),
              ...(file.endsWith(".spec.ts") ? ["@angular/core/testing", "@ngrx/signals", "effect"] : [])].includes(name);
         if (!allowed || (!file.endsWith(".spec.ts") && name.includes(".spec")) || /[%?#\\]/u.test(name))
           report(node, "dependency", "Forbidden browser dependency " + name);
