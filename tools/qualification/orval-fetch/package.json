@@ -1,0 +1,15 @@
+{
+  "name": "perfeng-orval-fetch-qualification",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@12.16.1",
+  "scripts": {
+    "repro": "orval --config orval.config.ts && tsc --project tsconfig.json",
+    "matrix": "sh qualify.sh",
+    "control": "orval --config control.config.ts && tsc --ignoreConfig --strict --noEmit --module esnext --moduleResolution bundler generated/control/client.ts"
+  },
+  "devDependencies": {
+    "orval": "8.46.0",
+    "typescript": "6.0.3"
+  }
+}
