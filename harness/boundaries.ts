@@ -92,8 +92,10 @@ export function scan(root: string): string[] {
     const name = relative(join(root, 'src'), path);
     const owner = name.split('/')[0]!;
     if (!Object.hasOwn(policy, owner)) issues.push(`src/${name} [owner] Assign an explicit layer.`);
-    else if (name.endsWith('.ts') || name.endsWith('.tsx')) issues.push(...inspectFile(root, path, owner));
-    else if (!/\.(md|css)$/u.test(name)) issues.push(`src/${name} [extension] Use TypeScript or review the source format.`);
+    else if (name.endsWith('.ts') || name.endsWith('.tsx') || name.endsWith('.d.mts')) issues.push(...inspectFile(root, path, owner));
+    else if (name === 'generated/validators.mjs') {
+      // Bytes are regenerated and compared by the offline contract gate.
+    } else if (!/\.(md|css)$/u.test(name)) issues.push(`src/${name} [extension] Use TypeScript or review the source format.`);
   }
   walk(join(root, 'src'));
   return issues;

@@ -3,6 +3,9 @@ import tseslint from 'typescript-eslint';
 export default [
   { ignores: ['node_modules/**', '.pnpm-store/**', 'dist/**', '.nx/**', 'test-results/**', 'playwright-report/**'] },
   ...tseslint.configs.recommended,
+  // Compiler-owned output is byte-checked offline; Ajv emits unused validation context arguments.
+  { files: ['src/generated/validators.mjs'], rules: { '@typescript-eslint/no-unused-vars': 'off' } },
+
   {
     files: ['**/*.{ts,tsx,mjs}'],
     linterOptions: { noInlineConfig: true },

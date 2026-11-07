@@ -126,3 +126,11 @@ secret/fixture markers. This is a regression sensor, not a general secret detect
 No production fixture, arbitrary Sass import or server resource is permitted.
 The strict-template mechanism is documented at
 https://angular.dev/tools/cli/template-typecheck.
+
+## Offline contract gate
+
+make verify begins with make contracts-check. The gate verifies vendored inventory,
+hashes and local references, then compares regenerated types and validators.
+make contracts-generate is the explicit write command. Both require util-linux
+unshare with Linux user/network namespaces and retain Node filesystem permissions.
+Read docs/development/contracts.md before updating provider or generator pins.

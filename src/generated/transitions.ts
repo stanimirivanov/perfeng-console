@@ -1,0 +1,54 @@
+export const transitions = {
+  "CREATED": [
+    "VALIDATING",
+    "ABORTED"
+  ],
+  "VALIDATING": [
+    "PROVISIONING",
+    "INVALID",
+    "INFRASTRUCTURE_FAILURE",
+    "ABORTED"
+  ],
+  "PROVISIONING": [
+    "WARMING_UP",
+    "RUNNING",
+    "INFRASTRUCTURE_FAILURE",
+    "CANCELLING"
+  ],
+  "WARMING_UP": [
+    "RUNNING",
+    "COLLECTING",
+    "INFRASTRUCTURE_FAILURE",
+    "CANCELLING"
+  ],
+  "RUNNING": [
+    "COLLECTING",
+    "INFRASTRUCTURE_FAILURE",
+    "CANCELLING"
+  ],
+  "COLLECTING": [
+    "ANALYZING",
+    "TEST_FAILURE",
+    "INFRASTRUCTURE_FAILURE",
+    "CANCELLING"
+  ],
+  "ANALYZING": [
+    "REPORTING",
+    "INFRASTRUCTURE_FAILURE",
+    "CANCELLING"
+  ],
+  "REPORTING": [
+    "COMPLETED",
+    "INFRASTRUCTURE_FAILURE",
+    "CANCELLING"
+  ],
+  "CANCELLING": [
+    "ABORTED",
+    "INFRASTRUCTURE_FAILURE"
+  ],
+  "COMPLETED": [],
+  "INVALID": [],
+  "ABORTED": [],
+  "INFRASTRUCTURE_FAILURE": [],
+  "TEST_FAILURE": []
+} as const;
