@@ -50,7 +50,8 @@ try {
   if (!rss) throw Error("tsserver resident memory unavailable.");
   const receipt = { typescript: "6.0.3", node: process.versions.node,
     workload: "Run.state completion at an actual generated-type consumer",
-    coldMs: samples[0], warmP50Ms: warm[2], warmP95Ms: warm[3], samples,
+    coldMs: samples[0], warmP50Ms: warm[Math.ceil(warm.length * 0.5) - 1],
+    warmP95Ms: warm[Math.ceil(warm.length * 0.95) - 1], samples,
     rssKiB: Number(rss) };
   writeFileSync("dist/qualification/editor-baseline.json", JSON.stringify(receipt, null, 2) + "\n");
   console.log(JSON.stringify(receipt, null, 2));

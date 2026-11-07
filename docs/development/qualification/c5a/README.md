@@ -24,8 +24,9 @@ The compiler workload runs the exact tsc project five times with extended diagno
 The editor workload opens an in-memory consumer in the pinned tsserver and requires
 Run.state to appear in completion results. First completion is measured after open,
 so coldMs excludes process startup and open acknowledgement. Four later completions
-supply warm samples; the reported p95 is their maximum, not a robust population
-quantile. RSS is the Linux process resident memory after those queries.
+supply warm samples. Both percentiles use empirical nearest rank; p95 is the
+maximum of four observations, so it is not a robust population quantile. The
+receipt preserves the raw samples and records the corrected p50 derivation. RSS is the Linux process resident memory after those queries.
 
 These small samples provide a reproducible baseline and no latency improvement
 claim. Candidate admission needs at least 30 repeated matched observations and
