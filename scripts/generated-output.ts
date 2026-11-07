@@ -14,6 +14,8 @@ function validateName(name: string) {
 }
 
 export function synchronizeOutputs(root: string, outputs: ReadonlyMap<string, string>, write: boolean) {
+  const rootInfo = lstatSync(root);
+  if (!rootInfo.isDirectory() || rootInfo.isSymbolicLink()) throw Error("Unsafe generated root.");
   let lock: number | undefined;
   if (write) lock = openSync(join(root, lockName), "wx", 0o600);
   else if (existsSync(join(root, lockName))) throw Error("Generation is in progress.");

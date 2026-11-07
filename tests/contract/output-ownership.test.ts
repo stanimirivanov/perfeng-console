@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { mkdtempSync, readFileSync, writeFileSync, existsSync, rmSync, symlinkSync } from "node:fs";
+import { mkdtempSync, readFileSync, writeFileSync, existsSync, rmSync, symlinkSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { synchronizeOutputs } from "../../scripts/generated-output.ts";
@@ -46,4 +46,16 @@ test("symlinks and concurrent writes cannot take ownership", () => {
     symlinkSync("/tmp", join(root, "escape"));
     assert.throws(() => synchronizeOutputs(root, new Map(), true), /symlink/);
   } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test("a symlinked output root never creates a lock or writes into its target", () => {
+  const area = mkdtempSync(join(tmpdir(), "generated-root-"));
+  try {
+    const actual = join(area, "actual");
+    mkdirSync(actual);
+    symlinkSync(actual, join(area, "link"));
+    assert.throws(() => synchronizeOutputs(join(area, "link"), new Map([["new.ts", "new"]]), true), /root/);
+    assert.equal(existsSync(join(actual, ".generation.lock")), false);
+    assert.equal(existsSync(join(actual, "new.ts")), false);
+  } finally { rmSync(area, { recursive: true, force: true }); }
 });
