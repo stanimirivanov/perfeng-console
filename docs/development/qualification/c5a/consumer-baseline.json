@@ -1,0 +1,71 @@
+{
+  "compiler": {
+    "p50Ms": 2231.059035,
+    "p95Ms": 2332.585905,
+    "samples": [
+      2165.3913090000005,
+      2175.5153090000003,
+      2231.059035,
+      2264.8279249999996,
+      2332.585905
+    ],
+    "memoryKiB": 414581
+  },
+  "node": "26.13.0",
+  "samples": 5,
+  "lockSha256": "09e4cee35ef33d89327f04b5f00b3d9aa99318b434f5cbe1bb2da32750a6c95a",
+  "inputSha256": "b72a4f71a716f5c771d557588e4554688a81686d2f508568dfeba507457a8922",
+  "workloads": [
+    {
+      "schemas": [
+        "run_CreateRun"
+      ],
+      "bytes": 909420,
+      "gzipBytes": 78462,
+      "processStartupAndDecodeMs": {
+        "p50": 36.23956399999997,
+        "p95": 36.56932899999998,
+        "samples": [
+          33.607054000000005,
+          34.26220699999999,
+          36.23956399999997,
+          36.335993,
+          36.56932899999998
+        ]
+      },
+      "retainedInputs": [
+        "src/generated/validators.mjs",
+        "consumer-baseline.js"
+      ]
+    },
+    {
+      "schemas": [
+        "run_CreateRun",
+        "analysis",
+        "native_WorkerPresence"
+      ],
+      "bytes": 911822,
+      "gzipBytes": 79486,
+      "processStartupAndDecodeMs": {
+        "p50": 39.971978000000036,
+        "p95": 40.76489700000002,
+        "samples": [
+          36.40072999999995,
+          37.50582200000002,
+          39.971978000000036,
+          40.115297,
+          40.76489700000002
+        ]
+      },
+      "retainedInputs": [
+        "src/generated/validators.mjs",
+        "consumer-baseline.js"
+      ]
+    }
+  ],
+  "unavailable": {
+    "serverClient": "M05-PR4 transport is not implemented",
+    "editor": "Measured separately by scripts/editor-baseline.mjs; compare matched call sites before claiming an improvement",
+    "candidate": "C5b generator cannot produce these pinned schemas"
+  }
+}

@@ -61,6 +61,12 @@ provider schema or platform data.
 - https://ajv.js.org/standalone.html
 - https://ajv.js.org/json-schema.html#openapi-support
 
+## Effect generator qualification
+
+The [C5b receipt](effect-codegen-qualification.md) retains the failed candidate
+qualification and a disposable reproduction fixture. It does not admit candidate
+packages or replace the currently authoritative types and Ajv validators.
+
 ## Output inventory
 
 src/generated/generated-manifest.json separates compiler-owned output from AGENTS.md.

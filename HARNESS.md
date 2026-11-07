@@ -135,6 +135,14 @@ make contracts-generate is the explicit write command. Both require util-linux
 unshare with Linux user/network namespaces and retain Node filesystem permissions.
 Read docs/development/contracts.md before updating provider or generator pins.
 
+## C5a generated-consumer authority
+
+Only src/generated/schemas may import effect/Schema. Server-generated clients
+remain BFF-owned and cannot be imported by schemas, presentation or browser code.
+Negative tests include barrel/type imports and resource escapes. This policy does
+not admit any replacement validator. See ADR 0003 and the C5a baseline receipt.
+Benchmark commands are explicit and install no tools.
+
 ## Generated-file ownership
 
 The contract generator owns only the names/hashes in generated-manifest.json,

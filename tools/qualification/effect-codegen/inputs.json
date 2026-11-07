@@ -1,0 +1,5 @@
+{
+  "openapi.json": "78019af05eabbe942310396586875db06afb6ae7fa666871a7b23df0ac7310c7",
+  "api/native-worker/v2/openapi.json": "a7fd9c27b145f118d0b1058b6e10b3581609b4dce8916f31a6e030fb08d56c45",
+  "api/performance-integration/v1/openapi.json": "0bdafe32dec51a51b42a512d5a3947356aa26a5c958768ec8cab68327d466556"
+}

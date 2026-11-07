@@ -47,3 +47,27 @@ test('unknown layers, alternate source languages and symlinks fail closed', () =
   const results = diagnostics({'src/other/x.ts':'', 'src/browser/hide.cjs':''}, true);
   for (const reason of ['owner','extension','symlink']) assert.match(results, new RegExp(reason));
 });
+
+test('generated schema namespace admits Effect Schema without admitting server clients', () => {
+  assert.equal(diagnostics({
+    'src/generated/schemas/run.ts': "import * as Schema from 'effect/Schema'; export {Schema};",
+    'src/presentation/run.ts': "import '../generated/schemas/run.js';",
+  }), '');
+  for (const code of [
+    "import '../../bff/generated/client.js';",
+    "export * from '../../bff/generated/client.js';",
+    "type Client = import('../../bff/generated/client.js').Client;",
+    "import * as Client from 'effect/unstable/http/HttpClient';",
+  ]) {
+    assert.match(diagnostics({'src/generated/schemas/run.ts': code}), /layer|package/);
+  }
+});
+
+test('generated schemas cannot smuggle server resources through URL constructors or styles', () => {
+  assert.match(diagnostics({
+    'src/generated/schemas/resource.ts': "export const file = new URL('../../bff/secret.txt', import.meta.url);",
+  }), /resource/);
+  assert.match(diagnostics({
+    'src/generated/schemas/style.css': '@import "../../bff/secret.css";',
+  }), /resource/);
+});

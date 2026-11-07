@@ -19,6 +19,8 @@ export const policy: Readonly<Record<string, Policy>> = {
 };
 
 function inspectFile(root: string, file: string, owner: string): string[] {
+  const schemaModule = relative(join(root, 'src/generated/schemas'), file);
+  const browserSchema = owner === 'generated' && !schemaModule.startsWith('..');
   const source = ts.createSourceFile(file, readFileSync(file, 'utf8'), ts.ScriptTarget.Latest, true);
   const errors: string[] = [];
   const report = (node: ts.Node, rule: string, message: string) => {
@@ -37,7 +39,7 @@ function inspectFile(root: string, file: string, owner: string): string[] {
     }
     const rules = policy[owner]!;
     if (!name.startsWith('./') && !name.startsWith('../')) {
-      if (!rules.packages.includes(name)) report(node, 'package', `Review and explicitly admit ${name} for ${owner}.`);
+      if (!rules.packages.includes(name) && !(browserSchema && name === 'effect/Schema')) report(node, 'package', `Review and explicitly admit ${name} for ${owner}.`);
       return;
     }
     const target = relative(join(root, 'src'), resolve(dirname(file), name));
@@ -50,6 +52,14 @@ function inspectFile(root: string, file: string, owner: string): string[] {
       report(node, 'layer', `${owner} cannot import ${targetOwner}. Use the declared public boundary.`);
     }
   };
+  if (owner === 'generated') {
+    const checkResource = (node: ts.Node) => {
+      if (ts.isNewExpression(node) && ts.isIdentifier(node.expression) && node.expression.text === 'URL')
+        report(node, 'resource', 'Generated schemas cannot create browser asset references.');
+      ts.forEachChild(node, checkResource);
+    };
+    checkResource(source);
+  }
   inspectImports(source, checkSpecifier, report);
   return errors;
 }
@@ -92,6 +102,7 @@ export function scan(root: string): string[] {
     const name = relative(join(root, 'src'), path);
     const owner = name.split('/')[0]!;
     if (!Object.hasOwn(policy, owner)) issues.push(`src/${name} [owner] Assign an explicit layer.`);
+    else if (owner === 'generated' && name.endsWith('.css')) issues.push('src/' + name + ' [resource] Generated schemas cannot own stylesheets.');
     else if (name.endsWith('.ts') || name.endsWith('.tsx') || name.endsWith('.d.mts')) issues.push(...inspectFile(root, path, owner));
     else if (name === 'generated/validators.mjs' || name === 'generated/generated-manifest.json') {
       // Bytes are regenerated and compared by the offline contract gate.

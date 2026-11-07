@@ -1,0 +1,18 @@
+{
+  "typescript": "6.0.3",
+  "node": "26.13.0",
+  "workload": "Run.state completion at an actual generated-type consumer",
+  "coldMs": 23.387609999999995,
+  "warmP50Ms": 0.6380599999999959,
+  "warmP95Ms": 5.664424000000054,
+  "samples": [
+    23.387609999999995,
+    5.664424000000054,
+    0.6662639999999556,
+    0.6380599999999959,
+    0.5100089999998545
+  ],
+  "rssKiB": 398536,
+  "previousDerivedWarmP50Ms": 0.6662639999999556,
+  "derivationCorrection": "Warm p50 corrected to nearest rank from the original observations; raw samples unchanged."
+}

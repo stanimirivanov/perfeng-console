@@ -1,0 +1,483 @@
+[
+  {
+    "family": "run",
+    "format": "httpclient",
+    "inputSha256": "78019af05eabbe942310396586875db06afb6ae7fa666871a7b23df0ac7310c7",
+    "warnings": [],
+    "status": "failed",
+    "error": "Error: Cannot import JSON Schema keyword \"if\": Effect has no equivalent constraint.\n  at [\"definitions\"][\"Run\"][\"allOf\"][0][\"if\"]"
+  },
+  {
+    "family": "run",
+    "format": "httpclient-type-only",
+    "inputSha256": "78019af05eabbe942310396586875db06afb6ae7fa666871a7b23df0ac7310c7",
+    "warnings": [],
+    "status": "failed",
+    "error": "Error: Cannot import JSON Schema keyword \"if\": Effect has no equivalent constraint.\n  at [\"definitions\"][\"Run\"][\"allOf\"][0][\"if\"]"
+  },
+  {
+    "family": "run",
+    "format": "httpapi",
+    "inputSha256": "78019af05eabbe942310396586875db06afb6ae7fa666871a7b23df0ac7310c7",
+    "warnings": [
+      {
+        "code": "response-headers-ignored",
+        "message": "Response headers on status 201 were ignored in HttpApi generation.",
+        "path": "/v1/runs",
+        "method": "post",
+        "operationId": "createRun"
+      },
+      {
+        "code": "response-headers-ignored",
+        "message": "Response headers on status 401 were ignored in HttpApi generation.",
+        "path": "/v1/runs",
+        "method": "post",
+        "operationId": "createRun"
+      },
+      {
+        "code": "response-headers-ignored",
+        "message": "Response headers on status 409 were ignored in HttpApi generation.",
+        "path": "/v1/runs",
+        "method": "post",
+        "operationId": "createRun"
+      },
+      {
+        "code": "response-headers-ignored",
+        "message": "Response headers on status 429 were ignored in HttpApi generation.",
+        "path": "/v1/runs",
+        "method": "post",
+        "operationId": "createRun"
+      },
+      {
+        "code": "response-headers-ignored",
+        "message": "Response headers on status 503 were ignored in HttpApi generation.",
+        "path": "/v1/runs",
+        "method": "post",
+        "operationId": "createRun"
+      },
+      {
+        "code": "response-headers-ignored",
+        "message": "Response headers on status 401 were ignored in HttpApi generation.",
+        "path": "/v1/runs/{runId}",
+        "method": "get",
+        "operationId": "getRun"
+      },
+      {
+        "code": "response-headers-ignored",
+        "message": "Response headers on status 429 were ignored in HttpApi generation.",
+        "path": "/v1/runs/{runId}",
+        "method": "get",
+        "operationId": "getRun"
+      },
+      {
+        "code": "response-headers-ignored",
+        "message": "Response headers on status 503 were ignored in HttpApi generation.",
+        "path": "/v1/runs/{runId}",
+        "method": "get",
+        "operationId": "getRun"
+      },
+      {
+        "code": "response-headers-ignored",
+        "message": "Response headers on status 401 were ignored in HttpApi generation.",
+        "path": "/v1/runs/{runId}/artifacts",
+        "method": "get",
+        "operationId": "listRunArtifacts"
+      },
+      {
+        "code": "response-headers-ignored",
+        "message": "Response headers on status 429 were ignored in HttpApi generation.",
+        "path": "/v1/runs/{runId}/artifacts",
+        "method": "get",
+        "operationId": "listRunArtifacts"
+      },
+      {
+        "code": "response-headers-ignored",
+        "message": "Response headers on status 503 were ignored in HttpApi generation.",
+        "path": "/v1/runs/{runId}/artifacts",
+        "method": "get",
+        "operationId": "listRunArtifacts"
+      },
+      {
+        "code": "response-headers-ignored",
+        "message": "Response headers on status 401 were ignored in HttpApi generation.",
+        "path": "/v1/runs/{runId}/cancel",
+        "method": "post",
+        "operationId": "cancelRun"
+      },
+      {
+        "code": "response-headers-ignored",
+        "message": "Response headers on status 429 were ignored in HttpApi generation.",
+        "path": "/v1/runs/{runId}/cancel",
+        "method": "post",
+        "operationId": "cancelRun"
+      },
+      {
+        "code": "response-headers-ignored",
+        "message": "Response headers on status 503 were ignored in HttpApi generation.",
+        "path": "/v1/runs/{runId}/cancel",
+        "method": "post",
+        "operationId": "cancelRun"
+      },
+      {
+        "code": "response-headers-ignored",
+        "message": "Response headers on status 201 were ignored in HttpApi generation.",
+        "path": "/v1/baselines",
+        "method": "post",
+        "operationId": "createBaseline"
+      },
+      {
+        "code": "response-headers-ignored",
+        "message": "Response headers on status 401 were ignored in HttpApi generation.",
+        "path": "/v1/baselines",
+        "method": "post",
+        "operationId": "createBaseline"
+      },
+      {
+        "code": "response-headers-ignored",
+        "message": "Response headers on status 429 were ignored in HttpApi generation.",
+        "path": "/v1/baselines",
+        "method": "post",
+        "operationId": "createBaseline"
+      },
+      {
+        "code": "response-headers-ignored",
+        "message": "Response headers on status 503 were ignored in HttpApi generation.",
+        "path": "/v1/baselines",
+        "method": "post",
+        "operationId": "createBaseline"
+      },
+      {
+        "code": "response-headers-ignored",
+        "message": "Response headers on status 401 were ignored in HttpApi generation.",
+        "path": "/v1/baselines/{baselineId}/versions/{version}",
+        "method": "get",
+        "operationId": "getBaseline"
+      },
+      {
+        "code": "response-headers-ignored",
+        "message": "Response headers on status 429 were ignored in HttpApi generation.",
+        "path": "/v1/baselines/{baselineId}/versions/{version}",
+        "method": "get",
+        "operationId": "getBaseline"
+      },
+      {
+        "code": "response-headers-ignored",
+        "message": "Response headers on status 503 were ignored in HttpApi generation.",
+        "path": "/v1/baselines/{baselineId}/versions/{version}",
+        "method": "get",
+        "operationId": "getBaseline"
+      },
+      {
+        "code": "response-headers-ignored",
+        "message": "Response headers on status 401 were ignored in HttpApi generation.",
+        "path": "/v1/baselines/{baselineId}/versions/{version}/transitions",
+        "method": "post",
+        "operationId": "transitionBaseline"
+      },
+      {
+        "code": "response-headers-ignored",
+        "message": "Response headers on status 429 were ignored in HttpApi generation.",
+        "path": "/v1/baselines/{baselineId}/versions/{version}/transitions",
+        "method": "post",
+        "operationId": "transitionBaseline"
+      },
+      {
+        "code": "response-headers-ignored",
+        "message": "Response headers on status 503 were ignored in HttpApi generation.",
+        "path": "/v1/baselines/{baselineId}/versions/{version}/transitions",
+        "method": "post",
+        "operationId": "transitionBaseline"
+      }
+    ],
+    "status": "failed",
+    "error": "Error: Cannot import JSON Schema keyword \"if\": Effect has no equivalent constraint.\n  at [\"definitions\"][\"Run\"][\"allOf\"][0][\"if\"]"
+  },
+  {
+    "family": "native",
+    "format": "httpclient",
+    "inputSha256": "a7fd9c27b145f118d0b1058b6e10b3581609b4dce8916f31a6e030fb08d56c45",
+    "warnings": [],
+    "status": "failed",
+    "error": "Error: Cannot import JSON Schema keyword \"if\": Effect has no equivalent constraint.\n  at [\"definitions\"][\"QualificationDecision\"][\"allOf\"][0][\"if\"]"
+  },
+  {
+    "family": "native",
+    "format": "httpclient-type-only",
+    "inputSha256": "a7fd9c27b145f118d0b1058b6e10b3581609b4dce8916f31a6e030fb08d56c45",
+    "warnings": [],
+    "status": "failed",
+    "error": "Error: Cannot import JSON Schema keyword \"if\": Effect has no equivalent constraint.\n  at [\"definitions\"][\"QualificationDecision\"][\"allOf\"][0][\"if\"]"
+  },
+  {
+    "family": "native",
+    "format": "httpapi",
+    "inputSha256": "a7fd9c27b145f118d0b1058b6e10b3581609b4dce8916f31a6e030fb08d56c45",
+    "warnings": [
+      {
+        "code": "response-headers-ignored",
+        "message": "Response headers on status 429 were ignored in HttpApi generation.",
+        "path": "/native-worker/v2/presence",
+        "method": "post",
+        "operationId": "reportWorkerPresence"
+      },
+      {
+        "code": "response-headers-ignored",
+        "message": "Response headers on status 503 were ignored in HttpApi generation.",
+        "path": "/native-worker/v2/presence",
+        "method": "post",
+        "operationId": "reportWorkerPresence"
+      },
+      {
+        "code": "response-headers-ignored",
+        "message": "Response headers on status 200 were ignored in HttpApi generation.",
+        "path": "/native-worker/v2/leases",
+        "method": "post",
+        "operationId": "acquireNativeLease"
+      },
+      {
+        "code": "response-headers-ignored",
+        "message": "Response headers on status 204 were ignored in HttpApi generation.",
+        "path": "/native-worker/v2/leases",
+        "method": "post",
+        "operationId": "acquireNativeLease"
+      },
+      {
+        "code": "response-headers-ignored",
+        "message": "Response headers on status 429 were ignored in HttpApi generation.",
+        "path": "/native-worker/v2/leases",
+        "method": "post",
+        "operationId": "acquireNativeLease"
+      },
+      {
+        "code": "response-headers-ignored",
+        "message": "Response headers on status 503 were ignored in HttpApi generation.",
+        "path": "/native-worker/v2/leases",
+        "method": "post",
+        "operationId": "acquireNativeLease"
+      },
+      {
+        "code": "response-headers-ignored",
+        "message": "Response headers on status 429 were ignored in HttpApi generation.",
+        "path": "/native-worker/v2/leases/{leaseId}/renew",
+        "method": "post",
+        "operationId": "renewNativeLease"
+      },
+      {
+        "code": "response-headers-ignored",
+        "message": "Response headers on status 503 were ignored in HttpApi generation.",
+        "path": "/native-worker/v2/leases/{leaseId}/renew",
+        "method": "post",
+        "operationId": "renewNativeLease"
+      },
+      {
+        "code": "response-headers-ignored",
+        "message": "Response headers on status 429 were ignored in HttpApi generation.",
+        "path": "/native-worker/v2/leases/{leaseId}/release",
+        "method": "post",
+        "operationId": "releaseNativeLease"
+      },
+      {
+        "code": "response-headers-ignored",
+        "message": "Response headers on status 503 were ignored in HttpApi generation.",
+        "path": "/native-worker/v2/leases/{leaseId}/release",
+        "method": "post",
+        "operationId": "releaseNativeLease"
+      },
+      {
+        "code": "response-headers-ignored",
+        "message": "Response headers on status 429 were ignored in HttpApi generation.",
+        "path": "/native-worker/v2/leases/{leaseId}/upload-grants",
+        "method": "post",
+        "operationId": "createNativeUploadGrant"
+      },
+      {
+        "code": "response-headers-ignored",
+        "message": "Response headers on status 503 were ignored in HttpApi generation.",
+        "path": "/native-worker/v2/leases/{leaseId}/upload-grants",
+        "method": "post",
+        "operationId": "createNativeUploadGrant"
+      },
+      {
+        "code": "response-headers-ignored",
+        "message": "Response headers on status 429 were ignored in HttpApi generation.",
+        "path": "/native-worker/v2/leases/{leaseId}/artifacts",
+        "method": "post",
+        "operationId": "registerNativeArtifact"
+      },
+      {
+        "code": "response-headers-ignored",
+        "message": "Response headers on status 503 were ignored in HttpApi generation.",
+        "path": "/native-worker/v2/leases/{leaseId}/artifacts",
+        "method": "post",
+        "operationId": "registerNativeArtifact"
+      },
+      {
+        "code": "response-headers-ignored",
+        "message": "Response headers on status 429 were ignored in HttpApi generation.",
+        "path": "/native-worker/v2/leases/{leaseId}/terminal",
+        "method": "post",
+        "operationId": "reportNativeTerminal"
+      },
+      {
+        "code": "response-headers-ignored",
+        "message": "Response headers on status 503 were ignored in HttpApi generation.",
+        "path": "/native-worker/v2/leases/{leaseId}/terminal",
+        "method": "post",
+        "operationId": "reportNativeTerminal"
+      },
+      {
+        "code": "response-headers-ignored",
+        "message": "Response headers on status 200 were ignored in HttpApi generation.",
+        "path": "/native-worker/v2/attempts/discover",
+        "method": "post",
+        "operationId": "discoverNativeAttempt"
+      },
+      {
+        "code": "response-headers-ignored",
+        "message": "Response headers on status 429 were ignored in HttpApi generation.",
+        "path": "/native-worker/v2/attempts/discover",
+        "method": "post",
+        "operationId": "discoverNativeAttempt"
+      },
+      {
+        "code": "response-headers-ignored",
+        "message": "Response headers on status 503 were ignored in HttpApi generation.",
+        "path": "/native-worker/v2/attempts/discover",
+        "method": "post",
+        "operationId": "discoverNativeAttempt"
+      },
+      {
+        "code": "response-headers-ignored",
+        "message": "Response headers on status 429 were ignored in HttpApi generation.",
+        "path": "/native-worker/v2/attempts/inspect",
+        "method": "post",
+        "operationId": "inspectNativeAttempt"
+      },
+      {
+        "code": "response-headers-ignored",
+        "message": "Response headers on status 503 were ignored in HttpApi generation.",
+        "path": "/native-worker/v2/attempts/inspect",
+        "method": "post",
+        "operationId": "inspectNativeAttempt"
+      }
+    ],
+    "status": "failed",
+    "error": "Error: Cannot import JSON Schema keyword \"if\": Effect has no equivalent constraint.\n  at [\"definitions\"][\"QualificationDecision\"][\"allOf\"][0][\"if\"]"
+  },
+  {
+    "family": "integration",
+    "format": "httpclient",
+    "inputSha256": "0bdafe32dec51a51b42a512d5a3947356aa26a5c958768ec8cab68327d466556",
+    "warnings": [],
+    "status": "failed",
+    "error": "Error: Unresolvable $ref \"#/$defs/Request/$defs/timestamp\". Nothing exists at that location.\n  at [\"definitions\"][\"Request\"][\"properties\"][\"time\"][\"$ref\"]"
+  },
+  {
+    "family": "integration",
+    "format": "httpclient-type-only",
+    "inputSha256": "0bdafe32dec51a51b42a512d5a3947356aa26a5c958768ec8cab68327d466556",
+    "warnings": [],
+    "status": "failed",
+    "error": "Error: Unresolvable $ref \"#/$defs/Request/$defs/timestamp\". Nothing exists at that location.\n  at [\"definitions\"][\"Request\"][\"properties\"][\"time\"][\"$ref\"]"
+  },
+  {
+    "family": "integration",
+    "format": "httpapi",
+    "inputSha256": "0bdafe32dec51a51b42a512d5a3947356aa26a5c958768ec8cab68327d466556",
+    "warnings": [
+      {
+        "code": "response-headers-ignored",
+        "message": "Response headers on status 429 were ignored in HttpApi generation.",
+        "path": "/integration/v1/requests",
+        "method": "post",
+        "operationId": "requestPerformanceRun"
+      },
+      {
+        "code": "response-headers-ignored",
+        "message": "Response headers on status 503 were ignored in HttpApi generation.",
+        "path": "/integration/v1/requests",
+        "method": "post",
+        "operationId": "requestPerformanceRun"
+      },
+      {
+        "code": "response-headers-ignored",
+        "message": "Response headers on status 429 were ignored in HttpApi generation.",
+        "path": "/integration/v1/requests/{requestId}",
+        "method": "get",
+        "operationId": "getPerformanceRequest"
+      },
+      {
+        "code": "response-headers-ignored",
+        "message": "Response headers on status 503 were ignored in HttpApi generation.",
+        "path": "/integration/v1/requests/{requestId}",
+        "method": "get",
+        "operationId": "getPerformanceRequest"
+      },
+      {
+        "code": "response-headers-ignored",
+        "message": "Response headers on status 429 were ignored in HttpApi generation.",
+        "path": "/integration/v1/requests/{requestId}/cancellation",
+        "method": "post",
+        "operationId": "cancelPerformanceRequest"
+      },
+      {
+        "code": "response-headers-ignored",
+        "message": "Response headers on status 503 were ignored in HttpApi generation.",
+        "path": "/integration/v1/requests/{requestId}/cancellation",
+        "method": "post",
+        "operationId": "cancelPerformanceRequest"
+      },
+      {
+        "code": "response-headers-ignored",
+        "message": "Response headers on status 200 were ignored in HttpApi generation.",
+        "path": "/integration/v1/requests/{requestId}/analysis",
+        "method": "get",
+        "operationId": "getPerformanceAnalysis"
+      },
+      {
+        "code": "response-headers-ignored",
+        "message": "Response headers on status 400 were ignored in HttpApi generation.",
+        "path": "/integration/v1/requests/{requestId}/analysis",
+        "method": "get",
+        "operationId": "getPerformanceAnalysis"
+      },
+      {
+        "code": "response-headers-ignored",
+        "message": "Response headers on status 401 were ignored in HttpApi generation.",
+        "path": "/integration/v1/requests/{requestId}/analysis",
+        "method": "get",
+        "operationId": "getPerformanceAnalysis"
+      },
+      {
+        "code": "response-headers-ignored",
+        "message": "Response headers on status 403 were ignored in HttpApi generation.",
+        "path": "/integration/v1/requests/{requestId}/analysis",
+        "method": "get",
+        "operationId": "getPerformanceAnalysis"
+      },
+      {
+        "code": "response-headers-ignored",
+        "message": "Response headers on status 404 were ignored in HttpApi generation.",
+        "path": "/integration/v1/requests/{requestId}/analysis",
+        "method": "get",
+        "operationId": "getPerformanceAnalysis"
+      },
+      {
+        "code": "response-headers-ignored",
+        "message": "Response headers on status 429 were ignored in HttpApi generation.",
+        "path": "/integration/v1/requests/{requestId}/analysis",
+        "method": "get",
+        "operationId": "getPerformanceAnalysis"
+      },
+      {
+        "code": "response-headers-ignored",
+        "message": "Response headers on status 503 were ignored in HttpApi generation.",
+        "path": "/integration/v1/requests/{requestId}/analysis",
+        "method": "get",
+        "operationId": "getPerformanceAnalysis"
+      }
+    ],
+    "status": "failed",
+    "error": "Error: Unresolvable $ref \"#/$defs/Request/$defs/timestamp\". Nothing exists at that location.\n  at [\"definitions\"][\"Request\"][\"properties\"][\"time\"][\"$ref\"]"
+  }
+]
