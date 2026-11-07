@@ -39,3 +39,33 @@ and the existing size and latency gates before proposing activation.
 No production package, generator, validator, or provider snapshot is part
 of this change. Reverting the fixture and receipt removes the qualification
 evidence without a runtime rollback.
+
+## Merged candidate wire and Ajv results
+
+Console issue [#31](https://github.com/stanimirivanov/perfeng-console/issues/31)
+tested Orval [#4466](https://github.com/orval-labs/orval/pull/4466) at its exact
+merged source revision `4832f60d598cf0569404898718167ea20dacd6ff`. The control,
+minimal repro and all three unchanged Console bundles generated and compiled
+offline. This source build clears the compile blocker recorded above.
+
+All 20 wire and parity tests passed. Nine compared the original payload and
+the generated client result using the same authoritative Ajv validators.
+The generated client preserved payloads and their accept/reject decisions,
+including conditional Native cancellation metadata, a closed Run object,
+and Integration analysis and error payloads.
+
+The unguarded candidate returned an empty object for a bodyless Native 204
+and accepted absent JSON as an empty object. It also returned wrong media
+types and undeclared statuses to callers and did not check required headers
+or bound body reads. The isolated adapter guards those cases, bounds the
+stream read, preserves headers, and cancels a pending read on abort.
+The tests also check Run idempotency-key serialization and conflict delivery
+without retry, Native lease capability and revision serialization, and
+Integration issuer query encoding and throttling metadata.
+
+This is sampled wire evidence with injected Fetch, using the original Ajv
+validators on both sides of the parity comparison. It does not qualify live
+HTTP/TLS or credentials, upstream idempotency persistence, the full status and
+header matrix, header value validation, or production BFF transport. Re-run
+this suite on the exact published release and complete the remaining admission
+and performance checks before activation.
