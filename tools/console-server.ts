@@ -1,6 +1,7 @@
 import { createServer } from 'node:https';
 import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { once } from 'node:events';
 import { createSession } from '../src/bff/session.ts';
 import { renderConsoleHtml } from '../src/bff/csp.ts';
@@ -12,7 +13,7 @@ const base = '/console/api/session';
 /** Serve the built console and its local pairing API on IPv4 loopback. */
 export async function startConsole(options: { cert: Buffer; key: Buffer; port: number; now?: () => number }) {
   const session = createSession(options.now);
-  const root = resolve('dist/apps/console/browser');
+  const root = fileURLToPath(new URL('../dist/apps/console/browser', import.meta.url));
   const server = createServer({ cert: options.cert, key: options.key, minVersion: 'TLSv1.2', requestTimeout: 5000, connectionsCheckingInterval: 1000 }, async (req, res) => {
     res.setHeader('Cache-Control', 'no-store');
     res.setHeader('X-Content-Type-Options', 'nosniff');

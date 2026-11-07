@@ -26,6 +26,7 @@ jobs:
       - run: make build
       - run: node_modules/.bin/playwright install --with-deps chromium
       - run: make browser-test
+      - run: make console-isolation-check
       - run: make stack-admission
       - run: make harness-self-test
   supply-chain:

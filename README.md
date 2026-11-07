@@ -36,3 +36,22 @@ consumes it. The session expires after 15 minutes without a successful session r
 or eight hours after pairing, whichever comes first. The server stores the grant
 in memory. Restart it to obtain a fresh code after sign-out, expiry or lockout.
 Keep the terminal and private key local to the operator.
+
+Build a versioned console archive with `make console-release`. The version comes
+from the console package manifest. Extract the archive into a fresh directory and
+run its entry point with the pinned Node version and your loopback certificate.
+
+```sh
+tar -xzf dist/releases/perfeng-console-0.1.0.tar.gz -C /path/to/empty-install-directory
+node /path/to/empty-install-directory/tools/serve-console.mjs /path/to/cert.pem /path/to/key.pem
+```
+
+The archive contains the browser distribution, bundled HTTPS entry, license, and
+`release.json` identity. The installed entry resolves browser assets from its own
+location. Use the previous archive to roll back the product. The verifier has its
+own release lifecycle and can pin the console identity independently.
+
+`make console-isolation-check` runs a frozen install and build from selected product
+sources, extracts the archive into a second directory, and verifies HTTPS pairing
+in Chromium. It requires the repository's pinned toolchain, installed Chromium,
+OpenSSL and tar.
