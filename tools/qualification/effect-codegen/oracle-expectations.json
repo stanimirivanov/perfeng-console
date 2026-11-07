@@ -1,0 +1,243 @@
+{
+  "cases": [
+    {
+      "name": "QUALIFIED without validUntil",
+      "schema": "QualificationDecision",
+      "input": {
+        "status": "QUALIFIED",
+        "reasons": []
+      },
+      "expected": false
+    },
+    {
+      "name": "UNQUALIFIED with empty reasons",
+      "schema": "QualificationDecision",
+      "input": {
+        "status": "UNQUALIFIED",
+        "reasons": []
+      },
+      "expected": false
+    },
+    {
+      "name": "QUALIFIED complete",
+      "schema": "QualificationDecision",
+      "input": {
+        "status": "QUALIFIED",
+        "reasons": [],
+        "validUntil": "2026-09-18T12:01:00Z"
+      },
+      "expected": true
+    },
+    {
+      "name": "QualificationDecision unknown property",
+      "schema": "QualificationDecision",
+      "input": {
+        "status": "QUALIFIED",
+        "reasons": [],
+        "validUntil": "2026-09-18T12:01:00Z",
+        "extra": true
+      },
+      "expected": false
+    },
+    {
+      "name": "WorkerCapabilities complete",
+      "schema": "WorkerCapabilities",
+      "input": {
+        "capacity": 1,
+        "tool": "playwright",
+        "operatingSystem": "linux",
+        "architecture": "x64",
+        "browsers": [
+          "chromium"
+        ],
+        "runnerContract": 2,
+        "executionArtifacts": [
+          "source-checkout"
+        ],
+        "artifactKinds": [
+          "measurements",
+          "manifest"
+        ],
+        "diagnosticModes": [
+          "baseline"
+        ]
+      },
+      "expected": true
+    },
+    {
+      "name": "WorkerCapabilities duplicate artifactKinds",
+      "schema": "WorkerCapabilities",
+      "input": {
+        "capacity": 1,
+        "tool": "playwright",
+        "operatingSystem": "linux",
+        "architecture": "x64",
+        "browsers": [
+          "chromium"
+        ],
+        "runnerContract": 2,
+        "executionArtifacts": [
+          "source-checkout"
+        ],
+        "artifactKinds": [
+          "measurements",
+          "measurements"
+        ],
+        "diagnosticModes": [
+          "baseline"
+        ]
+      },
+      "expected": false
+    },
+    {
+      "name": "Lease complete positional artifactPlan",
+      "schema": "Lease",
+      "input": {
+        "leaseId": "11111111-1111-4111-8111-111111111111",
+        "attemptId": "22222222-2222-4222-8222-222222222222",
+        "runId": "perf-20260918-120000-a1b2c3d4",
+        "runRevision": 4,
+        "issuedAt": "2026-09-18T12:00:00Z",
+        "expiresAt": "2026-09-18T12:02:00Z",
+        "renewAfterSeconds": 40,
+        "assignment": {
+          "catalogueTestId": "search-journey",
+          "workloadId": "browser-smoke",
+          "profile": "smoke",
+          "target": {
+            "environmentId": "local-demo",
+            "baseUrl": "https://sut.perfeng.invalid"
+          },
+          "browser": "chromium",
+          "diagnosticMode": "baseline",
+          "recipe": {
+            "journeyId": "search",
+            "workloadVersion": "1.0.0",
+            "workloadSha256": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+            "scenario": {
+              "cacheProfile": "cold",
+              "pageReuse": "per-iteration",
+              "warmupIterations": 1,
+              "measurementIterations": 5
+            },
+            "environment": {
+              "profileId": "linux-mainstream",
+              "profileVersion": "1.0.0",
+              "fingerprint": "9999999999999999999999999999999999999999999999999999999999999999",
+              "evidenceSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            },
+            "browserSettings": {
+              "headless": false,
+              "viewport": {
+                "width": 1366,
+                "height": 768
+              },
+              "deviceScaleFactor": 1
+            }
+          },
+          "executionArtifact": {
+            "kind": "source-checkout",
+            "repository": "https://example.invalid/perfeng-playwright.git",
+            "revision": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "lockfile": "pnpm-lock.yaml",
+            "lockfileSha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          }
+        },
+        "artifactPlan": [
+          {
+            "slot": "measurements",
+            "kind": "measurements",
+            "mediaType": "application/json",
+            "format": "playwright-measurements/v2",
+            "maximumBytes": 1048576,
+            "required": true
+          },
+          {
+            "slot": "manifest",
+            "kind": "manifest",
+            "mediaType": "application/json",
+            "format": "raw-result/v2",
+            "maximumBytes": 1048576,
+            "required": true
+          }
+        ]
+      },
+      "expected": true
+    },
+    {
+      "name": "Lease reversed positional artifactPlan",
+      "schema": "Lease",
+      "input": {
+        "leaseId": "11111111-1111-4111-8111-111111111111",
+        "attemptId": "22222222-2222-4222-8222-222222222222",
+        "runId": "perf-20260918-120000-a1b2c3d4",
+        "runRevision": 4,
+        "issuedAt": "2026-09-18T12:00:00Z",
+        "expiresAt": "2026-09-18T12:02:00Z",
+        "renewAfterSeconds": 40,
+        "assignment": {
+          "catalogueTestId": "search-journey",
+          "workloadId": "browser-smoke",
+          "profile": "smoke",
+          "target": {
+            "environmentId": "local-demo",
+            "baseUrl": "https://sut.perfeng.invalid"
+          },
+          "browser": "chromium",
+          "diagnosticMode": "baseline",
+          "recipe": {
+            "journeyId": "search",
+            "workloadVersion": "1.0.0",
+            "workloadSha256": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+            "scenario": {
+              "cacheProfile": "cold",
+              "pageReuse": "per-iteration",
+              "warmupIterations": 1,
+              "measurementIterations": 5
+            },
+            "environment": {
+              "profileId": "linux-mainstream",
+              "profileVersion": "1.0.0",
+              "fingerprint": "9999999999999999999999999999999999999999999999999999999999999999",
+              "evidenceSha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            },
+            "browserSettings": {
+              "headless": false,
+              "viewport": {
+                "width": 1366,
+                "height": 768
+              },
+              "deviceScaleFactor": 1
+            }
+          },
+          "executionArtifact": {
+            "kind": "source-checkout",
+            "repository": "https://example.invalid/perfeng-playwright.git",
+            "revision": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "lockfile": "pnpm-lock.yaml",
+            "lockfileSha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+          }
+        },
+        "artifactPlan": [
+          {
+            "slot": "manifest",
+            "kind": "manifest",
+            "mediaType": "application/json",
+            "format": "raw-result/v2",
+            "maximumBytes": 1048576,
+            "required": true
+          },
+          {
+            "slot": "measurements",
+            "kind": "measurements",
+            "mediaType": "application/json",
+            "format": "playwright-measurements/v2",
+            "maximumBytes": 1048576,
+            "required": true
+          }
+        ]
+      },
+      "expected": false
+    }
+  ]
+}

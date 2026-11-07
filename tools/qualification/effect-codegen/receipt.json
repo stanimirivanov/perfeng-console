@@ -1,0 +1,41 @@
+{
+  "date": "2026-11-07",
+  "status": "BLOCKED",
+  "node": "v26.13.0",
+  "pnpm": "12.16.1",
+  "versions": {
+    "effect": "4.1.2",
+    "@effect/openapi-generator": "4.1.2",
+    "@effect/platform-node": "4.1.2",
+    "typescript": "6.0.3"
+  },
+  "generatorTarballIntegrity": "sha512-seh1li7cp6XE734rWmsQ/lQ2RFp1YCMb1PP6pZ7CvFAeoAUsgM4J2z8iCllY8yE2VnswWWw9GQ/XKHLm/gpGzg==",
+  "lockSha256": "f7fb50a6a76ccb9d2aea1b12d219cb152344fca795b4e17081d314b8c50d8b97",
+  "generationExitStatus": 1,
+  "generatedFiles": 0,
+  "familyFormatAttempts": 9,
+  "failures": 9,
+  "oracleCases": 8,
+  "oracleMismatches": 0,
+  "candidateCompilation": "NOT_RUN_NO_GENERATED_SOURCE",
+  "candidateRuntimeComparison": "NOT_RUN_NO_GENERATED_SOURCE",
+  "modularityQualification": "NOT_RUN_NO_GENERATED_SOURCE",
+  "performanceQualification": "NOT_RUN_NO_GENERATED_SOURCE",
+  "offlineGenerationExitStatus": 1,
+  "artifactSha256": {
+    "generate.mjs": "6233ab46a59e00bf1bf7f68a17bac81544f578a395c9b816e92b7a319d1a15bb",
+    "oracle.mjs": "caacbad61a8819666ece8c2a36e65e6472dd75e31797d34815de8c2b08c16d34",
+    "inputs.json": "02eb1eabd2641daaafef60faea8d5ebe7e328c4ce2894c0bb24c4cca2c13a2c1",
+    "expected.json": "b4f4b88f0167f8ba167ceaf4c7d318ad0ff42ceb7248089a211ce49ab9d41db7",
+    "oracle-expectations.json": "4497e1e9e84881424e605e16bd6c9a28f973cef81453efd41813f52142e7869b",
+    "oracle-results.json": "1f877bf04b4a1154554cb84853f9d4e6d18a13df1a5b790732fb21d70ec11f16",
+    "generation.json": "43d894c9c7c1e70bcbf65f19e1ab53da75b3c539aace29d8d3f2ee3841a52b31",
+    "keyword-inventory.json": "f93893c3e76a603e7821185dd760cc8c3da98cafa312e918e38aa53b4624967c"
+  },
+  "candidateAudit": {
+    "command": "pnpm audit --audit-level high",
+    "exitStatus": 0,
+    "result": "No known vulnerabilities found",
+    "date": "2026-11-07"
+  }
+}
