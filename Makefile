@@ -32,7 +32,7 @@ hooks:
 
 .PHONY: build browser-test guide
 build:
-	NX_DAEMON=false node_modules/.bin/nx run-many -t build --output-style=stream
+	NX_DAEMON=false node_modules/.bin/nx run console:build --output-style=stream
 	node harness/assets.ts --distribution
 
 browser-test:
@@ -63,3 +63,10 @@ contracts-check:
 
 contracts-generate:
 	sh scripts/contracts-offline.sh --permission --allow-fs-read=. --allow-fs-read="$$(realpath node_modules)" --allow-fs-write=src/generated --allow-child-process scripts/contracts-generate.mjs --write
+
+.PHONY: console-release console-isolation-check
+console-release: build
+	node scripts/package-console.ts
+
+console-isolation-check: doctor
+	node scripts/check-console-isolation.ts
