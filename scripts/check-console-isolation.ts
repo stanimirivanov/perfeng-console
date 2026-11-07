@@ -13,7 +13,9 @@ const inputs = [
   'angular.json', 'nx.json', 'tsconfig.base.json', 'Makefile', 'apps/console',
   'harness/assets.ts', 'harness/workspace.ts', 'harness/boundaries.ts', 'harness/product-release.ts',
   'scripts/package-console.ts', 'tools/serve-console.ts', 'tools/console-server.ts',
-  'src/bff/session.ts', 'src/bff/csp.ts',
+  'src/bff/session.ts', 'src/bff/csp.ts', 'src/bff/runs.ts', 'src/bff/config.ts',
+  'src/bff/transport.ts', 'src/bff/run-reader.ts', 'src/bff/transport-result.ts',
+  'src/generated/run.ts', 'src/generated/validators.mjs', 'src/presentation/observation.ts',
 ];
 
 try {

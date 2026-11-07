@@ -11,12 +11,12 @@ test(
       title: "Recognize the console",
       body: "Start in Perfeng Console. This shell has no platform connection; it cannot show CI evidence yet.",
     });
-    await expect(page.getByRole("status")).toContainText("Backend unavailable");
+    await expect(page.getByRole("status")).toContainText("Ready for exact Run lookup");
     await guide.result(page.getByRole("status"), {
-      title: "Check availability before acting",
-      body: "An unavailable backend is explicit. No previous or sample Run is presented, and Open Run remains disabled.",
+      title: "Look up an exact Run",
+      body: "Enter a known Run ID. The console displays evidence only after a successful lookup.",
     });
-    await expect(page.getByRole("button", { name: "Open Run" })).toBeDisabled();
+    await expect(page.getByLabel("Run ID")).toBeVisible();
   },
 );
 test("keyboard skip link reaches the main content", async ({ page }) => {
