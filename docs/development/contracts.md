@@ -66,3 +66,20 @@ provider schema or platform data.
 The [C5b receipt](effect-codegen-qualification.md) retains the failed candidate
 qualification and a disposable reproduction fixture. It does not admit candidate
 packages or replace the currently authoritative types and Ajv validators.
+
+## Output inventory
+
+src/generated/generated-manifest.json separates compiler-owned output from AGENTS.md.
+Checking compares the complete output set. Regeneration preflights all existing
+files before changing any of them, refuses unowned or edited files, and removes
+only unchanged previously owned outputs that have been retired. Unsafe ledger
+paths and symlinks, including output-root ancestors, fail closed. The write command uses an exclusive local lock;
+a leftover lock after interruption must be inspected explicitly.
+The manifest itself is generated and byte-compared, never hand-maintained.
+C7 candidate adoption and source-attestation requirements remain separately pending.
+
+GitHub marks compiler-owned modules as generated and upstream copies as vendored.
+The handwritten agent guide, output manifest and source provenance remain visible
+review surfaces. This classification reduces review noise; checksums, semantic
+receipts and deterministic regeneration remain required and Git conflicts still
+need normal source reconciliation.

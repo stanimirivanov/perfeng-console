@@ -142,3 +142,13 @@ remain BFF-owned and cannot be imported by schemas, presentation or browser code
 Negative tests include barrel/type imports and resource escapes. This policy does
 not admit any replacement validator. See ADR 0003 and the C5a baseline receipt.
 Benchmark commands are explicit and install no tools.
+
+## Generated-file ownership
+
+The contract generator owns only the names/hashes in generated-manifest.json,
+plus the current deterministic output set. AGENTS.md remains handwritten.
+contracts-check rejects orphan modules, missing outputs, symlinks and stale bytes.
+Explicit regeneration refuses edited previous output and unowned files, then
+removes unchanged retired outputs. A local exclusive lock prevents concurrent
+writers; interruption or a failed check requires review rather than forced cleanup.
+This guard does not activate the blocked Effect candidate or retire Ajv.

@@ -104,7 +104,7 @@ export function scan(root: string): string[] {
     if (!Object.hasOwn(policy, owner)) issues.push(`src/${name} [owner] Assign an explicit layer.`);
     else if (owner === 'generated' && name.endsWith('.css')) issues.push('src/' + name + ' [resource] Generated schemas cannot own stylesheets.');
     else if (name.endsWith('.ts') || name.endsWith('.tsx') || name.endsWith('.d.mts')) issues.push(...inspectFile(root, path, owner));
-    else if (name === 'generated/validators.mjs') {
+    else if (name === 'generated/validators.mjs' || name === 'generated/generated-manifest.json') {
       // Bytes are regenerated and compared by the offline contract gate.
     } else if (!/\.(md|css)$/u.test(name)) issues.push(`src/${name} [extension] Use TypeScript or review the source format.`);
   }

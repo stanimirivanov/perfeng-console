@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync } from "node:fs";
+import { synchronizeOutputs } from "./generated-output.ts";
 import openapiTS, { astToString } from "openapi-typescript";
 import Ajv2020 from "ajv/dist/2020.js";
 import addFormats from "ajv-formats";
@@ -58,8 +58,4 @@ const bundled = await build({
 output.set("validators.mjs", bundled.outputFiles[0].text);
 output.set("validators.d.mts", Object.keys(exports).map(name =>
   "export const " + name + ": (data: unknown) => boolean;").join("\n") + "\n");
-for (const [name, content] of output) {
-  const path = "src/generated/" + name;
-  if (process.argv.includes("--write")) writeFileSync(path, content);
-  else if (readFileSync(path, "utf8") !== content) throw Error("Generated drift " + path);
-}
+synchronizeOutputs("src/generated", output, process.argv.includes("--write"));
