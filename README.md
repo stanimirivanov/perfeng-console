@@ -21,3 +21,18 @@ Run make guide to rebuild, execute only @user-guide journeys, and emit dist/user
 The optional narrator interface and owned-output protection are adapted from fleetiq-ui commit 173578f1fa2ba97a79f50f0499249f8609226f5d under Apache-2.0. See apps/web-e2e/user-guide/guide-narrator.ts and tools/user-guide/owned-output.mjs. This scaffold adapts narration into Playwright attachments and a reporter instead of copying FleetIQ's full video and qualification pipeline. Fresh capture contexts deny external/backend traffic and WebSockets. Never record live credentials or commit generated guide output.
 
 [Angular builder](https://angular.dev/tools/cli/build) · [Playwright reporters](https://playwright.dev/docs/test-reporters#custom-reporters) · [Nx configuration](https://nx.dev/docs/reference/project-configuration)
+
+For the local operator session, build the console and start the HTTPS server with a
+certificate trusted by your browser for the IP address `127.0.0.1`.
+
+```sh
+make build
+node tools/serve-console.ts /path/to/cert.pem /path/to/key.pem
+```
+
+Open `https://127.0.0.1:4310` and enter the pairing code shown in the server terminal.
+The code expires after five minutes or five failed attempts. A successful pairing
+consumes it. The session expires after 15 minutes without a successful session read
+or eight hours after pairing, whichever comes first. The server stores the grant
+in memory. Restart it to obtain a fresh code after sign-out, expiry or lockout.
+Keep the terminal and private key local to the operator.
