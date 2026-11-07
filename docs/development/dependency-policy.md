@@ -33,3 +33,15 @@ CSP exceptions follow ADR 0002 and explicit owner authorization.
 - [Angular CSP](https://angular.dev/best-practices/security#content-security-policy)
 - [NgRx SignalStore](https://ngrx.io/guide/signals/signal-store)
 - [Pinned package metadata](https://registry.npmjs.org/)
+
+## Node adapter admission — issue #33
+
+@effect/platform-node 4.1.2 is admitted for the BFF Run reader only, paired with
+Effect 4.1.2. MIT; Node >=22.19.0; current Node pin is 26.13.0. The exact registry
+metadata, resolved fixture licenses and qualification history are recorded under
+tools/qualification/effect-node. The root lock now pins the actual production graph.
+Undici and Redis peers increase installed dependency weight; no Redis authority or
+service is added. The selected Node HTTP backend exposes source.headersDistinct;
+upgrades must repeat TLS, raw-header and cleanup tests before pin changes.
+Existing peer warnings concern openapi-typescript's TypeScript range and optional
+WASM @emnapi peers. They are not suppressed by this admission; keep them visible.

@@ -13,7 +13,7 @@ export const policy: Readonly<Record<string, Policy>> = {
   generated: { layers: [], packages: [] },
   presentation: { layers: ['generated'], packages: [] },
   browser: { layers: ['presentation', 'generated'], packages: [] },
-  bff: { layers: ['presentation', 'generated'], packages: ['node:crypto', 'node:fs', 'node:https', 'node:path'] },
+  bff: { layers: ['presentation', 'generated'], packages: ['node:crypto', 'node:fs', 'node:path'] },
   scenarios: { layers: ['generated'], packages: [] },
   simulator: { layers: ['scenarios', 'generated'], packages: ['node:child_process', 'node:crypto', 'node:fs', 'node:path'] },
 };
@@ -38,8 +38,14 @@ function inspectFile(root: string, file: string, owner: string): string[] {
       return;
     }
     const rules = policy[owner]!;
+    // Exact module admission: package installation alone grants no BFF authority.
+    const admitted: Readonly<Record<string, readonly string[]>> = {
+      'src/bff/transport.ts': ['effect'],
+      'src/bff/run-reader.ts': ['effect', 'effect/http/HttpClient', '@effect/platform-node/NodeHttpClient', '@effect/platform-node/NodeHttpIncomingMessage'],
+    };
+    const localPackages = admitted[relative(root, file)] ?? [];
     if (!name.startsWith('./') && !name.startsWith('../')) {
-      if (!rules.packages.includes(name) && !(browserSchema && name === 'effect/Schema')) report(node, 'package', `Review and explicitly admit ${name} for ${owner}.`);
+      if (!rules.packages.includes(name) && !localPackages.includes(name) && !(browserSchema && name === 'effect/Schema')) report(node, 'package', `Review and explicitly admit ${name} for ${owner}.`);
       return;
     }
     const target = relative(join(root, 'src'), resolve(dirname(file), name));

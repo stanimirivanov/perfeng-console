@@ -5,3 +5,14 @@ Render accessible, escaped view models. Read only same-origin BFF routes. Clear 
 Build production components from [ADR 0002](../../docs/decisions/0002-ui-technology-stack.md) and the pinned contracts. Preserve the approved workflows, evidence states, and keyboard and focus behavior. Do not copy the gallery’s exported markup, styles, scripts or fixture data into the application. See the [design implementation guidance](../../docs/design/material-review/README.md#implementation-guidance).
 
 Read the [layer matrix](../../HARNESS.md) and run `make architecture` after changing dependencies.
+
+Read [runtime ownership](../../docs/development/runtime-ownership.md) and the
+[harness specification](../../docs/development/harness-rules.md). Components render
+and emit intents; Angular signals own local interactions. SignalStore is the single
+writer of shared observations. Effect operations own polling, bounded reads and
+cleanup behind the same-origin adapter. Bridge Angular DI/destruction to explicit
+route/session scopes; create runtimes only at registered integration boundaries.
+Reject late results by identity/epochs even after interruption. Do not add component
+HTTP, independent timers, duplicate caches or mutation retries. Production NgRx/Effect
+imports require narrow admission and behavioral proof; current spec-only allowance
+is not production approval.

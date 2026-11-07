@@ -71,3 +71,12 @@ test('generated schemas cannot smuggle server resources through URL constructors
     'src/generated/schemas/style.css': '@import "../../bff/secret.css";',
   }), /resource/);
 });
+
+test('Effect Node imports are admitted only to the reviewed BFF modules', () => {
+  assert.equal(diagnostics({'src/bff/run-reader.ts': "import * as N from '@effect/platform-node/NodeHttpClient';"}), '');
+  assert.equal(diagnostics({'src/bff/transport.ts': "import {Effect} from 'effect';"}), '');
+  for (const path of ['src/bff/other.ts', 'src/browser/view.ts']) {
+    assert.match(diagnostics({[path]: "import * as N from '@effect/platform-node/NodeHttpClient';"}), /package/);
+  }
+  assert.match(diagnostics({'src/bff/transport.ts': "import 'node:https';"}), /package/);
+});

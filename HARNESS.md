@@ -27,6 +27,14 @@ package.json, pnpm-lock.yaml exact tooling and dependency integrity
 .github/workflows/harness.yml  pull request and main verification
 ```
 
+## Application ownership specification
+
+Read [runtime and state ownership](docs/development/runtime-ownership.md) for the
+Angular/SignalStore/Effect split and [harness rules](docs/development/harness-rules.md)
+for required proof. Structural ownership sensors now run in make architecture; the rule specification records remaining behavioral and production-admission gaps.
+The following layer matrix describes the existing coarse policy; it does not admit
+production Effect adapters or replace the finer ownership requirements.
+
 ## Ownership and allowed edges
 
 Within-layer imports are allowed. The matrix lists cross-layer dependencies. External packages and Node built-ins require an exact entry in the executable policy. Keep package admission and permission to import that package separate in review.
@@ -167,3 +175,14 @@ The defaults cap the whole read at three seconds and one MiB. The transport
 uses explicit TLS trust, refuses redirects, and returns bounded reason codes
 for failures. The integration test uses OpenSSL and loopback HTTPS. Session
 binding and safe browser presentation belong to later slices.
+
+## Effect Node transport admission (issue #33)
+
+The production composition entry is src/bff/transport.ts; src/bff/run-reader.ts builds
+lazy scoped reads through @effect/platform-node 4.1.2. Raw Node response headers enforce
+duplicate cardinality. Per-read agents retain non-pooled behavior. Exact import paths
+are admitted; native HTTP imports and the transport legacy allowance are removed.
+make verify runs the production parity tests, including real TLS1.1 rejection with a
+positive control, duplicate headers, limits, cancellation and a child-process shutdown.
+The lifecycle test host is a fixture, not a new production BFF server/auth route.
+See tools/qualification/effect-node/README.md for the qualification history.
