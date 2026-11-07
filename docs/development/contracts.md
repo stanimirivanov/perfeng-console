@@ -71,3 +71,9 @@ paths and symlinks, including output-root ancestors, fail closed. The write comm
 a leftover lock after interruption must be inspected explicitly.
 The manifest itself is generated and byte-compared, never hand-maintained.
 C7 candidate adoption and source-attestation requirements remain separately pending.
+
+GitHub marks compiler-owned modules as generated and upstream copies as vendored.
+The handwritten agent guide, output manifest and source provenance remain visible
+review surfaces. This classification reduces review noise; checksums, semantic
+receipts and deterministic regeneration remain required and Git conflicts still
+need normal source reconciliation.

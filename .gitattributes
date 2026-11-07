@@ -1,0 +1,6 @@
+* text=auto eol=lf
+/src/generated/** linguist-generated=true
+/src/generated/AGENTS.md linguist-generated=false
+/src/generated/generated-manifest.json linguist-generated=false
+/vendor/perfeng-contracts/** linguist-vendored=true
+/vendor/perfeng-contracts/provenance.json linguist-vendored=false
