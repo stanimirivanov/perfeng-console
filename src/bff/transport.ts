@@ -1,5 +1,5 @@
 import { Effect } from 'effect';
-import { run_RunId } from '../generated/validators.mjs';
+import { run_RunId } from '#perfeng/validators';
 import { loadUpstreamConfig } from './config.ts';
 import type { UpstreamConfig } from './config.ts';
 import { createRunReader } from './run-reader.ts';

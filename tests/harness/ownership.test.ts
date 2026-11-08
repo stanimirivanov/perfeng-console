@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
-import { checkOwnership, type Role } from '../../harness/ownership.ts';
+import { checkOwnership, type Role } from '#perfeng/harness/ownership';
 
 function inspect(files: Record<string, string>, roles: Record<string, Role>) {
   const root = mkdtempSync(join(tmpdir(), 'ownership-'));
@@ -90,4 +90,52 @@ test('production transport has no native-dispatch legacy allowance', () => {
 test('composition may accept an AbortSignal type without constructing native abort machinery', () => {
   assert.equal(inspect({ [file]: 'export function run(signal?: AbortSignal) { return signal?.aborted; }' }, { [file]: 'composition' }), '');
   assert.match(inspect({ [file]: 'new AbortController()' }, { [file]: 'composition' }), /OWN-03/);
+});
+
+test('shared contracts are scanned for unregistered code and ambient authority', () => {
+  assert.match(inspect({ 'src/shared/contracts/hidden.ts': 'export {};' }, {}), /OWN-01/);
+  const root = mkdtempSync(join(tmpdir(), 'dto-ownership-'));
+  try {
+    mkdirSync(join(root, 'src/shared/contracts'), { recursive: true });
+    for (const source of ['fetch("/")', "import { Effect } from 'effect';"]) {
+      writeFileSync(join(root, 'src/shared/contracts/observation.ts'), source);
+      assert.match(checkOwnership(root).join('\n'), /OWN-03|OWN-04/);
+    }
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test('contracts contain only type declarations and admit no runtime consumers', () => {
+  const dto = 'src/shared/contracts/observation.ts';
+  for (const source of ['export const marker = 1;', 'export function work() {}', 'export class Runtime {}']) {
+    assert.match(inspect({ [dto]: source }, { [dto]: 'contract' }), /OWN-04/);
+  }
+  assert.equal(inspect({ [dto]: 'export interface Value { id: string }\nexport type Id = string;' }, { [dto]: 'contract' }), '');
+  assert.match(inspect({ [dto]: 'export interface Value {}', [file]: "import '../../../src/shared/contracts/observation.ts';" },
+    { [dto]: 'contract', [file]: 'component' }), /OWN-04/);
+});
+
+test('the BFF public entry re-exports composition without becoming a runtime owner', () => {
+  const root = mkdtempSync(join(tmpdir(), 'public-entry-'));
+  try {
+    mkdirSync(join(root, 'src/bff'), { recursive: true });
+    writeFileSync(join(root, 'src/bff/transport.ts'), 'export function createRunTransport() {}');
+    const entry = join(root, 'src/bff/public-api.ts');
+    writeFileSync(entry, "export { createRunTransport } from './transport.ts';");
+    assert.deepEqual(checkOwnership(root), []);
+    writeFileSync(entry, "export const runtime = 1;");
+    assert.match(checkOwnership(root).join('\n'), /OWN-01/);
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test('qualification config entry contains only named re-exports of its config owner', () => {
+  const root = mkdtempSync(join(tmpdir(), 'config-entry-'));
+  try {
+    mkdirSync(join(root, 'src/bff'), { recursive: true });
+    writeFileSync(join(root, 'src/bff/config.ts'), 'export const loadUpstreamConfig = () => ({});');
+    const entry = join(root, 'src/bff/config-public-api.ts');
+    writeFileSync(entry, "export { loadUpstreamConfig } from './config.ts';");
+    assert.deepEqual(checkOwnership(root), []);
+    writeFileSync(entry, 'setTimeout(() => {}, 1);');
+    assert.match(checkOwnership(root).join('\n'), /OWN-01/);
+  } finally { rmSync(root, { recursive: true, force: true }); }
 });

@@ -1,5 +1,5 @@
 import { Effect } from 'effect';
-import type { Observation, RunSummary } from '../../../src/presentation/observation';
+import type { Observation, RunSummary } from '#perfeng/contracts';
 
 type Lookup = { observation: Observation<RunSummary> } | { message: string };
 

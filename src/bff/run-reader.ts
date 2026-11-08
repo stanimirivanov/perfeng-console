@@ -4,7 +4,7 @@ import * as NodeHttpClient from '@effect/platform-node/NodeHttpClient';
 import { NodeHttpIncomingMessage } from '@effect/platform-node/NodeHttpIncomingMessage';
 import type { loadUpstreamConfig } from './config.ts';
 import type { Run, Failure, RunResult } from './transport-result.ts';
-import { run_Run } from '../generated/validators.mjs';
+import { run_Run } from '#perfeng/validators';
 
 class TransportFailure extends Data.TaggedError('TransportFailure')<{ readonly reason: Failure }> {}
 function isRun(value: unknown): value is Run { return run_Run(value); }

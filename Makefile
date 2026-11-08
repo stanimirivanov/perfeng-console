@@ -6,8 +6,9 @@ doctor:
 bootstrap: doctor
 	pnpm install --frozen-lockfile --ignore-scripts
 
-lint:
-	node_modules/.bin/eslint . --max-warnings 0
+lint: check-imports
+	NX_DAEMON=false node_modules/.bin/nx graph --file=dist/import-project-graph.json
+	NX_DAEMON=false node_modules/.bin/eslint . --max-warnings 0
 
 typecheck:
 	node_modules/.bin/tsc --project tsconfig.json
@@ -70,3 +71,7 @@ console-release: build
 
 console-isolation-check: doctor
 	node scripts/check-console-isolation.ts
+
+.PHONY: check-imports
+check-imports:
+	node harness/check-imports.ts

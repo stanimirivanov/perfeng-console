@@ -2,8 +2,8 @@ import { createServer } from 'node:http';
 import { once } from 'node:events';
 import { pathToFileURL } from 'node:url';
 import { resolve } from 'node:path';
-import { createRunTransport } from '../../../src/bff/transport.ts';
-import type { UpstreamConfig } from '../../../src/bff/config.ts';
+import { createRunTransport } from '#perfeng/bff';
+import type { UpstreamConfig } from '#perfeng/bff-config';
 
 /** Qualification-only request scope bridge; not a production session/auth server. */
 export async function startFixtureBff(config: UpstreamConfig, runId: string) {

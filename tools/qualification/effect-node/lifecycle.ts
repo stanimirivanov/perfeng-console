@@ -3,7 +3,7 @@ import { once } from 'node:events';
 import { pathToFileURL } from 'node:url';
 import { resolve } from 'node:path';
 import { createRunTransport } from './candidate.ts';
-import type { UpstreamConfig } from '../../../src/bff/config.ts';
+import type { UpstreamConfig } from '../../../src/bff/config-public-api.ts';
 
 /** Qualification-only request scope bridge; not a production session/auth server. */
 export async function startFixtureBff(config: UpstreamConfig, runId: string) {

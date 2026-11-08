@@ -12,10 +12,12 @@
     "@angular/build": "22.2.6",
     "@angular/cli": "22.2.6",
     "@angular/compiler-cli": "22.2.4",
+    "@nx/eslint-plugin": "24.0.4",
     "@playwright/test": "1.65.0",
     "@types/node": "26.6.6",
     "ajv": "8.20.0",
     "ajv-formats": "3.0.1",
+    "dependency-cruiser": "18.7.2",
     "esbuild": "0.28.0",
     "eslint": "10.14.0",
     "jsdom": "31.0.0",
@@ -28,7 +30,9 @@
   "scripts": {
     "build": "NX_DAEMON=false nx run console:build",
     "e2e": "playwright test -c apps/web-e2e/playwright.config.ts",
-    "guide": "node tools/user-guide/generate.mjs"
+    "guide": "node tools/user-guide/generate.mjs",
+    "lint": "make lint",
+    "check:imports": "make check-imports"
   },
   "dependencies": {
     "@angular/cdk": "22.2.6",
@@ -44,5 +48,38 @@
     "effect": "4.1.2",
     "rxjs": "7.8.2",
     "tslib": "2.8.1"
+  },
+  "imports": {
+    "#perfeng/contracts": "./src/shared/contracts/public-api.ts",
+    "#perfeng/bff": "./src/bff/public-api.ts",
+    "#perfeng/bff-config": "./src/bff/config-public-api.ts",
+    "#perfeng/bff-session": "./src/bff/session.ts",
+    "#perfeng/bff-csp": "./src/bff/csp.ts",
+    "#perfeng/bff-runs": "./src/bff/runs.ts",
+    "#perfeng/validators": {
+      "types": "./src/generated/validators.d.mts",
+      "default": "./src/generated/validators.mjs"
+    },
+    "#perfeng/server": "./tools/public-api.ts",
+    "#perfeng/user-guide": {
+      "types": "./tools/user-guide/public-api.d.mts",
+      "default": "./tools/user-guide/public-api.mjs"
+    },
+    "#perfeng/e2e": "./apps/web-e2e/public-api.ts",
+    "#perfeng/harness/boundaries": "./harness/boundaries.ts",
+    "#perfeng/harness/workspace": "./harness/workspace.ts",
+    "#perfeng/harness/ownership": "./harness/ownership.ts",
+    "#perfeng/harness/assets": "./harness/assets.ts",
+    "#perfeng/harness/product-release": "./harness/product-release.ts",
+    "#perfeng/tooling/angular-accounting": "./scripts/angular-accounting.ts",
+    "#perfeng/tooling/generated-output": "./scripts/generated-output.ts",
+    "#perfeng/tooling/contracts": "./scripts/contracts.ts",
+    "#perfeng/run-types": "./src/generated/run.ts",
+    "#perfeng/harness/imports": "./harness/imports.ts",
+    "#perfeng/harness/project-imports": "./harness/project-imports.ts",
+    "#perfeng/harness/import-lint": {
+      "types": "./harness/import-lint.d.mts",
+      "default": "./harness/import-lint.mjs"
+    }
   }
 }

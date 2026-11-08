@@ -2,7 +2,7 @@ import { createServer } from "node:http";
 import { readFile } from "node:fs/promises";
 import { resolve, extname } from "node:path";
 
-import { renderConsoleHtml } from "../src/bff/csp.ts";
+import { renderConsoleHtml } from "#perfeng/bff-csp";
 
 const root = resolve(process.env.PERFENG_ADMISSION === "1" ? "dist/admission/browser" : "dist/apps/console/browser");
 createServer(async (req, res) => {

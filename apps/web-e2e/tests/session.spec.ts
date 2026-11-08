@@ -1,12 +1,12 @@
 import { createServer } from 'node:https';
 import { once } from 'node:events';
-import { createRunTransport } from '../../../src/bff/transport.ts';
+import { createRunTransport } from '#perfeng/bff';
 import { expect, test } from '@playwright/test';
 import { execFileSync } from 'node:child_process';
 import { chmodSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
-import { startConsole } from '../../../tools/console-server.ts';
+import { startConsole } from '#perfeng/server';
 
 test('loopback HTTPS pairing is keyboard usable and session boundaries fail closed', async ({ browser }) => {
   const directory = mkdtempSync(join(homedir(), '.perfeng-session-'));

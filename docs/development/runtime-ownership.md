@@ -29,6 +29,7 @@ calculations; use Angular for rendering and framework lifecycle integration.
 | Reads, polling, deadlines and bounded concurrency | Effect application operations | One scheduler per observation; narrow client ports; no UI state ownership |
 | Browser HTTP | Same-origin BFF adapter | No provider URL or bearer; preserve session/CSRF protocol |
 | BFF requests and upstream resources | Effect operations and qualified server adapter | Fixed destination, server credentials, TLS and safe result projection |
+| Browser–BFF DTOs | Pure TypeScript in src/shared/contracts | Data-only contracts; no framework, runtime or I/O; generated provider types and validation remain authoritative |
 | Display models and comparisons | Pure TypeScript in src/presentation | No Angular, NgRx, Effect runtime or I/O; no recomputed scientific verdicts |
 | Provider shapes and validation | Pinned generated types and Ajv | Offline generation; no runtime schema fetching or hand-authored replacement wire types |
 | Framework Observable interoperability | Narrow Angular boundary adapter | RxJS does not become a competing polling, retry or state system |
@@ -52,7 +53,7 @@ The integration service delivers events; it does not keep a duplicate observatio
 Angular DI owns the browser integration service. Effect services supply operation
 dependencies inside that boundary; do not mirror the entire Angular service graph.
 The BFF has its own composition root and runtime. No cross-process runtime singleton.
-Keep presentation DTOs free of Effect types. Keep generated clients and validators
+Keep shared browser–BFF DTOs in src/shared/contracts, free of Effect types. Keep generated clients and validators
 in their existing ownership boundaries; do not edit generated source to fit an adapter.
 
 ## Lifetimes and completion

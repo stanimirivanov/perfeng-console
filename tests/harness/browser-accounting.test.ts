@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { checkAngularResult } from "../../scripts/angular-accounting.ts";
-import Accounting from "../../apps/web-e2e/accounting.ts";
+import { checkAngularResult } from "#perfeng/tooling/angular-accounting";
+import { Accounting } from "#perfeng/e2e";
 import type { TestResult, FullResult, TestCase } from "@playwright/test/reporter";
 
 test("Angular receipt rejects empty, skipped, retried or failed runs", () => {

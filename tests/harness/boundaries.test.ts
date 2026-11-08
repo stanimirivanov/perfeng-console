@@ -3,7 +3,7 @@ import { mkdirSync, mkdtempSync, rmSync, symlinkSync, writeFileSync } from 'node
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { test } from 'node:test';
-import { scan } from '../../harness/boundaries.ts';
+import { scan } from '#perfeng/harness/boundaries';
 
 function diagnostics(files: Record<string, string>, link = false): string {
   const root = mkdtempSync(join(tmpdir(), 'perfeng-guard-'));
@@ -79,4 +79,31 @@ test('Effect Node imports are admitted only to the reviewed BFF modules', () => 
     assert.match(diagnostics({[path]: "import * as N from '@effect/platform-node/NodeHttpClient';"}), /package/);
   }
   assert.match(diagnostics({'src/bff/transport.ts': "import 'node:https';"}), /package/);
+});
+
+test('shared DTOs are consumable by browser and BFF without acquiring authority', () => {
+  assert.equal(diagnostics({
+    'src/shared/contracts/observation.ts': 'export interface Observation { value: string }',
+    'src/browser/view.ts': "import type { Observation } from '#perfeng/contracts';",
+    'src/bff/view.ts': "import type { Observation } from '../shared/contracts/observation.ts';",
+  }), '');
+  for (const source of ["import '../../bff/config.ts';", "import '../../simulator/runner.ts';", "import 'effect';"]) {
+    assert.match(diagnostics({ 'src/shared/contracts/observation.ts': source }), /layer|package/);
+  }
+});
+
+test('root browser shared imports are exact and type-only', () => {
+  for (const source of [
+    "import type { RunSummary } from '../shared/contracts/observation.ts';",
+    "import '../shared/contracts/observation.ts';",
+    "export * from '../shared/contracts/observation.ts';",
+    "import('../shared/contracts/observation.ts');",
+    "import type { Other } from '../shared/contracts/other.ts';",
+  ]) assert.match(diagnostics({ 'src/browser/view.ts': source }), /shared-contract/);
+});
+
+test('aliases preserve layer authority and type-only DTO admission', () => {
+  assert.equal(diagnostics({ 'src/bff/view.ts': "import type { Observation } from '#perfeng/contracts';" }), '');
+  assert.match(diagnostics({ 'src/browser/view.ts': "import '#perfeng/bff';" }), /layer/);
+  assert.match(diagnostics({ 'src/browser/view.ts': "import '#perfeng/contracts';" }), /shared-contract/);
 });

@@ -1,5 +1,5 @@
 import type { RunResult } from './transport-result.ts';
-import type { Observation, RunSummary } from '../presentation/observation.ts';
+import type { Observation, RunSummary } from '#perfeng/contracts';
 
 /** Scope provider failures and project only fields needed by the lookup screen. */
 export function runObservation(result: RunResult): { status: number; body: Observation<RunSummary> | { reason: string } } {

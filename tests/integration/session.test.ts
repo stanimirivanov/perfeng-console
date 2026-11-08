@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { createSession } from '../../src/bff/session.ts';
+import { createSession } from '#perfeng/bff-session';
 
 test('pairing consumes the code once and rejects mismatched CSRF', () => {
   const session = createSession();

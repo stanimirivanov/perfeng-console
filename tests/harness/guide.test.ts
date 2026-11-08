@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { mkdtempSync, rmSync, readFileSync, existsSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import GuideReporter from "../../apps/web-e2e/user-guide/reporter.ts";
+import { GuideReporter } from "#perfeng/e2e";
 import type {
   TestCase,
   TestResult,
@@ -66,7 +66,7 @@ test("guide excludes ordinary tests and discards failed or empty publications", 
 });
 
 test("source provenance covers shared layers and browser provenance covers lazy chunks", async () => {
-  const { sourceDigest, browserDigest } = await import("../../tools/user-guide/source.mjs");
+  const { sourceDigest, browserDigest } = await import("#perfeng/user-guide");
   const { mkdirSync, writeFileSync } = await import("node:fs");
   const root = mkdtempSync(join(tmpdir(), "guide-inputs-"));
   const cwd = process.cwd();
@@ -74,8 +74,11 @@ test("source provenance covers shared layers and browser provenance covers lazy 
     process.chdir(root);
     for (const dir of ["src", "tools", "apps", "dist/apps/console/browser"])
       mkdirSync(dir, { recursive: true });
-    for (const path of ["pnpm-workspace.yaml", "angular.json", "nx.json", "tsconfig.base.json", "package.json", "pnpm-lock.yaml"])
+    for (const path of ["pnpm-workspace.yaml", "angular.json", "nx.json", "tsconfig.base.json", "tsconfig.paths.json", "package.json", "pnpm-lock.yaml"])
       writeFileSync(path, "");
+    const beforeAliases = sourceDigest();
+    writeFileSync("tsconfig.paths.json", "changed alias target");
+    assert.notEqual(sourceDigest(), beforeAliases);
     const source = sourceDigest();
     writeFileSync("src/shared.ts", "export const value = 1;");
     assert.notEqual(sourceDigest(), source);

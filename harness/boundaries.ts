@@ -2,6 +2,7 @@ import { lstatSync, readdirSync, readFileSync } from 'node:fs';
 import { dirname, join, relative, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import ts from 'typescript';
+import { publicImports, checkImportMaps } from './imports.ts';
 
 interface Policy {
   layers: readonly string[];
@@ -11,9 +12,10 @@ interface Policy {
 // All internal dependencies point down this graph. New external authority needs review.
 export const policy: Readonly<Record<string, Policy>> = {
   generated: { layers: [], packages: [] },
+  shared: { layers: [], packages: [] },
   presentation: { layers: ['generated'], packages: [] },
-  browser: { layers: ['presentation', 'generated'], packages: [] },
-  bff: { layers: ['presentation', 'generated'], packages: ['node:crypto', 'node:fs', 'node:path'] },
+  browser: { layers: ['presentation', 'shared', 'generated'], packages: [] },
+  bff: { layers: ['presentation', 'shared', 'generated'], packages: ['node:crypto', 'node:fs', 'node:path'] },
   scenarios: { layers: ['generated'], packages: [] },
   simulator: { layers: ['scenarios', 'generated'], packages: ['node:child_process', 'node:crypto', 'node:fs', 'node:path'] },
 };
@@ -33,7 +35,7 @@ function inspectFile(root: string, file: string, owner: string): string[] {
       return;
     }
     const name = specifier.text;
-    if (['%', '#', '?', String.fromCharCode(92)].some((char) => name.includes(char))) {
+    if (['%', '?', String.fromCharCode(92)].some((char) => name.includes(char)) || (name.includes('#') && !Object.hasOwn(publicImports, name))) {
       report(node, 'specifier', 'Use a canonical module path without encoding, query or fragment.');
       return;
     }
@@ -44,16 +46,20 @@ function inspectFile(root: string, file: string, owner: string): string[] {
       'src/bff/run-reader.ts': ['effect', 'effect/http/HttpClient', '@effect/platform-node/NodeHttpClient', '@effect/platform-node/NodeHttpIncomingMessage'],
     };
     const localPackages = admitted[relative(root, file)] ?? [];
-    if (!name.startsWith('./') && !name.startsWith('../')) {
+    if (!Object.hasOwn(publicImports, name) && !name.startsWith('./') && !name.startsWith('../')) {
       if (!rules.packages.includes(name) && !localPackages.includes(name) && !(browserSchema && name === 'effect/Schema')) report(node, 'package', `Review and explicitly admit ${name} for ${owner}.`);
       return;
     }
-    const target = relative(join(root, 'src'), resolve(dirname(file), name));
+    const target = relative(join(root, 'src'), Object.hasOwn(publicImports, name) ? resolve(root, publicImports[name]!) : resolve(dirname(file), name));
     if (target === '..' || target.startsWith('../')) {
       report(node, 'escape', 'Import only modules owned under src/.');
       return;
     }
     const targetOwner = target.split('/')[0]!;
+    if (owner === 'browser' && targetOwner === 'shared' &&
+        !(name === '#perfeng/contracts' && target === 'shared/contracts/public-api.ts' && ts.isImportDeclaration(node) && node.importClause?.isTypeOnly === true)) {
+      report(node, 'shared-contract', 'Use a type-only import of the reviewed shared observation DTO.');
+    }
     if (targetOwner !== owner && !rules.layers.includes(targetOwner)) {
       report(node, 'layer', `${owner} cannot import ${targetOwner}. Use the declared public boundary.`);
     }
@@ -119,7 +125,7 @@ export function scan(root: string): string[] {
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
-  const errors = scan(process.cwd());
+  const errors = [...scan(process.cwd()), ...checkImportMaps(process.cwd())];
   for (const layer of Object.keys(policy)) {
     const guide = join('src', layer, 'AGENTS.md');
     if (!lstatSync(guide, { throwIfNoEntry: false })?.isFile()) errors.push(`${guide} [guide] Restore the layer's instructions.`);
