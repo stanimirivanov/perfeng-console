@@ -1,6 +1,8 @@
-import { Effect } from 'effect';
+import { lookupRun } from './run-client';
+import type { RunSummary } from '../../../src/presentation/observation';
+import { Effect, Fiber } from 'effect';
 import { sessionRequest } from './session-client';
-import { Component, inject, signal } from "@angular/core";
+import { Component, DestroyRef, inject, signal } from "@angular/core";
 import { bootstrapApplication } from "@angular/platform-browser";
 import { provideRouter, Router, RouterLink, RouterOutlet, Routes } from "@angular/router";
 import { VerificationAccess } from "./verification/access";
@@ -9,12 +11,82 @@ import { VerificationAccess } from "./verification/access";
   selector: "app-home",
   template: `
     <h1>Perfeng Console</h1>
-    <p>Open a Run from a CI link to inspect its evidence.</p>
-    <p role="status">Backend unavailable — platform connection is not configured.</p>
-    <button disabled>Open Run</button>
+    <h2>Find a Run</h2>
+    <p id="lookup-help">Enter an exact Run ID. Run listing and history are unavailable.</p>
+    <form (submit)="find($event, id.value)">
+      <label for="run-id">Run ID</label>
+      <input id="run-id" #id required maxlength="100" autocomplete="off" spellcheck="false"
+        aria-describedby="lookup-help" (input)="invalidate('Ready to look up this Run.')">
+      <button type="submit">Look up Run</button>
+    </form>
+    <p role="status">{{ status() }}</p>
+    @if (run(); as record) {
+      <h3>Current Run</h3>
+      <dl class="run-summary">
+        <dt>Run ID</dt><dd>{{ record.id }}</dd>
+        <dt>State</dt><dd>{{ record.state }}</dd>
+        <dt>Revision</dt><dd>{{ record.revision }}</dd>
+        <dt>Updated at</dt><dd>{{ record.updatedAt }}</dd>
+      </dl>
+    }
   `,
+  host: {
+    '(window:offline)': "invalidate('Connection unavailable. Run evidence cleared.')",
+    '(window:online)': "invalidate('Connection restored. Look up the Run again.')",
+    '(document:visibilitychange)': 'visibilityChanged()',
+  },
 })
-class ConsoleHome {}
+class ConsoleHome {
+  readonly status = signal('Ready for exact Run lookup.');
+  readonly run = signal<RunSummary | undefined>(undefined);
+  private generation = 0;
+  private pending?: Fiber.Fiber<void>;
+
+  constructor() {
+    inject(DestroyRef).onDestroy(() => this.invalidate(''));
+  }
+
+  invalidate(message: string) {
+    this.generation++;
+    if (this.pending) Effect.runFork(Fiber.interrupt(this.pending));
+    this.run.set(undefined);
+    this.status.set(message);
+  }
+
+  visibilityChanged() {
+    if (document.hidden) this.invalidate('Look up the Run again to see current evidence.');
+  }
+
+  find(event: Event, id: string) {
+    event.preventDefault();
+    this.invalidate('Looking up Run…');
+    if (!navigator.onLine) {
+      this.status.set('Connection unavailable. Try again when connected.');
+      return;
+    }
+    const generation = this.generation;
+    const started = performance.now();
+    this.pending = Effect.runFork(Effect.gen({ self: this }, function* () {
+      const result = yield* lookupRun(id.trim());
+      if (this.generation !== generation) return;
+      if ('message' in result) {
+        this.status.set(result.message);
+        return;
+      }
+      // Charge transit and processing against the lifetime so network delay never extends freshness.
+      const remaining = result.observation.validForMs - (performance.now() - started);
+      if (remaining > 0) {
+        this.run.set(result.observation.value);
+        this.status.set('Current Run evidence loaded.');
+        yield* Effect.sleep(remaining);
+      }
+      if (this.generation === generation) {
+        this.run.set(undefined);
+        this.status.set('Run evidence expired. Look up the Run again.');
+      }
+    }));
+  }
+}
 
 const routes: Routes = [
   { path: "", pathMatch: "full", component: ConsoleHome },
@@ -42,7 +114,7 @@ const routes: Routes = [
       </nav>
     }
     <main #main id="main" tabindex="-1">
-      <div [hidden]="mode() !== 'paired' && mode() !== 'preview'"><router-outlet /></div>
+      @if (mode() === 'paired' || mode() === 'preview') { <router-outlet /> }
       @if (mode() === 'pairing') {
         <h1>Pair local console</h1>
         <p id="pair-help">Enter the single-use code shown in the console server terminal.</p>

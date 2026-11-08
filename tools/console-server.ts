@@ -1,3 +1,5 @@
+import { runObservation } from '../src/bff/runs.ts';
+import type { createRunTransport } from '../src/bff/transport.ts';
 import { createServer } from 'node:https';
 import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
@@ -11,7 +13,7 @@ const attributes = '; Secure; HttpOnly; SameSite=Strict; Path=/';
 const base = '/console/api/session';
 
 /** Serve the built console and its local pairing API on IPv4 loopback. */
-export async function startConsole(options: { cert: Buffer; key: Buffer; port: number; now?: () => number }) {
+export async function startConsole(options: { cert: Buffer; key: Buffer; port: number; now?: () => number; runs?: ReturnType<typeof createRunTransport> }) {
   const session = createSession(options.now);
   const root = fileURLToPath(new URL('../dist/apps/console/browser', import.meta.url));
   const server = createServer({ cert: options.cert, key: options.key, minVersion: 'TLSv1.2', requestTimeout: 5000, connectionsCheckingInterval: 1000 }, async (req, res) => {
@@ -26,6 +28,22 @@ export async function startConsole(options: { cert: Buffer; key: Buffer; port: n
 
     const cookies = (req.headers.cookie ?? '').split(';').map(value => value.trim()).filter(value => value.startsWith(cookie + '='));
     const id = cookies.length === 1 ? cookies[0]?.slice(cookie.length + 1) : undefined;
+    const exactRun = /^\/console\/api\/runs\/([^/?#]{1,300})$/.exec(path ?? '');
+    if (req.method === 'GET' && exactRun) {
+      if (req.headersDistinct['x-perfeng-csrf']?.length !== 1 || req.headers['x-perfeng-csrf'] !== 'read') return end(403);
+      if (!session.read(id)) return end(401);
+      if (!options.runs) return end(503);
+      let runId: string;
+      try { runId = decodeURIComponent(exactRun[1]!); }
+      catch { return end(400); }
+      const cancel = new AbortController();
+      res.once('close', () => cancel.abort());
+      const result = await options.runs.getRun(runId, cancel.signal);
+      if (res.destroyed) return;
+      if (!session.read(id)) return end(401);
+      const { status, body } = runObservation(result);
+      return res.writeHead(status, { 'Content-Type': 'application/json' }).end(JSON.stringify(body));
+    }
     if (path === base && req.method === 'GET') {
       // Ambient cookie-bearing GETs cannot extend the idle deadline.
       if (req.headersDistinct['x-perfeng-csrf']?.length !== 1 || req.headers['x-perfeng-csrf'] !== 'read') return end(403);

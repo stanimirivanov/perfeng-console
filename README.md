@@ -55,3 +55,11 @@ own release lifecycle and can pin the console identity independently.
 sources, extracts the archive into a second directory, and verifies HTTPS pairing
 in Chromium. It requires the repository's pinned toolchain, installed Chromium,
 OpenSSL and tar.
+
+To enable exact Run lookup, start the console with all three server settings:
+`PERFENG_UPSTREAM_ORIGIN` (the fixed control-plane HTTPS origin),
+`PERFENG_UPSTREAM_TOKEN_FILE`, and `PERFENG_UPSTREAM_CA_FILE`. Use absolute paths
+to owner-only files in protected directories. The browser sees only the Run ID,
+state, revision, and update time. A lookup has a three-second deadline and its
+evidence expires within ten seconds of dispatch. Reconnect requires a fresh
+lookup. Run listing and history remain unavailable.
