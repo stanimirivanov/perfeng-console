@@ -1,4 +1,4 @@
-import { createRunTransport } from '../src/bff/transport.ts';
+import { createRunTransport } from '#perfeng/bff';
 import { readFile } from 'node:fs/promises';
 import { startConsole } from './console-server.ts';
 

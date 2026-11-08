@@ -32,8 +32,14 @@ Keep pure transformations in plain TypeScript. Use the owning layer guide for de
 explicitly identify pending enforcement. Existing passing gates do not admit a new
 adapter or prove the full ownership model. Preserve generated contracts and Ajv.
 
+## Imports
+
+Follow [import boundaries](docs/IMPORTS.md). Use reviewed public aliases across owners.
+Keep within-owner relative imports local. Run pnpm check:imports and pnpm lint.
+
 ## Review checklist
 
+- No relative import crosses a project or layer boundary except the documented public-entry links; cross-layer contract types live in shared/contracts, not presentation.
 - Identify the state writer, operation owner, runtime scope and authority boundary.
 - Verify teardown, late-result rejection and safe failure projection where relevant.
 - Preserve credential, TLS, deadline, response-limit and contract guarantees.

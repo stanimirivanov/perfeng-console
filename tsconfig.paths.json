@@ -1,0 +1,63 @@
+{
+  "compilerOptions": {
+    "paths": {
+      "#perfeng/contracts": [
+        "./src/shared/contracts/public-api.ts"
+      ],
+      "#perfeng/bff": [
+        "./src/bff/public-api.ts"
+      ],
+      "#perfeng/bff-config": [
+        "./src/bff/config-public-api.ts"
+      ],
+      "#perfeng/bff-session": [
+        "./src/bff/session.ts"
+      ],
+      "#perfeng/bff-csp": [
+        "./src/bff/csp.ts"
+      ],
+      "#perfeng/bff-runs": [
+        "./src/bff/runs.ts"
+      ],
+      "#perfeng/server": [
+        "./tools/public-api.ts"
+      ],
+      "#perfeng/e2e": [
+        "./apps/web-e2e/public-api.ts"
+      ],
+      "#perfeng/harness/boundaries": [
+        "./harness/boundaries.ts"
+      ],
+      "#perfeng/harness/workspace": [
+        "./harness/workspace.ts"
+      ],
+      "#perfeng/harness/ownership": [
+        "./harness/ownership.ts"
+      ],
+      "#perfeng/harness/assets": [
+        "./harness/assets.ts"
+      ],
+      "#perfeng/harness/product-release": [
+        "./harness/product-release.ts"
+      ],
+      "#perfeng/tooling/angular-accounting": [
+        "./scripts/angular-accounting.ts"
+      ],
+      "#perfeng/tooling/generated-output": [
+        "./scripts/generated-output.ts"
+      ],
+      "#perfeng/tooling/contracts": [
+        "./scripts/contracts.ts"
+      ],
+      "#perfeng/run-types": [
+        "./src/generated/run.ts"
+      ],
+      "#perfeng/harness/imports": [
+        "./harness/imports.ts"
+      ],
+      "#perfeng/harness/project-imports": [
+        "./harness/project-imports.ts"
+      ]
+    }
+  }
+}

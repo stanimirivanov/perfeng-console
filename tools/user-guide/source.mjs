@@ -23,6 +23,7 @@ export function sourceDigest() {
     "angular.json",
     "nx.json",
     "tsconfig.base.json",
+    "tsconfig.paths.json",
     "package.json",
     "pnpm-lock.yaml",
   ]);

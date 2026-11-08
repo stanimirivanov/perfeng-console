@@ -5,7 +5,7 @@ import { createHash } from 'node:crypto';
 import ts from 'typescript';
 import { inspectImports } from './boundaries.ts';
 
-export type Role = 'component' | 'store' | 'operation' | 'port' | 'adapter' | 'composition' | 'presentation';
+export type Role = 'component' | 'store' | 'operation' | 'port' | 'adapter' | 'composition' | 'presentation' | 'contract' | 'entry';
 // Register concrete consumers in review; a directory name never grants authority.
 export const roles: Readonly<Record<string, Role>> = {
   'apps/console/src/main.ts': 'composition',
@@ -16,7 +16,10 @@ export const roles: Readonly<Record<string, Role>> = {
   'src/bff/session.ts': 'adapter',
   'apps/console/src/run-client.ts': 'adapter',
   'src/bff/runs.ts': 'adapter',
-  'src/presentation/observation.ts': 'presentation',
+  'src/shared/contracts/observation.ts': 'contract',
+  'src/shared/contracts/public-api.ts': 'contract',
+  'src/bff/public-api.ts': 'entry',
+  'src/bff/config-public-api.ts': 'entry',
   'apps/console/src/session-client.ts': 'adapter',
   'src/bff/transport.ts': 'composition',
   'src/bff/run-reader.ts': 'adapter',
@@ -27,13 +30,15 @@ const legacyHashes: Readonly<Record<string, string>> = {
   'apps/console/src/verification/access.ts': '124a443f1e5680bf84769e491ff37cda77ebacf75fdab16e1ec3757e9f993008'
 };
 const edges: Record<Role, readonly Role[]> = {
-  component: ['component', 'store', 'port', 'presentation'],
-  store: ['store', 'port', 'operation', 'presentation'],
-  operation: ['operation', 'port', 'presentation'],
-  port: ['port', 'presentation'],
-  adapter: ['adapter', 'port', 'presentation'],
-  composition: ['component', 'store', 'operation', 'port', 'adapter', 'presentation'],
+  component: ['component', 'store', 'port', 'presentation', 'contract'],
+  store: ['store', 'port', 'operation', 'presentation', 'contract'],
+  operation: ['operation', 'port', 'presentation', 'contract'],
+  port: ['port', 'presentation', 'contract'],
+  adapter: ['adapter', 'port', 'presentation', 'contract'],
+  composition: ['component', 'store', 'operation', 'port', 'adapter', 'presentation', 'contract'],
   presentation: ['presentation'],
+  contract: ['contract'],
+  entry: ['composition', 'adapter'],
 };
 const ioNames = new Set(['fetch', 'XMLHttpRequest', 'WebSocket', 'EventSource', 'AbortController', 'AbortSignal', 'setTimeout', 'setInterval']);
 const runtimes = new Set(['runPromise', 'runPromiseExit', 'runFork', 'runSync', 'runSyncExit', 'runCallback', 'runForkWith', 'runPromiseWith']);
@@ -51,7 +56,7 @@ export function checkOwnership(root: string, registry: Readonly<Record<string, R
       else if (/\.(?:[cm]?[jt]sx?)$/.test(file) && !file.endsWith('.spec.ts')) files.push(file);
     }
   };
-  for (const dir of ['apps/console/src', 'src/browser', 'src/bff', 'src/presentation']) walk(resolve(root, dir));
+  for (const dir of ['apps/console/src', 'src/browser', 'src/bff', 'src/presentation', 'src/shared']) walk(resolve(root, dir));
   const config = ts.findConfigFile(root, ts.sys.fileExists, 'tsconfig.json');
   const options = config ? ts.parseJsonConfigFileContent(ts.readConfigFile(config, ts.sys.readFile).config, ts.sys, root).options : {};
   const program = ts.createProgram(files, { ...options, noEmit: true });
@@ -65,6 +70,16 @@ export function checkOwnership(root: string, registry: Readonly<Record<string, R
     const report = (node: ts.Node, rule: string, reason: string) => {
       errors.push(`${name}:${source.getLineAndCharacterOfPosition(node.getStart(source)).line + 1} [${rule}] ${reason}`);
     };
+    if (role === 'entry' && source.statements.some(statement => !ts.isExportDeclaration(statement) || !statement.moduleSpecifier || !statement.exportClause || !ts.isNamedExports(statement.exportClause)))
+      report(source, 'OWN-01', 'Public entries contain only explicit named re-exports.');
+    if (role === 'contract') {
+      for (const statement of source.statements) {
+        if (!ts.isInterfaceDeclaration(statement) && !ts.isTypeAliasDeclaration(statement) &&
+            !(ts.isImportDeclaration(statement) && statement.importClause?.isTypeOnly === true) &&
+            !(ts.isExportDeclaration(statement) && statement.isTypeOnly))
+          report(statement, 'OWN-04', 'Shared contracts contain only type declarations and type-only imports/exports.');
+      }
+    }
     // A hash-bound legacy allowance cannot grow while production code is held unchanged.
     const legacy = registry === roles && Object.hasOwn(legacyHashes, name);
     if (legacy && createHash('sha256').update(readFileSync(file)).digest('hex') !== legacyHashes[name]) {
@@ -77,6 +92,11 @@ export function checkOwnership(root: string, registry: Readonly<Record<string, R
       if (target && !target.isExternalLibraryImport) {
         const targetName = relative(root, target.resolvedFileName);
         const targetRole = registry[targetName];
+        if (role === 'entry' && targetName !== (name === 'src/bff/public-api.ts' ? 'src/bff/transport.ts' : 'src/bff/config.ts'))
+          report(node, 'OWN-01', 'Public entry must re-export only its reviewed owner.');
+        if (targetRole === 'contract' && !(ts.isImportDeclaration(node) && node.importClause?.isTypeOnly === true) &&
+            !(role === 'contract' && ts.isExportDeclaration(node) && node.isTypeOnly))
+          report(node, 'OWN-04', 'Consume shared contracts through declaration-level import type.');
         if (targetName.startsWith('src/generated/')) return;
         if (!targetRole || !edges[role].includes(targetRole)) {
           // Existing main consumes the existing capability adapter until the reviewed browser migration.
@@ -85,7 +105,7 @@ export function checkOwnership(root: string, registry: Readonly<Record<string, R
         }
       }
       if (['node:http', 'node:https', 'http', 'https'].includes(spec)) report(node, 'OWN-03', 'Native dispatch needs explicit platform admission, not just an adapter role.');
-      if (role === 'presentation' && !spec.startsWith('.')) report(node, 'OWN-04', 'Presentation stays framework/runtime independent.');
+      if ((role === 'presentation' || role === 'contract') && !spec.startsWith('.') && spec !== '#perfeng/contracts') report(node, 'OWN-04', 'Presentation and shared contracts stay framework/runtime independent.');
       if ((spec.startsWith('node:') || spec.startsWith('effect/http') || spec.startsWith('@effect/platform-node')) && role !== 'adapter')
         report(node, 'OWN-03', 'Platform I/O belongs in a reviewed adapter.');
     }, report);

@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { mkdtempSync, readFileSync, writeFileSync, existsSync, rmSync, symlinkSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
-import { synchronizeOutputs } from "../../scripts/generated-output.ts";
+import { synchronizeOutputs } from "#perfeng/tooling/generated-output";
 
 test("renamed outputs remove only unchanged previously owned files", () => {
   const root = mkdtempSync(join(tmpdir(), "generated-ownership-"));

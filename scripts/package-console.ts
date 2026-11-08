@@ -2,9 +2,9 @@ import { execFileSync } from 'node:child_process';
 import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
-import { bundleServer } from '../harness/product-release.ts';
-import { checkDistribution } from '../harness/assets.ts';
-import { checkApp } from '../harness/workspace.ts';
+import { bundleServer } from '#perfeng/harness/product-release';
+import { checkDistribution } from '#perfeng/harness/assets';
+import { checkApp } from '#perfeng/harness/workspace';
 
 const { name, version, engines } = JSON.parse(readFileSync('package.json', 'utf8'));
 if (name !== '@perfeng/console' || typeof version !== 'string' || !/^\d+\.\d+\.\d+$/.test(version)) {

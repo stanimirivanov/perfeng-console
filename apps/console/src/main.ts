@@ -1,5 +1,5 @@
 import { lookupRun } from './run-client';
-import type { RunSummary } from '../../../src/presentation/observation';
+import type { RunSummary } from '#perfeng/contracts';
 import { Effect, Fiber } from 'effect';
 import { sessionRequest } from './session-client';
 import { Component, DestroyRef, inject, signal } from "@angular/core";

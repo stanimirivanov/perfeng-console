@@ -13,6 +13,7 @@ src/
   browser/AGENTS.md          browser principal and UI state
   bff/AGENTS.md              session, credential and public HTTP boundary
   presentation/AGENTS.md     display models and formatting
+  shared/AGENTS.md           browser–BFF data contracts
   generated/AGENTS.md        reviewed contract-generated source
   scenarios/AGENTS.md        independent oracle
   simulator/AGENTS.md        runner and approved environment adapter client
@@ -41,9 +42,10 @@ Within-layer imports are allowed. The matrix lists cross-layer dependencies. Ext
 
 | Owner | Owns | May import |
 |---|---|---|
-| browser | Render state, accessible intents, same-origin BFF calls | presentation, generated |
-| bff | Server session, fixed-origin calls, safe errors | presentation, generated |
+| browser | Render state, accessible intents, same-origin BFF calls | presentation, shared, generated |
+| bff | Server session, fixed-origin calls, safe errors | presentation, shared, generated |
 | presentation | Pure display models | generated |
+| shared | Browser–BFF DTOs | none |
 | generated | Vendored-contract bindings | own layer |
 | scenarios | Frozen expectations and independent comparisons | generated |
 | simulator | Journal, approval, public-API driver, offline analysis adapter | scenarios, generated |

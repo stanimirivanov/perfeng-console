@@ -1,4 +1,5 @@
 {
+  "extends": "./tsconfig.paths.json",
   "compilerOptions": {
     "target": "ES2024",
     "module": "NodeNext",
@@ -8,7 +9,14 @@
     "verbatimModuleSyntax": true,
     "allowImportingTsExtensions": true,
     "noEmit": true,
-    "types": ["node"]
+    "types": [
+      "node"
+    ]
   },
-  "include": ["src", "harness", "tests", "scripts"]
+  "include": [
+    "src",
+    "harness",
+    "tests",
+    "scripts"
+  ]
 }

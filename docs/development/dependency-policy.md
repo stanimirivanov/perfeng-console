@@ -45,3 +45,21 @@ service is added. The selected Node HTTP backend exposes source.headersDistinct;
 upgrades must repeat TLS, raw-header and cleanup tests before pin changes.
 Existing peer warnings concern openapi-typescript's TypeScript range and optional
 WASM @emnapi peers. They are not suppressed by this admission; keep them visible.
+
+## Import harness admission — issue #41
+
+Development-only dependency-cruiser 18.7.2 (MIT; Node ^22 || ^24 || >=26)
+owns cross-owner cycle and forbidden graph-edge checks. User approved the pin.
+@nx/eslint-plugin 24.0.4 (MIT) matches Nx 24.0.4 and supplies the requested
+module-boundary lint rule. Registry peers are @typescript-eslint/parser ^8 and
+eslint-config-prettier ^10; the frozen graph resolves the plugin.
+No Angular ESLint or eslint-plugin-import direct dependency was added.
+Both tools are replaceable behind make check-imports / make lint and add no runtime
+authority. Install scripts remain disabled; release-age settings remain unchanged.
+The existing openapi-typescript/TypeScript and optional @emnapi peer warnings remain
+visible. Admission verification uses frozen bootstrap, full verify, audit and
+negative fixtures proving lint/graph failure; receipts are reported with the change.
+
+Official sources: [dependency-cruiser](https://github.com/sverweij/dependency-cruiser),
+[Nx boundary rule](https://nx.dev/docs/kb/enforce-module-boundaries). Exact license,
+engine and peer metadata was read from the npm registry for these versions.

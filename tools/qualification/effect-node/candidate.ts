@@ -2,10 +2,10 @@ import { Data, Effect, Stream } from 'effect';
 import * as HttpClient from 'effect/http/HttpClient';
 import * as NodeHttpClient from '@effect/platform-node/NodeHttpClient';
 import { NodeHttpIncomingMessage } from '@effect/platform-node/NodeHttpIncomingMessage';
-import { loadUpstreamConfig } from '../../../src/bff/config.ts';
-import type { UpstreamConfig } from '../../../src/bff/config.ts';
-import type { operations } from '../../../src/generated/run.ts';
-import { run_Run, run_RunId } from '../../../src/generated/validators.mjs';
+import { loadUpstreamConfig } from '../../../src/bff/config-public-api.ts';
+import type { UpstreamConfig } from '../../../src/bff/config-public-api.ts';
+import type { operations } from '../public-api.ts';
+import { run_Run, run_RunId } from '../public-api.mjs';
 
 type Run = operations['getRun']['responses'][200]['content']['application/json'];
 type Failure = 'invalid_input' | 'not_found' | 'forbidden' | 'unavailable' | 'invalid_response' | 'deadline' | 'aborted';

@@ -22,7 +22,7 @@ No new Make commands are proposed; extend the existing gates.
 | OWN-01 | Register production module roles; component consumes feature view, operation consumes port | Component/store imports concrete network adapter; operation imports store; unclassified new executable module | make architecture; harness/workspace.ts and harness/boundaries.ts |
 | OWN-02 | Execute Effect only at registered composition/integration boundaries | runPromise/runFork/runtime construction in component or reusable operation, including renamed imports | make architecture; same scanners |
 | OWN-03 | Permit HTTP, native abort and timer primitives only in explicitly admitted adapters/schedulers | fetch, XMLHttpRequest, Node HTTP, manual AbortController or setInterval in components/stores; globalThis and aliased forms | make architecture; AST checks plus resolved symbol provenance |
-| OWN-04 | Pure presentation transforms may import generated types | Presentation imports Angular, NgRx, Effect runtime, network or filesystem | make architecture; extend existing layer fixtures |
+| OWN-04 | Pure presentation transforms may import generated types; shared contracts contain type declarations and type-only imports | Presentation or contracts import runtime authority; contracts contain executable declarations or have runtime consumers | make architecture; extend existing layer fixtures |
 | OWN-05 | Browser consumes same-origin BFF; runner stays external | Server credentials/fault adapters imported through barrel, type-only, lazy or path-alias edges; design fixture in built output | make architecture and make build; existing scanners/assets |
 | OWN-06 | Qualified server adapter preserves security contract | Wrong CA/hostname, redirect, repeated content-type, oversized or slow body, credential canary, invalid identity | make test; tests/integration/transport.test.ts |
 | OWN-07 | Scope closure terminates work and releases resources | Disconnect/interrupt before headers and mid-body leaves socket or work alive; shutdown leaves request scopes running | make test; real local TLS and bounded cleanup assertions |
@@ -79,7 +79,7 @@ replace deterministic gates or human review. No agent workflow is introduced her
 ## Structural sensor receipt (2026-11-07, issue #33)
 
 make architecture now runs harness/ownership.ts. It registers exact handwritten paths
-under apps/console/src, src/browser, src/bff and src/presentation, resolves module
+under apps/console/src, src/browser, src/bff, src/presentation and src/shared, resolves module
 edges using TypeScript configuration, and checks type/lazy/barrel edges, runtime
 execution references, native/ambient I/O and unsupported executable extensions.
 Existing package/asset scanners remain independent constraints; a role never admits a
@@ -102,3 +102,8 @@ namespace/global property forms are covered by fixtures; arbitrary reflective Ja
 is not proven safe. Existing eval/loader prohibitions still apply. Admission of a new
 adapter/composition module requires registry and negative-test review. A registered
 role does not prove cleanup, authorization, secrecy or absence of duplicate state.
+
+Issue #41 extends OWN-04 to the shared contract role. Browser imports resolve to the
+exact reviewed observation DTO and must use declaration-level import type. The
+product release gate also rejects runtime imports of that DTO. Phase 3 adds exact Node/TypeScript alias parity and named public entries; see
+[import surfaces](import-surfaces.md). Broad import lint/cycle rules remain Phase 4.

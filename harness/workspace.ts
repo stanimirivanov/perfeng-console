@@ -42,14 +42,14 @@ export function checkApp(root: string): string[] {
         }
         const name = target.text;
         const internal = name.startsWith("./") || name.startsWith("../");
-        const allowed = internal
-          ? !relative(resolve(root, "src"), resolve(dirname(file), name)).startsWith("..") ||
-            (name === "../../../src/presentation/observation" && ts.isImportDeclaration(node) && node.importClause?.isTypeOnly === true)
+        const contractAlias = name === "#perfeng/contracts" && ts.isImportDeclaration(node) && node.importClause?.isTypeOnly === true;
+        const allowed = contractAlias || (internal
+          ? !relative(resolve(root, "src"), resolve(dirname(file), name)).startsWith("..")
           : ["@angular/core", "@angular/platform-browser", "@angular/router",
              "@angular/common", "@angular/material/button",
              ...(["main.ts", "session-client.ts", "run-client.ts"].includes(relative(resolve(root, "src"), file)) ? ["effect"] : []),
-             ...(file.endsWith(".spec.ts") ? ["@angular/core/testing", "@ngrx/signals", "effect"] : [])].includes(name);
-        if (!allowed || (!file.endsWith(".spec.ts") && name.includes(".spec")) || /[%?#\\]/u.test(name))
+             ...(file.endsWith(".spec.ts") ? ["@angular/core/testing", "@ngrx/signals", "effect"] : [])].includes(name));
+        if (!allowed || (!file.endsWith(".spec.ts") && name.includes(".spec")) || (/[%?\\]/u.test(name) || (name.includes("#") && name !== "#perfeng/contracts")))
           report(node, "dependency", "Forbidden browser dependency " + name);
       }, report);
     }

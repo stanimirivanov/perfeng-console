@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
-import * as ajv from '../../../src/generated/validators.mjs';
+import * as ajv from '../public-api.mjs';
 import { getRuns } from './generated/run/runs/runs.ts';
 import { getDefault as getNative } from './generated/native/default/default.ts';
 import { getDefault as getIntegration } from './generated/integration/default/default.ts';

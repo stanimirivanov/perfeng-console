@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 import { dirname, join, relative, resolve } from 'node:path';
 import ts from 'typescript';
 import { inspectImports } from './boundaries.ts';
+import { publicImports, checkImportMaps } from './imports.ts';
 
 const serverBuiltins = new Set(['node:crypto', 'node:events', 'node:fs/promises', 'node:https', 'node:path', 'node:url']);
 
@@ -16,6 +17,10 @@ const lockedRuntimeDirectories = new Set([
 const serverSources = new Set([
   'tools/serve-console.ts',
   'tools/console-server.ts',
+  'src/bff/public-api.ts',
+  'src/bff/config-public-api.ts',
+  'tools/public-api.ts',
+  'src/shared/contracts/public-api.ts',
   'src/bff/csp.ts',
   'src/bff/session.ts',
   'src/bff/config.ts',
@@ -25,11 +30,14 @@ const serverSources = new Set([
   'src/bff/runs.ts',
   'src/generated/run.ts',
   'src/generated/validators.mjs',
-  'src/presentation/observation.ts',
+  'src/shared/contracts/observation.ts',
 ]);
 
 /** Bundle the reviewed server entry and enforce its complete runtime closure. */
 export async function bundleServer(root: string) {
+  // Standalone packaging excludes verifier configs; validate its actual shared maps.
+  const aliasErrors = checkImportMaps(root, false);
+  if (aliasErrors.length) throw new Error(aliasErrors.join('\n'));
   const bundle = await build({
     absWorkingDir: root, entryPoints: ['tools/serve-console.ts'], bundle: true,
     format: 'esm', platform: 'node', target: 'node26', metafile: true, write: false,
@@ -39,11 +47,15 @@ export async function bundleServer(root: string) {
     if (dependency && lockedRuntimeDirectories.has(dependency)) continue;
     if (!serverSources.has(file)) throw new Error('Forbidden product input: ' + file);
     const source = ts.createSourceFile(file, readFileSync(join(root, file), 'utf8'), ts.ScriptTarget.Latest, true);
-    inspectImports(source, (_node, specifier) => {
+    inspectImports(source, (node, specifier) => {
       if (!specifier || !ts.isStringLiteralLike(specifier)) throw new Error('Computed product import: ' + file);
       const name = specifier.text;
       if (serverBuiltins.has(name) || (file === 'src/bff/config.ts' && name === 'node:fs') || (file.startsWith('src/bff/') && runtimePackages.has(name))) return;
-      const target = name.startsWith('.') ? relative(root, resolve(root, dirname(file), name)) : name;
+      const target = publicImports[name] ?? (name.startsWith('.') ? relative(root, resolve(root, dirname(file), name)) : name);
+      if (target.startsWith('src/shared/contracts/') &&
+          !(ts.isImportDeclaration(node) && node.importClause?.isTypeOnly === true) &&
+          !(file.startsWith('src/shared/contracts/') && ts.isExportDeclaration(node) && node.isTypeOnly))
+        throw new Error('Type-only product contract: ' + target);
       if (!serverSources.has(target)) throw new Error('Forbidden product input: ' + target);
     }, (_node, _rule, reason) => { throw new Error(file + ': ' + reason); });
   }

@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { renderConsoleHtml } from "../../src/bff/csp.ts";
+import { renderConsoleHtml } from "#perfeng/bff-csp";
 
 test("HTML binds unpredictable nonces to Angular and CSP and forbids cached reuse", () => {
   const template = '<html><app-root></app-root></html>';

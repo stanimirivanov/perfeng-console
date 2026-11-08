@@ -3,7 +3,7 @@ import { resolve } from "node:path";
 import {
   resetGuideOutput,
   discardGuideOutput,
-} from "../../../tools/user-guide/owned-output.mjs";
+} from "#perfeng/user-guide";
 import type {
   Reporter,
   TestCase,

@@ -425,7 +425,7 @@ Paths are relative to the owning repo. [new] identifies proposed paths or comman
 - **Depends on / parallel with:** PR5, PR42 / G6.
 - **Objective & scope:** Implement S3 exact lookup with common freshness envelopes and generation invalidation. Foundation freshness is reused by all screens.
 - **Not in this PR:** Run listing or invented history.
-- **Layers / files:** src/bff/runs.ts [new]; src/presentation/observation.ts [new]; src/browser/runs.ts [new]; tests/browser/runs.spec.ts [new].
+- **Layers / files:** src/bff/runs.ts [new]; src/shared/contracts/observation.ts [new]; src/browser/runs.ts [new]; tests/browser/runs.spec.ts [new].
 - **Contracts & boundaries:** Additive consumer behavior; no provider semantic change.
 - **Acceptance criteria:**
   - S3.1–S3.4: current response only, explicit listing gap and scoped not-found.

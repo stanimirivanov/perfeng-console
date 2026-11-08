@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { analysis, run_Run, run_RunState, native_WorkerPresence, integration_Error } from "../../src/generated/validators.mjs";
+import { analysis, run_Run, run_RunState, native_WorkerPresence, integration_Error } from "#perfeng/validators";
 
 const example = (path: string) => JSON.parse(readFileSync("vendor/perfeng-contracts/" + path, "utf8"));
 test("report preserves pinned verdicts and rejects WARN, unknown fields and unsupported schema versions", () => {

@@ -1,12 +1,12 @@
-import { runObservation } from '../src/bff/runs.ts';
-import type { createRunTransport } from '../src/bff/transport.ts';
+import { runObservation } from '#perfeng/bff-runs';
+import type { createRunTransport } from '#perfeng/bff';
 import { createServer } from 'node:https';
 import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { once } from 'node:events';
-import { createSession } from '../src/bff/session.ts';
-import { renderConsoleHtml } from '../src/bff/csp.ts';
+import { createSession } from '#perfeng/bff-session';
+import { renderConsoleHtml } from '#perfeng/bff-csp';
 
 const cookie = '__Host-perfeng-session';
 const attributes = '; Secure; HttpOnly; SameSite=Strict; Path=/';

@@ -15,7 +15,7 @@ import * as HttpClient from 'effect/http/HttpClient';
 import * as NodeHttpClient from '@effect/platform-node/NodeHttpClient';
 import { NodeHttpIncomingMessage } from '@effect/platform-node/NodeHttpIncomingMessage';
 
-import { createRunTransport } from '../../src/bff/transport.ts';
+import { createRunTransport } from '#perfeng/bff';
 
 const run = JSON.parse(readFileSync('vendor/perfeng-contracts/api/run-management/v1/examples/completed.json', 'utf8'));
 

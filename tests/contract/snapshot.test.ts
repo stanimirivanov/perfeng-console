@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { mkdtempSync, cpSync, rmSync, appendFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
-import { verifySnapshot, checkReferences } from "../../scripts/contracts.ts";
+import { verifySnapshot, checkReferences } from "#perfeng/tooling/contracts";
 
 test("snapshot hashes reject byte tampering and undeclared files", () => {
   const dir = mkdtempSync(join(tmpdir(), "contract-snapshot-"));
