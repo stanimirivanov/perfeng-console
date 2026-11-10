@@ -75,3 +75,8 @@ console-isolation-check: doctor
 .PHONY: check-imports
 check-imports:
 	node harness/check-imports.ts
+
+.PHONY: contracts-shadow
+contracts-shadow:
+	@$(MAKE) --no-print-directory contracts-check >/dev/null
+	@sh scripts/contracts-offline.sh scripts/contracts.ts "$(CONTRACTS_SHADOW_ASSETS)" "$(CONTRACTS_BOOTSTRAP)" "$(CONTRACTS_VERIFIER)" "$(CONTRACTS_CONTROL_PLANE_RECEIPT)"
