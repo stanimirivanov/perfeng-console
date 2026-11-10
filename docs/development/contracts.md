@@ -83,3 +83,32 @@ The handwritten agent guide, output manifest and source provenance remain visibl
 review surfaces. This classification reduces review noise; checksums, semantic
 receipts and deterministic regeneration remain required and Git conflicts still
 need normal source reconciliation.
+
+## Direct-provider shadow comparison
+
+The reviewed [distribution lock](../../contracts-distribution.lock.json) binds
+the control-plane selection to its exact merged commit and receipt digest.
+Obtain the receipt by running the control-plane shadow gate from that commit.
+Stage the history and materializer releases in `history/` and `tool/`
+under one private local directory, using the exact tags in the lock. The
+bootstrap is a trusted perfeng-environment checkout with its locked Python
+environment installed. Use the independently checksum-pinned verifier.
+
+```sh
+make contracts-shadow CONTRACTS_SHADOW_ASSETS=/absolute/path/to/assets \
+  CONTRACTS_BOOTSTRAP=/absolute/path/to/reviewed/perfeng-environment \
+  CONTRACTS_VERIFIER=/absolute/path/to/trusted/gh \
+  CONTRACTS_CONTROL_PLANE_RECEIPT=/absolute/path/to/control-plane-selection.json
+```
+
+The gate verifies the signed provider closure for each family, compares its
+selected bytes to the vendored snapshot, and checks the three API type surfaces
+and Ajv output via deterministic regeneration. The snapshot ledger must match
+the reviewed control-plane receipt. The report supplements are checked directly
+against their separately recorded provider source. The provenance document
+describes the current vendoring path and is not a provider contract.
+
+A changed receipt fails its digest check. To align with a newer control-plane
+revision, regenerate its receipt and review the commit, digest, and selections
+before changing the pins. Routine verification and the product still use the
+existing vendored snapshot. This gate adds no runtime release access.
