@@ -80,3 +80,14 @@ check-imports:
 contracts-shadow:
 	@$(MAKE) --no-print-directory contracts-check >/dev/null
 	@sh scripts/contracts-offline.sh scripts/contracts.ts "$(CONTRACTS_SHADOW_ASSETS)" "$(CONTRACTS_BOOTSTRAP)" "$(CONTRACTS_VERIFIER)" "$(CONTRACTS_CONTROL_PLANE_RECEIPT)"
+
+.PHONY: contracts-update-check contracts-restore-check
+contracts-update-check:
+	@test -n "$(CONTRACTS_STAGING_TARGET)"
+	@$(MAKE) --no-print-directory contracts-check >/dev/null
+	@sh scripts/contracts-offline.sh scripts/contracts.ts "$(CONTRACTS_SHADOW_ASSETS)" "$(CONTRACTS_BOOTSTRAP)" "$(CONTRACTS_VERIFIER)" "$(CONTRACTS_CONTROL_PLANE_RECEIPT)" --target "$(CONTRACTS_STAGING_TARGET)"
+
+contracts-restore-check:
+	@test -n "$(CONTRACTS_STAGING_TARGET)" && test -n "$(CONTRACTS_ROLLBACK_SNAPSHOT)"
+	@$(MAKE) --no-print-directory contracts-check >/dev/null
+	@sh scripts/contracts-offline.sh scripts/contracts.ts "$(CONTRACTS_SHADOW_ASSETS)" "$(CONTRACTS_BOOTSTRAP)" "$(CONTRACTS_VERIFIER)" "$(CONTRACTS_CONTROL_PLANE_RECEIPT)" --target "$(CONTRACTS_STAGING_TARGET)" --rollback "$(CONTRACTS_ROLLBACK_SNAPSHOT)"

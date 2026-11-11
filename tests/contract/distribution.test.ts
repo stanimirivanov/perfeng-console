@@ -1,7 +1,10 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { test } from "node:test";
-import { compareDistribution, readSelectionReceipt } from "#perfeng/tooling/contracts";
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { compareDistribution, readSelectionReceipt, stageSnapshot, verifyRollback } from "#perfeng/tooling/contracts";
 
 const revision = "a".repeat(40);
 const digest = "b".repeat(64);
@@ -55,4 +58,27 @@ test("rejects a mismatched vendor ledger and duplicate projection destinations",
   const verified = new Map([["runPolicy", new Map([["api/run/openapi.json", digest]])]]);
   assert.throws(() => compareDistribution({ ...receipt, ledgerSha256: "d".repeat(64) }, snapshot, [], verified), /vendor lock/i);
   assert.throws(() => compareDistribution(receipt, snapshot, ["openapi.json"], verified), /openapi.json/);
+});
+
+
+test("stages exact provider bytes and refuses changed or unsafe candidates", () => {
+  const area = mkdtempSync(join(tmpdir(), "console-contract-update-"));
+  const target = join(area, "snapshot");
+  const content = Buffer.from("{}");
+  const sha = createHash("sha256").update(content).digest("hex");
+  const provenance = Buffer.from(JSON.stringify({ sha256: { "schema.json": sha } }));
+  try {
+    assert.throws(() => stageSnapshot(target, provenance, new Map([["schema.json", Buffer.from("changed")]])), /checksum/);
+    assert.throws(() => readFileSync(target), /ENOENT/);
+    stageSnapshot(target, provenance, new Map([["schema.json", content]]));
+    assert.deepEqual(readFileSync(join(target, "schema.json")), content);
+    assert.deepEqual(readFileSync(join(target, "provenance.json")), provenance);
+    assert.throws(() => stageSnapshot(target, provenance, new Map([["schema.json", content]])), /EEXIST/);
+    const pin = createHash("sha256").update(provenance).digest("hex");
+    verifyRollback(target, { "schema.json": sha }, pin);
+    writeFileSync(join(target, "schema.json"), "{} ");
+    assert.throws(() => verifyRollback(target, { "schema.json": sha }, pin), /checksum/);
+  } finally {
+    rmSync(area, { recursive: true, force: true });
+  }
 });

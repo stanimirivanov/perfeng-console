@@ -14,7 +14,8 @@
     "signerWorkflow": "stanimirivanov/perfeng-contracts/.github/workflows/contracts-publish.yml"
   },
   "controlPlane": {
-    "commit": "97b391193c188c9c49d2d4d39a7afde7ec742f40",
-    "receiptSha256": "cf970baa39f70a9ad4f52e91a76c7656f0a4ceac78d3707132a12b47677e8b98"
-  }
+    "commit": "6d1e1ceeab054722168b9979b85f2e74d9b88252",
+    "receiptSha256": "b6b724a1fbec056d9e076f0868ec627b36758ee634da4517f7d82f5a093c26f4"
+  },
+  "rollbackProvenanceSha256": "b72a4f71a716f5c771d557588e4554688a81686d2f508568dfeba507457a8922"
 }

@@ -1,8 +1,11 @@
 {
-  "repository": "https://github.com/stanimirivanov/perfeng-control-plane",
-  "commit": "ed997869daa7ca1688f8cc7e52cfd83584cd0dbd",
-  "sourceDirectory": "internal/contract/snapshot/",
-  "upstreamLock": "lock.json",
+  "repository": "https://github.com/stanimirivanov/perfeng-contracts",
+  "historyRelease": "contract-history-42672401359",
+  "controlPlaneSelection": {
+    "commit": "6d1e1ceeab054722168b9979b85f2e74d9b88252",
+    "receiptSha256": "b6b724a1fbec056d9e076f0868ec627b36758ee634da4517f7d82f5a093c26f4"
+  },
+  "snapshotLedger": "lock.json",
   "sha256": {
     "api/native-worker/v2/examples/acquire.json": "e9ba2464e978e4383b43e90cfe305d646fc2c9005049d1dd20698f223cd80b10",
     "api/native-worker/v2/examples/artifact.json": "e2018a96a6d6ded52ddbecbedf52ac02bc3be68009edb370f493a231bbbad394",
