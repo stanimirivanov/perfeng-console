@@ -23,26 +23,9 @@ TypeScript paths alone do not rewrite runtime imports.
 
 ## Surfaces
 
-| Alias | Entry |
-|---|---|
-| `#perfeng/contracts` | `./src/shared/contracts/public-api.ts` |
-| `#perfeng/bff` | `./src/bff/public-api.ts` |
-| `#perfeng/bff-config` | `./src/bff/config-public-api.ts` |
-| `#perfeng/bff-session` | `./src/bff/session.ts` |
-| `#perfeng/bff-csp` | `./src/bff/csp.ts` |
-| `#perfeng/bff-runs` | `./src/bff/runs.ts` |
-| `#perfeng/validators` | `./src/generated/validators.mjs` |
-| `#perfeng/server` | `./tools/public-api.ts` |
-| `#perfeng/user-guide` | `./tools/user-guide/public-api.mjs` |
-| `#perfeng/e2e` | `./apps/web-e2e/public-api.ts` |
-| `#perfeng/harness/boundaries` | `./harness/boundaries.ts` |
-| `#perfeng/harness/workspace` | `./harness/workspace.ts` |
-| `#perfeng/harness/ownership` | `./harness/ownership.ts` |
-| `#perfeng/harness/assets` | `./harness/assets.ts` |
-| `#perfeng/harness/product-release` | `./harness/product-release.ts` |
-| `#perfeng/tooling/angular-accounting` | `./scripts/angular-accounting.ts` |
-| `#perfeng/tooling/generated-output` | `./scripts/generated-output.ts` |
-| `#perfeng/tooling/contracts` | `./scripts/contracts.ts` |
+Use the single [reviewed alias table](../IMPORTS.md#reviewed-aliases).
+The executable map in `harness/imports.ts` remains authoritative for enforcement;
+update that map, the Node/compiler maps and the canonical table together.
 
 Each exact alias is an explicit public module surface; existing focused modules
 such as session and CSP keep their own entry rather than loading an umbrella BFF

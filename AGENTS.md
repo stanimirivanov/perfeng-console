@@ -20,6 +20,8 @@ Nx owns one Angular browser application in apps/console. Verification is a disti
 Use the repository gates for the build (`make build`), tests (`make test`),
 type checking (`make typecheck`), and lint (`make lint`). Run `make verify`
 before handoff. Run `make supply-chain` for delivery.
+`make verify` does not include browser, installation or harness-self-test gates;
+see the [gate map](HARNESS.md#sensors-and-failure-handling) for those CI duties.
 
 ## Architecture and code style
 
@@ -35,7 +37,8 @@ adapter or prove the full ownership model. Preserve generated contracts and Ajv.
 ## Imports
 
 Follow [import boundaries](docs/IMPORTS.md). Use reviewed public aliases across owners.
-Keep within-owner relative imports local. Run pnpm check:imports and pnpm lint.
+Keep within-owner relative imports local. Run `pnpm lint`, which includes the
+import/cycle gate; use `pnpm check:imports` for a focused import check.
 
 ## Review checklist
 
@@ -56,4 +59,6 @@ Keep within-owner relative imports local. Run pnpm check:imports and pnpm lint.
 - [Fixed-origin acceptance](HARNESS.md#fixed-origin-upstream-transport)
 
 Qualified BFF examples: [lazy reader](src/bff/run-reader.ts) and
-[composition boundary](src/bff/transport.ts). Browser integration remains a later slice.
+[composition boundary](src/bff/transport.ts). The
+[Run-detail admission](docs/development/runtime-ownership.md#run-detail-browser-admission-m05-pr22)
+is narrow; mixed Angular composition and shared-session coordination remain debt.

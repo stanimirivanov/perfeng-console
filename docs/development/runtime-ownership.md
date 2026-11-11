@@ -1,8 +1,10 @@
 # Runtime and state ownership
 
-Status: documentation prerequisite for [issue #33](https://github.com/stanimirivanov/perfeng-console/issues/33).
+Origin: ownership specification for [issue #33](https://github.com/stanimirivanov/perfeng-console/issues/33).
 The user approved the ownership model, sensors and Node adapter qualification.
-Issue #33 now implements the qualified BFF adapter; browser integration remains separate.
+Issue #33 implements the qualified BFF adapter; PR #48 adds the narrow Run-detail
+browser admission below. The matrix describes the target ownership model; the
+[enforcement index](harness-rules.md) separates active checks from pending work.
 
 ## Decision and scope
 
@@ -30,6 +32,7 @@ calculations; use Angular for rendering and framework lifecycle integration.
 | Browser HTTP | Same-origin BFF adapter | No provider URL or bearer; preserve session/CSRF protocol |
 | BFF requests and upstream resources | Effect operations and qualified server adapter | Fixed destination, server credentials, TLS and safe result projection |
 | Browser–BFF DTOs | Pure TypeScript in src/shared/contracts | Data-only contracts; no framework, runtime or I/O; generated provider types and validation remain authoritative |
+| Safe provider-to-DTO projection | BFF boundary | Remove private failure messages/storage locations; do not confer artifact-content verification |
 | Display models and comparisons | Pure TypeScript in src/presentation | No Angular, NgRx, Effect runtime or I/O; no recomputed scientific verdicts |
 | Provider shapes and validation | Pinned generated types and Ajv | Offline generation; no runtime schema fetching or hand-authored replacement wire types |
 | Framework Observable interoperability | Narrow Angular boundary adapter | RxJS does not become a competing polling, retry or state system |
@@ -121,15 +124,18 @@ before admission. Do not silently fall back to a handwritten transport in applic
 
 Pinned baseline: Angular 22.2.4, NgRx signals 22.0.1, Effect 4.1.2 and TypeScript 6.0.3.
 Documentation establishes intended semantics, not exact adapter compatibility. The existing
-stack test proves an abort callback is reached, not full network cleanup. Production adapter evidence is in tests/integration/transport.test.ts. Browser
-integration receipts remain outstanding.
+stack test proves an abort callback is reached, not full network cleanup. Production adapter evidence is in tests/integration/transport.test.ts. Narrow Run
+freshness/browser evidence is in apps/web-e2e/tests/runs.spec.ts and run-detail.spec.ts;
+general session coordination and mutation lifetimes remain unimplemented.
 
 ## Run-detail browser admission (M05-PR22)
 
 `apps/console/src/run-detail-store.ts` is the sole SignalStore writer for the
 Run-detail observation, safe artifact claims and the bounded session observation
-log. `run-detail.ts` renders readonly inputs. The existing `main.ts` route
-composition owns the Effect fiber, generation guard and teardown; `run-client.ts`
+log. `run-detail.ts` renders readonly inputs. The existing `main.ts` contains
+components as well as composition; its file-level role admits the Effect fiber,
+generation guard and teardown. This mixed role is migration debt, not a component
+reference pattern (H4/H5). `run-client.ts`
 owns same-origin bounded reads. Refresh keeps only actually observed revisions
 for the same Run; invalidation removes evidence. This narrow feature admission
 does not implement general shared-session coordination, polling or mutation

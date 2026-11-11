@@ -28,7 +28,7 @@ Scenario Lab lives inside the Console under Verification, with a distinct Materi
 - [x] [M05-PR6 — Deliver fresh exact Run lookup](plan.md#m05-pr6-deliver-fresh-exact-run-lookup) · perfeng-console · depends on PR5, PR42 · G6 · verified merged [Console #40](https://github.com/stanimirivanov/perfeng-console/pull/40)
 - [ ] [M05-PR48 — Serve service-authorized comparisons by native Run ID](plan.md#m05-pr48-serve-service-authorized-comparisons-by-native-run-id) · perfeng-control-plane · depends on PR45, PR46, PR47, PR27 · G6
 - [ ] [M05-PR52 — Sign in to the console with a service-scoped identity](plan.md#m05-pr52-sign-in-to-the-console-with-a-service-scoped-identity) · perfeng-console · depends on PR5, PR43, PR58 · G6
-- [ ] [M05-PR22 — Inspect contract-driven Run state and artifact references](plan.md#m05-pr22-inspect-contract-driven-run-state-and-artifact-references) · perfeng-console · depends on PR6 · G7
+- [x] [M05-PR22 — Inspect contract-driven Run state and artifact references](plan.md#m05-pr22-inspect-contract-driven-run-state-and-artifact-references) · perfeng-console · depends on PR6 · G7 · verified merged [Console #48](https://github.com/stanimirivanov/perfeng-console/pull/48)
 - [ ] [M05-PR51 — Admit and serve the real audited rerun](plan.md#m05-pr51-admit-and-serve-the-real-audited-rerun) · perfeng-control-plane · depends on PR45, PR48, PR49, PR50, PR59 · G7
 - [ ] [M05-PR53 — Publish and open the canonical CI Run link](plan.md#m05-pr53-publish-and-open-the-canonical-ci-run-link) · perfeng-console · depends on PR6, PR43, PR45, PR52, PR42 · G7
 - [ ] [M05-PR28 — Render the report and verified provenance chain](plan.md#m05-pr28-render-the-report-and-verified-provenance-chain) · perfeng-console · depends on PR22, PR27, PR48 · G8

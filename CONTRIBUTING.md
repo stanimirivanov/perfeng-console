@@ -17,3 +17,25 @@ The owner reviews and merges. Do not merge on the owner's behalf.
 
 Dependency additions must pass docs/development/dependency-policy.md.
 Design exports are guidelines; implement real Angular components and runtime checks.
+
+## Rationale comments and review
+
+Comments explain a non-obvious invariant or why a decision exists; they do not
+narrate the next line. Security-sensitive allowlists and pins should name the threat
+and the review issue/decision. A temporary allowance names its owning issue and
+retirement condition, for example `TODO(issue-49): ...`; avoid unticketed promises.
+Do not add comments to every function or enforce comment counts with a regex.
+This policy is a human review duty, not an active comment-quality linter.
+
+When fixing a recurring agent mistake, record its smallest violating example,
+the regression/sensor that catches it and the local guide that prevents it.
+The [PR template](.github/pull_request_template.md) captures this steering loop.
+Documentation-only work has no behavioral RED/GREEN requirement; review facts,
+links and the applicable gates instead. Do not add artificial tests or claim a
+future sensor is already active.
+
+Reviewers judge scope, misunderstood requirements, unnecessary features and
+abstraction cost alongside deterministic results. Optional isolated AI review is
+advisory and requires its own authorization; it cannot replace human review or
+turn passing structural checks into proof of semantics. See the
+[enforcement index](docs/development/harness-rules.md#semantic-review-duties).
