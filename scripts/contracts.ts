@@ -1,8 +1,8 @@
 import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { readFileSync, readdirSync, lstatSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { readFileSync, readdirSync, lstatSync, mkdtempSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { isAbsolute, join, posix } from "node:path";
+import { isAbsolute, dirname, join, posix } from "node:path";
 
 type Document = Record<string, unknown>;
 export function checkReferences(files: Map<string, unknown>) {
@@ -71,6 +71,7 @@ type Receipt = {
 type ReceiptPin = { commit: string; receiptSha256: string };
 type DistributionLock = {
   controlPlane: ReceiptPin;
+  rollbackProvenanceSha256: string;
   historyRelease: string;
   toolRelease: string;
   tool: Record<string, string>;
@@ -118,6 +119,72 @@ export function compareDistribution(
   return selected.size;
 }
 
+export function stageSnapshot(target: string, provenance: Buffer, files: Map<string, Buffer>) {
+  const expected = (JSON.parse(provenance.toString()) as { sha256: Record<string, string> }).sha256;
+  if (files.size !== Object.keys(expected).length) throw Error("Candidate inventory mismatch");
+  for (const [path, bytes] of files) {
+    if (!/^[A-Za-z0-9_./-]+$/.test(path) || path.split("/").some(part => !part || part === "." || part === "..") ||
+        path === "provenance.json" || sha256(bytes) !== expected[path])
+      throw Error("Candidate path or checksum mismatch: " + path);
+  }
+  mkdirSync(target, { mode: 0o700 });
+  try {
+    for (const [path, bytes] of files) {
+      const output = join(target, path);
+      mkdirSync(dirname(output), { recursive: true });
+      writeFileSync(output, bytes, { flag: "wx" });
+    }
+    writeFileSync(join(target, "provenance.json"), provenance, { flag: "wx" });
+    verifySnapshot(target);
+  } catch (error) {
+    rmSync(target, { recursive: true, force: true });
+    throw error;
+  }
+}
+
+export function verifyRollback(root: string, expected: Record<string, string>, provenancePin: string) {
+  const bytes = readFileSync(join(root, "provenance.json"));
+  if (!/^[a-f0-9]{64}$/.test(provenancePin) || sha256(bytes) !== provenancePin)
+    throw Error("Retained provenance differs from the reviewed rollback pin");
+  verifySnapshot(root);
+  const prior = (JSON.parse(bytes.toString()) as { sha256: Record<string, string> }).sha256;
+  if (Object.keys(prior).length !== Object.keys(expected).length ||
+      Object.entries(expected).some(([path, digest]) => prior[path] !== digest))
+    throw Error("Retained snapshot differs from the selected provider bytes");
+}
+
+function projectFamily(
+  family: Family, lock: DistributionLock, history: string, scratch: string, tool: string,
+  verified: Map<string, string>, selected: Record<string, { destination: string; sha256: string }>,
+) {
+  const area = mkdtempSync(join(scratch, "projection-"));
+  const policy = join(area, "policy.json");
+  writeFileSync(policy, JSON.stringify({ ...lock.publisher, manifestSha256: family.manifestSha256 }));
+  const selection = join(area, "selection.json");
+  writeFileSync(selection, JSON.stringify({
+    sourceRevision: family.sourceRevision,
+    members: Object.fromEntries([...verified].map(([source, sha256]) =>
+      [source, { sha256, destination: selected[source] ? "snapshot/" + selected[source].destination : "closure/" + source }])),
+  }));
+  const store = join(area, "store");
+  mkdirSync(store, { mode: 0o700 });
+  const profile = join(history, family.sourceRevision);
+  const output = run(join(tool, "runtime/bin/python3.12"), [
+    "-IB", join(tool, "materialize.py"), "--manifest", profile + ".manifest.json",
+    "--archive", profile + ".tar.gz", "--bundle", join(history, "manifest.sigstore.jsonl"),
+    "--policy", policy, "--selection", selection, "--target", store, "--execute",
+  ], area, {});
+  const pointer = readFileSync(join(store, "current"), "ascii");
+  if (!/^[a-f0-9]{64}\n$/.test(pointer) || output !== join(store, pointer.trim()) + "\n")
+    throw Error("Materializer output disagrees with its generation");
+  return Object.entries(selected).map(([source, member]) => {
+    const bytes = readFileSync(join(store, pointer.trim(), "snapshot", member.destination));
+    if (sha256(bytes) !== member.sha256 || verified.get(source) !== member.sha256)
+      throw Error("Projected signed bytes differ: " + source);
+    return [member.destination, bytes] as const;
+  });
+}
+
 function run(file: string, args: string[], cwd: string, env?: NodeJS.ProcessEnv) {
   return execFileSync(file, args, {
     cwd, env, encoding: "utf8", timeout: 120_000, maxBuffer: 4 * 1024 * 1024,
@@ -156,7 +223,7 @@ function verifyFamily(
   return new Map(Object.entries(JSON.parse(result) as Record<string, string>));
 }
 
-function shadow(assets: string, bootstrap: string, verifier: string, receiptPath: string) {
+function shadow(assets: string, bootstrap: string, verifier: string, receiptPath: string, target?: string, rollback?: string) {
   if (![assets, bootstrap, verifier, receiptPath].every(path => path && isAbsolute(path)))
     throw Error("Expected absolute paths for assets, bootstrap, verifier and control-plane receipt");
   const lock = JSON.parse(readFileSync("contracts-distribution.lock.json", "utf8")) as DistributionLock;
@@ -166,6 +233,11 @@ function shadow(assets: string, bootstrap: string, verifier: string, receiptPath
   const root = "vendor/perfeng-contracts";
   verifySnapshot(root);
   const provenance = JSON.parse(readFileSync(join(root, "provenance.json"), "utf8"));
+  if (provenance.repository !== "https://github.com/stanimirivanov/perfeng-contracts" ||
+      provenance.historyRelease !== lock.historyRelease ||
+      provenance.controlPlaneSelection?.commit !== lock.controlPlane.commit ||
+      provenance.controlPlaneSelection?.receiptSha256 !== lock.controlPlane.receiptSha256)
+    throw Error("Direct-provider provenance differs from the reviewed alignment");
   const supplemental = provenance.supplemental;
   if (supplemental.repository !== "https://github.com/stanimirivanov/perfeng-contracts" ||
       supplemental.commit !== receipt.families.runPolicy?.sourceRevision)
@@ -183,8 +255,29 @@ function shadow(assets: string, bootstrap: string, verifier: string, receiptPath
     const verified = new Map(Object.entries(receipt.families).map(([name, family]) =>
       [name, verifyFamily(family, lock, join(assets, "history"), scratch, tool)]));
     const matchedFiles = compareDistribution(receipt, provenance.sha256, supplemental.files, verified);
+    if (target) {
+      const projected = new Map<string, Buffer>();
+      for (const [name, family] of Object.entries(receipt.families)) {
+        const selected = { ...family.members };
+        if (name === "runPolicy") {
+          for (const path of supplemental.files as string[])
+            selected[path] = { destination: path, sha256: provenance.sha256[path] as string };
+        }
+        const hashes = verified.get(name);
+        if (!hashes) throw Error("Missing verified family: " + name);
+        for (const [destination, bytes] of projectFamily(family, lock, join(assets, "history"), scratch, tool, hashes, selected)) {
+          if (projected.has(destination)) throw Error("Duplicate projected destination");
+          projected.set(destination, bytes);
+        }
+      }
+      const ledger = readFileSync(join(root, "lock.json"));
+      if (sha256(ledger) !== receipt.ledgerSha256) throw Error("Reviewed ledger changed during preparation");
+      projected.set("lock.json", ledger);
+      if (rollback) verifyRollback(rollback, provenance.sha256, lock.rollbackProvenanceSha256);
+      stageSnapshot(target, readFileSync(join(root, "provenance.json")), projected);
+    }
     return {
-      status: "passed", controlPlaneCommit: receipt.consumerCommit,
+      status: target ? "prepared" : "passed", ...(rollback ? { rollbackScope: "distribution-path; same family revisions" } : {}), controlPlaneCommit: receipt.consumerCommit,
       controlPlaneReceiptSha256: lock.controlPlane.receiptSha256,
       historyRelease: lock.historyRelease, toolRelease: lock.toolRelease, matchedFiles,
     };
@@ -194,9 +287,12 @@ function shadow(assets: string, bootstrap: string, verifier: string, receiptPath
 }
 
 if (import.meta.main) {
-  const [assets = "", bootstrap = "", verifier = "", receipt = ""] = process.argv.slice(2);
+  const [assets = "", bootstrap = "", verifier = "", receipt = "", ...options] = process.argv.slice(2);
   try {
-    console.log(JSON.stringify(shadow(assets, bootstrap, verifier, receipt)));
+    if (![0, 2, 4].includes(options.length) || (options.length > 0 && (options[0] !== "--target" || !options[1])) ||
+        (options.length === 4 && (options[2] !== "--rollback" || !options[3])))
+      throw Error("Use --target with a fresh directory and optional --rollback snapshot");
+    console.log(JSON.stringify(shadow(assets, bootstrap, verifier, receipt, options[1], options[3])));
   } catch (error) {
     console.error("contracts-shadow:", error instanceof Error ? error.message : error);
     process.exitCode = 1;

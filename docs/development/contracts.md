@@ -1,12 +1,45 @@
 # Offline contract consumption
 
-The snapshot comes from control-plane commit ed997869daa7ca1688f8cc7e52cfd83584cd0dbd.
-Its upstream lock retains primary bundle 0.21.0 and independently selected native,
-integration, analysis-publication and catalogue families. provenance.json records
-the copied directory, every byte checksum and supplemental source pins.
-The report payload schema and fixtures come from the primary contracts commit
-143daa58774d8807f1745f8410ccab8b610170a0. This selection matches the provider;
-it is deliberately not a claim that every family is at the latest bundle.
+The snapshot is prepared directly from signed perfeng-contracts distributions.
+The distribution lock binds the exact control-plane alignment receipt and five
+independent family selections. The local provenance document records direct
+provider identity, selected file hashes and the separately pinned report
+supplements. The vendor ledger matches the hash in the control-plane receipt.
+Primary bundle 0.21.0 and the existing Native, integration, analysis-publication
+and catalogue selections retain their exact bytes.
+
+## Signed updates and recovery
+
+Stage the exact tool and history assets described below. Use a fresh destination
+under an operator-owned directory:
+
+```sh
+make contracts-update-check CONTRACTS_SHADOW_ASSETS="$assets" \
+  CONTRACTS_BOOTSTRAP="$bootstrap" CONTRACTS_VERIFIER="$verifier" \
+  CONTRACTS_CONTROL_PLANE_RECEIPT="$receipt" CONTRACTS_STAGING_TARGET="$scratch/current"
+```
+
+Review the staged tree before applying it to `vendor/perfeng-contracts`.
+The command obtains schemas and examples from the provider's signed artifacts.
+It carries the independently reviewed ledger and provenance into the staged
+snapshot. A different selection requires a new reviewed receipt and pin update.
+
+Keep the pre-cutover snapshot, its reviewed commit and the signed assets.
+The distribution lock records the retained provenance digest for rollback.
+Recreate a fresh snapshot and compare it to the retained bytes:
+
+```sh
+make contracts-restore-check CONTRACTS_SHADOW_ASSETS="$retained_assets" \
+  CONTRACTS_BOOTSTRAP="$bootstrap" CONTRACTS_VERIFIER="$verifier" \
+  CONTRACTS_CONTROL_PLANE_RECEIPT="$receipt" CONTRACTS_STAGING_TARGET="$scratch/recovered" \
+  CONTRACTS_ROLLBACK_SNAPSHOT="$previous_snapshot"
+```
+
+Both commands run in the existing network namespace. All selected signed
+closures and receipt pins must pass before staging. The recovery rehearsal
+covers distribution rollback at the same contract revisions. Run
+`make contracts-check` on the staged candidate in a disposable checkout to
+verify that all generated types and validators reproduce identically.
 
 ## Generation and validation
 
@@ -106,7 +139,7 @@ selected bytes to the vendored snapshot, and checks the three API type surfaces
 and Ajv output via deterministic regeneration. The snapshot ledger must match
 the reviewed control-plane receipt. The report supplements are checked directly
 against their separately recorded provider source. The provenance document
-describes the current vendoring path and is not a provider contract.
+records the direct provider and independent alignment and supplement identities.
 
 A changed receipt fails its digest check. To align with a newer control-plane
 revision, regenerate its receipt and review the commit, digest, and selections
