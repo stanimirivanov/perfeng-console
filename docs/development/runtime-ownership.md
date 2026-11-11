@@ -123,3 +123,20 @@ Pinned baseline: Angular 22.2.4, NgRx signals 22.0.1, Effect 4.1.2 and TypeScrip
 Documentation establishes intended semantics, not exact adapter compatibility. The existing
 stack test proves an abort callback is reached, not full network cleanup. Production adapter evidence is in tests/integration/transport.test.ts. Browser
 integration receipts remain outstanding.
+
+## Run-detail browser admission (M05-PR22)
+
+`apps/console/src/run-detail-store.ts` is the sole SignalStore writer for the
+Run-detail observation, safe artifact claims and the bounded session observation
+log. `run-detail.ts` renders readonly inputs. The existing `main.ts` route
+composition owns the Effect fiber, generation guard and teardown; `run-client.ts`
+owns same-origin bounded reads. Refresh keeps only actually observed revisions
+for the same Run; invalidation removes evidence. This narrow feature admission
+does not implement general shared-session coordination, polling or mutation
+ownership. The existing Verification adapter allowance remains frozen.
+
+The BFF uses the generated `#perfeng/run-transitions` entry to project pinned
+topology. The browser consumes it as DTO data, without fetching schemas or
+importing a provider runtime. Artifact-list reads share the qualified Node reader
+and never confer artifact-body access. The standalone release inventory includes
+the generated transition entry.

@@ -32,3 +32,13 @@ html {
 }
 
 .run-summary dd { overflow-wrap: anywhere; }
+
+input:focus-visible, summary:focus-visible { outline: 3px solid #824100; outline-offset: 3px; }
+app-run-detail { display: block; max-width: 65rem; }
+app-run-detail table { width: 100%; table-layout: fixed; border-collapse: collapse; }
+app-run-detail th, app-run-detail td { text-align: left; padding: .5rem; border-bottom: 1px solid #9baea9; overflow-wrap: anywhere; }
+app-run-detail dl { margin-block: 1rem; }
+app-run-detail dt { font-weight: 650; }
+app-run-detail dd { margin-inline-start: 1rem; }
+app-run-detail details { padding-block: 1rem; }
+app-run-detail summary { cursor: pointer; }

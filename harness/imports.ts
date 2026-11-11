@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 export const publicImports: Readonly<Record<string, string>> = {
+  "#perfeng/run-transitions": "src/generated/transitions.ts",
   "#perfeng/run-types": "src/generated/run.ts",
   "#perfeng/harness/imports": "harness/imports.ts",
   "#perfeng/harness/project-imports": "harness/project-imports.ts",

@@ -3,8 +3,8 @@ import * as HttpClient from 'effect/http/HttpClient';
 import * as NodeHttpClient from '@effect/platform-node/NodeHttpClient';
 import { NodeHttpIncomingMessage } from '@effect/platform-node/NodeHttpIncomingMessage';
 import type { loadUpstreamConfig } from './config.ts';
-import type { Run, Failure, RunResult } from './transport-result.ts';
-import { run_Run } from '#perfeng/validators';
+import type { Run, Failure, RunResult, ArtifactResult, Artifacts } from './transport-result.ts';
+import { run_Run, run_ArtifactCollection } from '#perfeng/validators';
 
 class TransportFailure extends Data.TaggedError('TransportFailure')<{ readonly reason: Failure }> {}
 function isRun(value: unknown): value is Run { return run_Run(value); }
@@ -14,10 +14,10 @@ const fail = (reason: Failure) => Effect.fail(new TransportFailure({ reason }));
 export function createRunReader(config: ReturnType<typeof loadUpstreamConfig>) {
   const { origin, token, ca, deadlineMs, maxResponseBytes } = config;
   const layer = NodeHttpClient.layerNodeHttpOptions({ ca, minVersion: 'TLSv1.2', rejectUnauthorized: true, keepAlive: false });
-  function read(runId: string) {
+  function read<Result>(runId: string, suffix: string, decode: (value: unknown) => Result) {
     return Effect.scoped(Effect.gen(function* () {
       const client = HttpClient.withScope(yield* HttpClient.HttpClient);
-      const response = yield* client.get(new URL('/v1/runs/' + encodeURIComponent(runId), origin).href, {
+      const response = yield* client.get(new URL('/v1/runs/' + encodeURIComponent(runId) + suffix, origin).href, {
         headers: { authorization: 'Bearer ' + token, accept: 'application/json' },
       });
       // Provider bodies can contain secrets; classify errors without reading them.
@@ -43,9 +43,9 @@ export function createRunReader(config: ReturnType<typeof loadUpstreamConfig>) {
         return Effect.void;
       });
       return yield* Effect.try({
-        try: (): RunResult => {
+        try: () => {
           const value: unknown = JSON.parse(new TextDecoder('utf-8', { fatal: true }).decode(Buffer.concat(chunks, length)));
-          return isRun(value) && value.id === runId ? { ok: true, run: value } : { ok: false, reason: 'invalid_response' };
+          return decode(value);
         },
         catch: () => new TransportFailure({ reason: 'invalid_response' }),
       });
@@ -58,5 +58,14 @@ export function createRunReader(config: ReturnType<typeof loadUpstreamConfig>) {
       Effect.catchTag('TransportFailure', error => Effect.succeed({ ok: false as const, reason: error.reason })),
     );
   }
-  return read;
+  return {
+    getRun: (id: string) => read<RunResult>(id, '', value => isRun(value) && value.id === id
+      ? { ok: true, run: value } : { ok: false, reason: 'invalid_response' }),
+    listArtifacts: (id: string) => read<ArtifactResult>(id, '/artifacts', value => {
+      if (!run_ArtifactCollection(value)) return { ok: false, reason: 'invalid_response' };
+      const { artifacts } = value as { artifacts: Artifacts };
+      return artifacts.every(artifact => artifact.runId === id)
+        ? { ok: true, artifacts } : { ok: false, reason: 'invalid_response' };
+    }),
+  };
 }

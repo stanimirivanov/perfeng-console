@@ -59,7 +59,16 @@ OpenSSL and tar.
 To enable exact Run lookup, start the console with all three server settings:
 `PERFENG_UPSTREAM_ORIGIN` (the fixed control-plane HTTPS origin),
 `PERFENG_UPSTREAM_TOKEN_FILE`, and `PERFENG_UPSTREAM_CA_FILE`. Use absolute paths
-to owner-only files in protected directories. The browser sees only the Run ID,
-state, revision, and update time. A lookup has a three-second deadline and its
+to owner-only files in protected directories. The browser receives safe Run detail fields and the pinned transition graph,
+plus artifact metadata with SHA-256 claims. Provider failure messages and artifact
+storage URIs remain server-side. The view does not download or verify artifact bytes. A lookup has a three-second deadline and its
 evidence expires within ten seconds of dispatch. Reconnect requires a fresh
 lookup. Run listing and history remain unavailable.
+
+Refresh Run detail explicitly to observe another snapshot. The last 20 observed
+revisions are session observations, not a durable history; skipped revisions remain
+unknown. Expiry, disconnection, hidden-page invalidation or a new Run clears the
+view. A separate artifact-service failure displays unavailable rather than an empty
+list; loss of session or Run authorization clears the Run. COMPLETED describes
+execution, not a performance PASS. Execution identity and report/provenance reads
+remain explicit gaps. All guide examples use test-owned fixtures.

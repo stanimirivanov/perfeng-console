@@ -16,7 +16,7 @@ const inputs = [
   'src/shared/contracts/public-api.ts', 'src/bff/public-api.ts', 'src/bff/config-public-api.ts',
   'tools/public-api.ts', 'src/bff/session.ts', 'src/bff/csp.ts', 'src/bff/runs.ts', 'src/bff/config.ts',
   'src/bff/transport.ts', 'src/bff/run-reader.ts', 'src/bff/transport-result.ts',
-  'src/generated/run.ts', 'src/generated/validators.mjs', 'src/shared/contracts/observation.ts',
+  'src/generated/transitions.ts', 'src/generated/run.ts', 'src/generated/validators.mjs', 'src/shared/contracts/observation.ts',
 ];
 
 try {

@@ -6,26 +6,26 @@ Scenario Lab lives inside the Console under Verification, with a distinct Materi
 
 ## Product
 
-- [ ] [M05-PR1 — Record approved constraints and admit the console stack](plan.md#m05-pr1-record-approved-constraints-and-admit-the-console-stack) · perfeng-console · depends on — · G1
+- [x] [M05-PR1 — Record approved constraints and admit the console stack](plan.md#m05-pr1-record-approved-constraints-and-admit-the-console-stack) · perfeng-console · depends on — · G1 · verified merged [Console #16](https://github.com/stanimirivanov/perfeng-console/pull/16)
 - [ ] [M05-PR18 — Compose the console in the joint source workspace](plan.md#m05-pr18-compose-the-console-in-the-joint-source-workspace) · perfeng-environment · depends on — · G1
 - [ ] [M05-PR43 — Publish service-scoped identity and CI Run discovery semantics](plan.md#m05-pr43-publish-service-scoped-identity-and-ci-run-discovery-semantics) · perfeng-contracts · depends on — · G1
-- [ ] [M05-PR2 — Establish the offline engineering and browser harness](plan.md#m05-pr2-establish-the-offline-engineering-and-browser-harness) · perfeng-console · depends on PR1 · G2
+- [x] [M05-PR2 — Establish the offline engineering and browser harness](plan.md#m05-pr2-establish-the-offline-engineering-and-browser-harness) · perfeng-console · depends on PR1 · G2 · verified merged [Console #18](https://github.com/stanimirivanov/perfeng-console/pull/18)
 - [ ] [M05-PR44 — Persist service ownership and revocable grants](plan.md#m05-pr44-persist-service-ownership-and-revocable-grants) · perfeng-control-plane · depends on PR43 · G2
 - [ ] [M05-PR46 — Define an immutable Run comparison projection](plan.md#m05-pr46-define-an-immutable-run-comparison-projection) · perfeng-contracts · depends on PR43 · G2
 - [ ] [M05-PR58 — Verify named human and CI identities at the provider](plan.md#m05-pr58-verify-named-human-and-ci-identities-at-the-provider) · perfeng-control-plane · depends on PR43 · G2
-- [ ] [M05-PR3 — Vendor contracts and generate the offline typed client](plan.md#m05-pr3-vendor-contracts-and-generate-the-offline-typed-client) · perfeng-console · depends on PR2 · G3
+- [x] [M05-PR3 — Vendor contracts and generate the offline typed client](plan.md#m05-pr3-vendor-contracts-and-generate-the-offline-typed-client) · perfeng-console · depends on PR2 · G3 · verified merged [Console #20](https://github.com/stanimirivanov/perfeng-console/pull/20)
 - [ ] [M05-PR25 — Specify authorized immutable Run evidence reads](plan.md#m05-pr25-specify-authorized-immutable-run-evidence-reads) · perfeng-contracts · depends on PR43, PR46 · G3
-- [ ] [M05-PR42 — Isolate the product build and release entry point](plan.md#m05-pr42-isolate-the-product-build-and-release-entry-point) · perfeng-console · depends on PR2 · G3
+- [x] [M05-PR42 — Isolate the product build and release entry point](plan.md#m05-pr42-isolate-the-product-build-and-release-entry-point) · perfeng-console · depends on PR2 · G3 · verified merged [Console #38](https://github.com/stanimirivanov/perfeng-console/pull/38)
 - [ ] [M05-PR45 — Authorize cross-principal Run access and CI resolution](plan.md#m05-pr45-authorize-cross-principal-run-access-and-ci-resolution) · perfeng-control-plane · depends on PR44, PR58 · G3
 - [ ] [M05-PR47 — Capture exact report-time comparison bindings](plan.md#m05-pr47-capture-exact-report-time-comparison-bindings) · perfeng-control-plane · depends on PR44, PR46 · G3
 - [ ] [M05-PR49 — Specify attributed rerun and audit receipt](plan.md#m05-pr49-specify-attributed-rerun-and-audit-receipt) · perfeng-contracts · depends on PR43, PR46 · G3
-- [ ] [M05-PR4 — Secure the fixed-origin upstream transport](plan.md#m05-pr4-secure-the-fixed-origin-upstream-transport) · perfeng-console · depends on PR3 · G4
+- [x] [M05-PR4 — Secure the fixed-origin upstream transport](plan.md#m05-pr4-secure-the-fixed-origin-upstream-transport) · perfeng-console · depends on PR3 · G4 · verified merged [Console #34](https://github.com/stanimirivanov/perfeng-console/pull/34)
 - [ ] [M05-PR26 — Serve one authorized verified artifact body](plan.md#m05-pr26-serve-one-authorized-verified-artifact-body) · perfeng-control-plane · depends on PR25, PR45 · G4
 - [ ] [M05-PR50 — Store immutable rerun intent and audit receipts](plan.md#m05-pr50-store-immutable-rerun-intent-and-audit-receipts) · perfeng-control-plane · depends on PR44, PR49 · G4
-- [ ] [M05-PR5 — Pair a local operator session with the console shell](plan.md#m05-pr5-pair-a-local-operator-session-with-the-console-shell) · perfeng-console · depends on PR4 · G5
+- [x] [M05-PR5 — Pair a local operator session with the console shell](plan.md#m05-pr5-pair-a-local-operator-session-with-the-console-shell) · perfeng-console · depends on PR4 · G5 · verified merged [Console #36](https://github.com/stanimirivanov/perfeng-console/pull/36)
 - [ ] [M05-PR27 — Expose exact run-used policy evidence through serving](plan.md#m05-pr27-expose-exact-run-used-policy-evidence-through-serving) · perfeng-control-plane · depends on PR26 · G5
 - [ ] [M05-PR59 — Fence rerun execution to the approved source binding](plan.md#m05-pr59-fence-rerun-execution-to-the-approved-source-binding) · perfeng-control-plane · depends on PR47, PR49, PR50 · G5
-- [ ] [M05-PR6 — Deliver fresh exact Run lookup](plan.md#m05-pr6-deliver-fresh-exact-run-lookup) · perfeng-console · depends on PR5, PR42 · G6
+- [x] [M05-PR6 — Deliver fresh exact Run lookup](plan.md#m05-pr6-deliver-fresh-exact-run-lookup) · perfeng-console · depends on PR5, PR42 · G6 · verified merged [Console #40](https://github.com/stanimirivanov/perfeng-console/pull/40)
 - [ ] [M05-PR48 — Serve service-authorized comparisons by native Run ID](plan.md#m05-pr48-serve-service-authorized-comparisons-by-native-run-id) · perfeng-control-plane · depends on PR45, PR46, PR47, PR27 · G6
 - [ ] [M05-PR52 — Sign in to the console with a service-scoped identity](plan.md#m05-pr52-sign-in-to-the-console-with-a-service-scoped-identity) · perfeng-console · depends on PR5, PR43, PR58 · G6
 - [ ] [M05-PR22 — Inspect contract-driven Run state and artifact references](plan.md#m05-pr22-inspect-contract-driven-run-state-and-artifact-references) · perfeng-console · depends on PR6 · G7

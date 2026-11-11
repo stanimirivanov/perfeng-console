@@ -1,1 +1,1 @@
-export type { Observation, RunSummary } from './observation.ts';
+export type { Observation, RunSummary, RunDetail, ArtifactClaim, ArtifactObservation } from './observation.ts';

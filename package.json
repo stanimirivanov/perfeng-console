@@ -80,6 +80,7 @@
     "#perfeng/harness/import-lint": {
       "types": "./harness/import-lint.d.mts",
       "default": "./harness/import-lint.mjs"
-    }
+    },
+    "#perfeng/run-transitions": "./src/generated/transitions.ts"
   }
 }

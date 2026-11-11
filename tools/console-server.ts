@@ -1,4 +1,4 @@
-import { runObservation } from '#perfeng/bff-runs';
+import { artifactObservation, runObservation } from '#perfeng/bff-runs';
 import type { createRunTransport } from '#perfeng/bff';
 import { createServer } from 'node:https';
 import { readFile } from 'node:fs/promises';
@@ -28,7 +28,7 @@ export async function startConsole(options: { cert: Buffer; key: Buffer; port: n
 
     const cookies = (req.headers.cookie ?? '').split(';').map(value => value.trim()).filter(value => value.startsWith(cookie + '='));
     const id = cookies.length === 1 ? cookies[0]?.slice(cookie.length + 1) : undefined;
-    const exactRun = /^\/console\/api\/runs\/([^/?#]{1,300})$/.exec(path ?? '');
+    const exactRun = /^\/console\/api\/runs\/([^/?#]{1,300})(\/artifacts)?$/.exec(path ?? '');
     if (req.method === 'GET' && exactRun) {
       if (req.headersDistinct['x-perfeng-csrf']?.length !== 1 || req.headers['x-perfeng-csrf'] !== 'read') return end(403);
       if (!session.read(id)) return end(401);
@@ -38,10 +38,12 @@ export async function startConsole(options: { cert: Buffer; key: Buffer; port: n
       catch { return end(400); }
       const cancel = new AbortController();
       res.once('close', () => cancel.abort());
-      const result = await options.runs.getRun(runId, cancel.signal);
+      const result = exactRun[2]
+        ? artifactObservation(await options.runs.listArtifacts(runId, cancel.signal))
+        : runObservation(await options.runs.getRun(runId, cancel.signal));
       if (res.destroyed) return;
       if (!session.read(id)) return end(401);
-      const { status, body } = runObservation(result);
+      const { status, body } = result;
       return res.writeHead(status, { 'Content-Type': 'application/json' }).end(JSON.stringify(body));
     }
     if (path === base && req.method === 'GET') {

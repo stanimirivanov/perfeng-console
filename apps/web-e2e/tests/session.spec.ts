@@ -25,6 +25,7 @@ test('loopback HTTPS pairing is keyboard usable and session boundaries fail clos
     chmodSync(cert, 0o600);
     const provider = createServer(tls, (req, res) => {
       if (req.headers.authorization !== 'Bearer ' + token) return res.writeHead(401).end();
+      if (req.url === '/v1/runs/' + example.id + '/artifacts') return res.writeHead(200, { 'Content-Type': 'application/json' }).end(JSON.stringify({ artifacts: [] }));
       if (req.url !== '/v1/runs/' + example.id) return res.writeHead(403).end('private provider response');
       return res.writeHead(200, { 'Content-Type': 'application/json' }).end(JSON.stringify(example));
     });
@@ -88,13 +89,17 @@ test('loopback HTTPS pairing is keyboard usable and session boundaries fail clos
       await runId.fill(example.id);
       await runId.press('Enter');
       await expect(page.getByRole('heading', { name: 'Current Run' })).toBeVisible();
-      await expect(page.getByText('COMPLETED', { exact: true })).toBeVisible();
+      await expect(page.locator('.run-summary').first().getByText('COMPLETED', { exact: true })).toBeVisible();
       const response = await context.request.get(runPath, { headers });
       expect(response.headers()['cache-control']).toBe('no-store');
       expect(await response.json()).toEqual({
-        value: { id: example.id, state: example.state, revision: example.revision, updatedAt: example.updatedAt },
+        value: { id: example.id, state: example.state, revision: example.revision, updatedAt: example.updatedAt, createdAt: example.createdAt, finishedAt: example.finishedAt, failureCode: null, transitions: JSON.parse(readFileSync('vendor/perfeng-contracts/transitions.json', 'utf8')) },
         validForMs: 10_000,
       });
+      const artifactPath = runPath + '/artifacts';
+      expect((await context.request.get(artifactPath)).status()).toBe(403);
+      expect((await context.request.get(artifactPath, { headers })).status()).toBe(200);
+      await expect(page.getByText('No artifact references returned for this Run.')).toBeVisible();
       await runId.fill('perf-20260902-120000-abcdef13');
       await runId.press('Enter');
       await expect(page.getByRole('status')).toContainText('not found in this operator scope');
