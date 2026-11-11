@@ -121,3 +121,15 @@ test('browser admits only the public contract alias as a type', () => {
     }
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
+
+test('SignalStore authority is confined to the reviewed Run detail store', () => {
+  const root = mkdtempSync(join(tmpdir(), 'run-store-admission-'));
+  try {
+    mkdirSync(join(root, 'src'));
+    const source = "import { signalStore } from '@ngrx/signals';";
+    writeFileSync(join(root, 'src/run-detail-store.ts'), source);
+    assert.deepEqual(checkApp(root), []);
+    writeFileSync(join(root, 'src/main.ts'), source);
+    assert.match(checkApp(root).join('\n'), /Forbidden browser dependency @ngrx\/signals/);
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});

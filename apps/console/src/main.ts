@@ -1,5 +1,7 @@
 import { lookupRun } from './run-client';
-import type { RunSummary } from '#perfeng/contracts';
+import { RunDetailView } from './run-detail';
+import { RunDetailStore } from './run-detail-store';
+import { MatButtonModule } from '@angular/material/button';
 import { Effect, Fiber } from 'effect';
 import { sessionRequest } from './session-client';
 import { Component, DestroyRef, inject, signal } from "@angular/core";
@@ -9,6 +11,8 @@ import { VerificationAccess } from "./verification/access";
 
 @Component({
   selector: "app-home",
+  imports: [RunDetailView, MatButtonModule],
+  providers: [RunDetailStore],
   template: `
     <h1>Perfeng Console</h1>
     <h2>Find a Run</h2>
@@ -21,13 +25,8 @@ import { VerificationAccess } from "./verification/access";
     </form>
     <p role="status">{{ status() }}</p>
     @if (run(); as record) {
-      <h3>Current Run</h3>
-      <dl class="run-summary">
-        <dt>Run ID</dt><dd>{{ record.id }}</dd>
-        <dt>State</dt><dd>{{ record.state }}</dd>
-        <dt>Revision</dt><dd>{{ record.revision }}</dd>
-        <dt>Updated at</dt><dd>{{ record.updatedAt }}</dd>
-      </dl>
+      <button matButton type="button" (click)="find($event, record.id)">Refresh Run detail</button>
+      <app-run-detail [run]="record" [artifacts]="detail.artifacts()" [observations]="detail.observations()" />
     }
   `,
   host: {
@@ -38,7 +37,8 @@ import { VerificationAccess } from "./verification/access";
 })
 class ConsoleHome {
   readonly status = signal('Ready for exact Run lookup.');
-  readonly run = signal<RunSummary | undefined>(undefined);
+  readonly detail = inject(RunDetailStore);
+  readonly run = this.detail.run;
   private generation = 0;
   private pending?: Fiber.Fiber<void>;
 
@@ -46,10 +46,10 @@ class ConsoleHome {
     inject(DestroyRef).onDestroy(() => this.invalidate(''));
   }
 
-  invalidate(message: string) {
+  invalidate(message: string, preserveObservations = false) {
     this.generation++;
     if (this.pending) Effect.runFork(Fiber.interrupt(this.pending));
-    this.run.set(undefined);
+    this.detail.clear(preserveObservations);
     this.status.set(message);
   }
 
@@ -59,7 +59,7 @@ class ConsoleHome {
 
   find(event: Event, id: string) {
     event.preventDefault();
-    this.invalidate('Looking up Run…');
+    this.invalidate('Looking up Run…', true);
     if (!navigator.onLine) {
       this.status.set('Connection unavailable. Try again when connected.');
       return;
@@ -70,18 +70,23 @@ class ConsoleHome {
       const result = yield* lookupRun(id.trim());
       if (this.generation !== generation) return;
       if ('message' in result) {
+        this.detail.clear();
         this.status.set(result.message);
         return;
       }
       // Charge transit and processing against the lifetime so network delay never extends freshness.
       const remaining = result.observation.validForMs - (performance.now() - started);
       if (remaining > 0) {
-        this.run.set(result.observation.value);
+        if (!this.detail.observe(result.observation.value, result.artifacts)) {
+          this.detail.clear();
+          this.status.set('Run observation inconsistent. Look up the Run again.');
+          return;
+        }
         this.status.set('Current Run evidence loaded.');
         yield* Effect.sleep(remaining);
       }
       if (this.generation === generation) {
-        this.run.set(undefined);
+        this.detail.clear();
         this.status.set('Run evidence expired. Look up the Run again.');
       }
     }));

@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { expect, test } from '@playwright/test';
 
 function deferred() {
@@ -9,8 +10,12 @@ function deferred() {
 const id = 'perf-20260902-120000-abcdef12';
 const path = '**/console/api/runs/' + id;
 const observation = (revision: number) => ({
-  value: { id, revision, state: 'COMPLETED', updatedAt: '2026-09-02T12:00:00Z' },
+  value: { createdAt: '2026-09-02T12:00:00Z', finishedAt: '2026-09-02T12:00:05Z', failureCode: null, transitions: JSON.parse(readFileSync('vendor/perfeng-contracts/transitions.json', 'utf8')), id, revision, state: 'COMPLETED', updatedAt: '2026-09-02T12:00:00Z' },
   validForMs: 10_000,
+});
+
+test.beforeEach(async ({ page }) => {
+  await page.route(path + '/artifacts', route => route.fulfill({ json: { value: { artifacts: [] }, validForMs: 10_000 } }));
 });
 
 test('exact Run evidence expires and reconnect requires a new lookup', async ({ page, context }) => {

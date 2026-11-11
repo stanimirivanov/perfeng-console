@@ -45,6 +45,7 @@ this specific rule.
 | `#perfeng/tooling/angular-accounting` | `./scripts/angular-accounting.ts` |
 | `#perfeng/tooling/generated-output` | `./scripts/generated-output.ts` |
 | `#perfeng/tooling/contracts` | `./scripts/contracts.ts` |
+| `#perfeng/run-transitions` | `./src/generated/transitions.ts` (BFF-owned graph projection) |
 | `#perfeng/run-types` | `./src/generated/run.ts` |
 | `#perfeng/harness/imports` | `./harness/imports.ts` |
 | `#perfeng/harness/project-imports` | `./harness/project-imports.ts` |

@@ -17,6 +17,7 @@ import { NodeHttpIncomingMessage } from '@effect/platform-node/NodeHttpIncomingM
 
 import { createRunTransport } from '#perfeng/bff';
 
+const artifact = { id: '11111111-1111-4111-8111-111111111111', runId: 'perf-20260902-120000-abcdef12', kind: 'raw', uri: 's3://evidence/fixture', sha256: 'a'.repeat(64), sizeBytes: 42, mediaType: 'application/json', format: 'k6/v1' };
 const run = JSON.parse(readFileSync('vendor/perfeng-contracts/api/run-management/v1/examples/completed.json', 'utf8'));
 
 test('fixed-origin Run transport enforces credential, TLS and response boundaries', { timeout: 20000 }, async (t) => {
@@ -58,6 +59,8 @@ test('fixed-origin Run transport enforces credential, TLS and response boundarie
     receivedBearer = request.headers.authorization;
     response.setHeader('Content-Type', 'application/json');
     switch (mode) {
+      case 'artifacts': response.end(JSON.stringify({ artifacts: [{ ...artifact, runId: run.id }] })); break;
+      case 'foreign-artifact': response.end(JSON.stringify({ artifacts: [{ ...artifact, runId: 'perf-20260902-120000-12345678' }] })); break;
       case 'before-headers': bodyStarted(); break;
       case 'redirect': response.writeHead(302, { Location: '/elsewhere?value=' + token }).end(); break;
       case 'error': response.writeHead(404).end(token); break;
@@ -97,6 +100,17 @@ test('fixed-origin Run transport enforces credential, TLS and response boundarie
   const origin = 'https://127.0.0.1:' + address.port;
   const config = { origin, tokenFile, caFile: tls.caFile };
   const transport = createRunTransport(config);
+
+  await t.test('artifact reads share the qualified transport and reject foreign Run membership', async () => {
+    mode = 'artifacts';
+    assert.deepEqual(await transport.listArtifacts(run.id), { ok: true, artifacts: [{ ...artifact, runId: run.id }] });
+    assert.equal(receivedPath, '/v1/runs/' + run.id + '/artifacts');
+    for (const value of ['foreign-artifact', 'redirect', 'duplicate-same', 'encoding', 'oversize']) {
+      mode = value;
+      assert.deepEqual(await transport.listArtifacts(run.id), { ok: false, reason: 'invalid_response' });
+    }
+    mode = 'valid';
+  });
 
   await t.test('reads only the typed operation at the configured destination', async () => {
     assert.deepEqual(await transport.getRun(run.id), { ok: true, run });

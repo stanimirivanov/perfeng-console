@@ -43,7 +43,8 @@ export function checkApp(root: string): string[] {
         const name = target.text;
         const internal = name.startsWith("./") || name.startsWith("../");
         const contractAlias = name === "#perfeng/contracts" && ts.isImportDeclaration(node) && node.importClause?.isTypeOnly === true;
-        const allowed = contractAlias || (internal
+        const storePackage = name === "@ngrx/signals" && relative(resolve(root, "src"), file) === "run-detail-store.ts";
+        const allowed = storePackage || contractAlias || (internal
           ? !relative(resolve(root, "src"), resolve(dirname(file), name)).startsWith("..")
           : ["@angular/core", "@angular/platform-browser", "@angular/router",
              "@angular/common", "@angular/material/button",

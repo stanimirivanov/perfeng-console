@@ -28,7 +28,7 @@ const serverSources = new Set([
   'src/bff/transport-result.ts',
   'src/bff/run-reader.ts',
   'src/bff/runs.ts',
-  'src/generated/run.ts',
+  'src/generated/transitions.ts', 'src/generated/run.ts',
   'src/generated/validators.mjs',
   'src/shared/contracts/observation.ts',
 ]);

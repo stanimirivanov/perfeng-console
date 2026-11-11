@@ -57,6 +57,9 @@
       ],
       "#perfeng/harness/project-imports": [
         "./harness/project-imports.ts"
+      ],
+      "#perfeng/run-transitions": [
+        "./src/generated/transitions.ts"
       ]
     }
   }
