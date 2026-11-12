@@ -170,6 +170,12 @@ facade and store, retiring the last mixed-ownership allowance. Read the
 [denial-scope receipt](docs/development/harness-rules.md#h6-shared-session-receipt)
 before changing session or capability handling.
 
+H7 extends role/native-admission checks to incoming server, CLI and preview tools.
+Read [tools guidance](tools/AGENTS.md) and the
+[tools receipt](docs/development/harness-rules.md#h7-tools-ownership-receipt).
+Qualification and guide tools remain separate owners; the preview JS parser check
+is not a JavaScript compiler gate. Product installation still has its own target.
+
 ## M05-PR2 failure propagation
 
 make verify now includes the production AOT build and its distribution scan.
