@@ -11,6 +11,7 @@ lint: check-imports
 	NX_DAEMON=false node_modules/.bin/eslint . --max-warnings 0
 
 typecheck:
+	node_modules/.bin/tsc --project tools/tsconfig.json
 	node_modules/.bin/tsc --project tsconfig.json
 	node_modules/.bin/tsc --project apps/web-e2e/tsconfig.json
 

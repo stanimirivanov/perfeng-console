@@ -40,13 +40,15 @@ export function checkImportMaps(root: string, checkConsumers = true): string[] {
     Object.entries(wanted).every(([key, value]) => JSON.stringify((actual as Record<string, unknown>)[key]) === JSON.stringify(value));
   const configs: Record<string, string> = {
     'tsconfig.json': './tsconfig.paths.json', 'tsconfig.base.json': './tsconfig.paths.json',
+    'tools/tsconfig.json': '../tsconfig.json',
     'apps/console/tsconfig.app.json': '../../tsconfig.base.json',
     'apps/console/tsconfig.spec.json': '../../tsconfig.base.json',
     'apps/web-e2e/tsconfig.json': '../../tsconfig.base.json',
   };
   const inherited = !checkConsumers || Object.entries(configs).every(([file, parent]) => {
     const consumer = JSON.parse(readFileSync(join(root, file), 'utf8'));
-    return consumer.extends === parent && !consumer.compilerOptions?.paths && !consumer.compilerOptions?.baseUrl;
+    return consumer.extends === parent && !Object.hasOwn(consumer.compilerOptions ?? {}, 'paths') &&
+      !Object.hasOwn(consumer.compilerOptions ?? {}, 'baseUrl');
   });
   const central = !Object.hasOwn(config, 'extends') && !Object.hasOwn(config.compilerOptions ?? {}, 'baseUrl');
   return central && inherited && same(pkg.imports, expected) && same(config.compilerOptions?.paths, paths) ? [] :

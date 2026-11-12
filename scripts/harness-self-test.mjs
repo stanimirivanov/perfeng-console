@@ -23,6 +23,22 @@ try {
   });
   symlinkSync(join(root, "node_modules"), join(target, "node_modules"), "dir");
   run("make", ["verify"], true);
+  // Issue #51: prove the production gate checks tools independently of test imports.
+  for (const file of ['tools/serve-console.ts', 'tools/console-server.ts']) {
+    const path = join(target, file);
+    const source = readFileSync(path, 'utf8');
+    const probe = "\nconst h2CompilerProbe: number = 'production-tool-compiler-probe';\n";
+    if (source.includes('h2CompilerProbe')) throw Error('Compiler probe already present: ' + file);
+    try {
+      writeFileSync(path, source + probe);
+      if (readFileSync(path, 'utf8') !== source + probe) throw Error('Compiler probe was not injected: ' + file);
+      run('make', ['typecheck'], false,
+        new RegExp(file.replaceAll('.', '\\.') + '\\(\\d+,\\d+\\): error TS2322:'));
+    } finally {
+      writeFileSync(path, source);
+    }
+  }
+
   const main = join(target, "apps/console/src/main.ts");
   const original = readFileSync(main, "utf8");
   writeFileSync(main, original.replace("<h1>Perfeng Console", "<h1>{{ missingProperty }} Perfeng Console"));
