@@ -1,8 +1,6 @@
-import { Effect } from 'effect';
-import { sessionRequest } from './session-client';
-import { Component, inject, signal } from "@angular/core";
-import { Router, RouterLink, RouterOutlet } from "@angular/router";
-import { VerificationAccess } from "./verification/access";
+import { Component, DestroyRef, inject } from '@angular/core';
+import { Router, RouterLink, RouterOutlet } from '@angular/router';
+import { SESSION_FEATURE } from './operator-ports';
 
 @Component({
   selector: "app-root",
@@ -33,47 +31,21 @@ import { VerificationAccess } from "./verification/access";
 })
 export class App {
   readonly router = inject(Router);
-  readonly access = inject(VerificationAccess);
-  readonly mode = signal<'pairing' | 'paired' | 'preview'>(
-    document.querySelector('meta[name="perfeng-console-preview"][content="true"]') ? 'preview' : 'pairing',
-  );
-  readonly pending = signal(false);
-  readonly message = signal('');
-  private csrf = '';
-
+  private readonly owner = inject(DestroyRef);
+  private readonly session = inject(SESSION_FEATURE)(this.owner);
+  readonly access = this.session;
+  readonly mode = this.session.mode;
+  readonly pending = this.session.pending;
+  readonly message = this.session.message;
   constructor() {
-    if (this.mode() === 'preview') void this.access.refresh();
-    else void this.refresh();
+    this.session.start(!!document.querySelector('meta[name="perfeng-console-preview"][content="true"]'));
   }
-
-  private async refresh() {
-    this.pending.set(true);
-    const result = await Effect.runPromise(sessionRequest());
-    this.apply(result);
-  }
-
-  private apply(result: { mode: 'paired'; csrf: string } | { mode: 'pairing' | 'unavailable' }) {
-    this.csrf = result.mode === 'paired' ? result.csrf : '';
-    this.mode.set(result.mode === 'unavailable' ? 'pairing' : result.mode);
-    this.message.set(result.mode === 'unavailable' ? 'Session unavailable. Check the code or restart the local server.' : '');
-    this.pending.set(false);
-    if (result.mode === 'paired') void this.access.refresh();
-  }
-
   async pair(event: Event, input: HTMLInputElement, main: HTMLElement) {
     event.preventDefault();
     if (this.pending()) return;
-    this.pending.set(true);
     const code = input.value;
     input.value = '';
-    const result = await Effect.runPromise(sessionRequest('pair', code));
-    this.apply(result);
-    if (result.mode === 'paired') main.focus();
+    if (await this.session.pair(code) && !this.owner.destroyed) main.focus();
   }
-
-  async signOut() {
-    if (this.pending()) return;
-    this.pending.set(true);
-    this.apply(await Effect.runPromise(sessionRequest('logout', this.csrf)));
-  }
+  signOut() { return this.session.signOut(); }
 }

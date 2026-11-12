@@ -5,14 +5,18 @@ import { createHash } from 'node:crypto';
 import ts from 'typescript';
 import { inspectImports } from './boundaries.ts';
 
-export type Role = 'component' | 'store' | 'operation' | 'port' | 'adapter' | 'composition' | 'presentation' | 'contract' | 'entry';
+export type Role = 'component' | 'store' | 'operation' | 'port' | 'adapter' | 'composition' | 'integration' | 'presentation' | 'contract' | 'entry';
 // Register concrete consumers in review; a directory name never grants authority.
 export const roles: Readonly<Record<string, Role>> = {
   'apps/console/src/main.ts': 'composition',
-  // Issue #55: temporary mixed roles; H5 retires them with the byte fences.
-  'apps/console/src/app.ts': 'composition',
-  'apps/console/src/console-home.ts': 'composition',
-  'apps/console/src/app.routes.ts': 'composition',
+  'apps/console/src/app.ts': 'component',
+  'apps/console/src/console-home.ts': 'component',
+  'apps/console/src/app.routes.ts': 'integration',
+  'apps/console/src/operator-ports.ts': 'port',
+  'apps/console/src/run-lookup.operation.ts': 'operation',
+  'apps/console/src/run-lookup.integration.ts': 'integration',
+  'apps/console/src/local-session.integration.ts': 'integration',
+  'apps/console/src/local-session.store.ts': 'store',
   'apps/console/src/verification/lab.ts': 'component',
   'apps/console/src/verification/access.ts': 'adapter',
   'src/bff/config.ts': 'adapter',
@@ -41,7 +45,8 @@ const edges: Record<Role, readonly Role[]> = {
   operation: ['operation', 'port', 'presentation', 'contract'],
   port: ['port', 'presentation', 'contract'],
   adapter: ['adapter', 'port', 'presentation', 'contract'],
-  composition: ['component', 'store', 'operation', 'port', 'adapter', 'presentation', 'contract'],
+  composition: ['component', 'integration', 'store', 'operation', 'port', 'adapter', 'presentation', 'contract'],
+  integration: ['component', 'integration', 'store', 'operation', 'port', 'adapter', 'presentation', 'contract'],
   presentation: ['presentation'],
   contract: ['contract'],
   entry: ['composition', 'adapter'],
@@ -109,11 +114,7 @@ export function checkOwnership(root: string, registry: Readonly<Record<string, R
           report(node, 'OWN-04', 'Consume shared contracts through declaration-level import type.');
         if (targetName.startsWith('src/generated/')) return;
         if (!targetRole || !edges[role].includes(targetRole)) {
-          // Issue #55: exact extraction assembly only; H5 removes these mixed-role edges.
-          const extractionEdge = registry === roles && role === 'composition' && targetRole === 'composition' &&
-            ((name === 'apps/console/src/main.ts' && ['apps/console/src/app.ts', 'apps/console/src/app.routes.ts'].includes(targetName)) ||
-             (name === 'apps/console/src/app.routes.ts' && targetName === 'apps/console/src/console-home.ts'));
-          if (!extractionEdge) report(node, 'OWN-01', `${role} cannot depend on ${targetRole ?? 'unregistered module'} ${targetName}. Use a port.`);
+          report(node, 'OWN-01', `${role} cannot depend on ${targetRole ?? 'unregistered module'} ${targetName}. Use a port.`);
         }
       }
       if (['node:http', 'node:https', 'http', 'https'].includes(spec)) report(node, 'OWN-03', 'Native dispatch needs explicit platform admission, not just an adapter role.');
@@ -140,7 +141,31 @@ export function checkOwnership(root: string, registry: Readonly<Record<string, R
       const variable = symbol.declarations?.find(ts.isVariableDeclaration);
       return variable?.initializer ? authority(variable.initializer, seen) : expression.text;
     };
+    // Issue #57: framework integration executes work but cannot conceal a UI declaration.
+    const decoratorName = (expression: ts.Expression, seen = new Set<ts.Symbol>()): string => {
+      if (ts.isPropertyAccessExpression(expression)) return expression.name.text;
+      if (ts.isElementAccessExpression(expression) && ts.isStringLiteralLike(expression.argumentExpression)) return expression.argumentExpression.text;
+      if (ts.isIdentifier(expression)) {
+        let symbol = checker.getSymbolAtLocation(expression);
+        if (symbol && (symbol.flags & ts.SymbolFlags.Alias)) symbol = checker.getAliasedSymbol(symbol);
+        if (symbol && ['Component', 'Directive'].includes(symbol.getName())) return symbol.getName();
+        if (symbol && !seen.has(symbol)) {
+          seen.add(symbol);
+          const variable = symbol.declarations?.find(ts.isVariableDeclaration);
+          if (variable?.initializer) return decoratorName(variable.initializer, seen);
+        }
+      }
+      return authority(expression);
+    };
+    const canExecute = role === 'composition' || role === 'integration';
     const visit = (node: ts.Node) => {
+      if (role !== 'component' && (ts.isClassDeclaration(node) || ts.isClassExpression(node))) {
+        for (const decorator of ts.getDecorators(node) ?? []) {
+          const expression = ts.isCallExpression(decorator.expression) ? decorator.expression.expression : decorator.expression;
+          if (['Component', 'Directive'].includes(decoratorName(expression)))
+            report(decorator, 'OWN-01', 'A component or directive requires the component role; it cannot inherit runtime, adapter or store authority.');
+        }
+      }
       if (!legacy && role !== 'adapter' && ts.isBindingElement(node) && node.propertyName &&
           ts.isComputedPropertyName(node.propertyName) && ts.isStringLiteralLike(node.propertyName.expression) &&
           ioNames.has(node.propertyName.expression.text))
@@ -151,19 +176,19 @@ export function checkOwnership(root: string, registry: Readonly<Record<string, R
         const declaration = symbol?.declarations?.find(ts.isImportSpecifier);
         const original = declaration ? (declaration.propertyName ?? declaration.name).text : node.text;
         if (!legacy && ioNames.has(original) && role !== 'adapter' && !(original === 'AbortSignal' && ts.isTypeReferenceNode(node.parent))) report(node, 'OWN-03', 'I/O, native abort and scheduling belong in an admitted adapter; use Angular render hooks for rendering.');
-        if (original === 'ManagedRuntime' && role !== 'composition') report(node, 'OWN-02', 'Managed runtime creation belongs at composition.');
-        if (runtimes.has(original) && role !== 'composition') report(node, 'OWN-02', 'Execute Effects only at composition boundaries.');
+        if (original === 'ManagedRuntime' && !canExecute) report(node, 'OWN-02', 'Managed runtime creation belongs at registered composition/integration boundaries.');
+        if (runtimes.has(original) && !canExecute) report(node, 'OWN-02', 'Execute Effects only at registered composition/integration boundaries.');
       }
       if (ts.isElementAccessExpression(node)) {
         const member = node.argumentExpression;
         if (ts.isStringLiteralLike(member)) {
           if (!legacy && ioNames.has(member.text) && role !== 'adapter') report(node, 'OWN-03', 'Indirect I/O and native scheduling must stay in an admitted adapter.');
-          if (runtimes.has(member.text) && role !== 'composition') report(node, 'OWN-02', 'Indirect runtime execution is forbidden here.');
+          if (runtimes.has(member.text) && !canExecute) report(node, 'OWN-02', 'Indirect runtime execution is forbidden here.');
         } else if (/^(window|globalThis|self|scheduler|Effect|ManagedRuntime|Runtime)$/.test(authority(node.expression))) report(node, 'OWN-03', 'Computed authority is not reviewable.');
       }
       if (ts.isImportDeclaration(node) && node.moduleSpecifier && ts.isStringLiteral(node.moduleSpecifier) &&
-        /effect\/(ManagedRuntime|Runtime)$/.test(node.moduleSpecifier.text) && role !== 'composition') report(node, 'OWN-02', 'Runtime modules belong at composition boundaries.');
-      if (ts.isPropertyAccessExpression(node) && node.name.text === 'ManagedRuntime' && role !== 'composition') report(node, 'OWN-02', 'Managed runtimes belong at composition boundaries.');
+        /effect\/(ManagedRuntime|Runtime)$/.test(node.moduleSpecifier.text) && !canExecute) report(node, 'OWN-02', 'Runtime modules belong at registered composition/integration boundaries.');
+      if (ts.isPropertyAccessExpression(node) && node.name.text === 'ManagedRuntime' && !canExecute) report(node, 'OWN-02', 'Managed runtimes belong at registered composition/integration boundaries.');
       ts.forEachChild(node, visit);
     };
     visit(source);

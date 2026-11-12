@@ -1,5 +1,10 @@
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
+import { DestroyRef } from '@angular/core';
+import { SESSION_FEATURE } from './operator-ports';
+import { LocalSessionIntegration } from './local-session.integration';
+import { VerificationAccess } from './verification/access';
+import { sessionRequest } from './session-client';
 import { App } from './app';
 
 afterEach(() => { TestBed.resetTestingModule(); vi.unstubAllGlobals(); });
@@ -9,7 +14,8 @@ it('pairing clears the code, focuses main, denies Verification and logout return
     if (url.endsWith('/verification/access')) return new Response(null, { status: 403 });
     return Response.json(url.endsWith('/pair') ? { csrf: 'a'.repeat(43) } : {});
   }));
-  TestBed.configureTestingModule({ imports: [App], providers: [provideRouter([])] });
+  TestBed.configureTestingModule({ imports: [App], providers: [provideRouter([]), { provide: SESSION_FEATURE, useValue: (owner: DestroyRef) =>
+    new LocalSessionIntegration(owner, TestBed.inject(VerificationAccess), sessionRequest) }] });
   const fixture = TestBed.createComponent(App);
   const host: HTMLElement = fixture.nativeElement;
   document.body.append(host);

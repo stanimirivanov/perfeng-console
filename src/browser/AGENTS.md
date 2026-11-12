@@ -17,9 +17,10 @@ HTTP, independent timers, duplicate caches or mutation retries. Production NgRx/
 imports require narrow admission and behavioral proof. The existing
 [Run-detail admission](../../docs/development/runtime-ownership.md#run-detail-browser-admission-m05-pr22)
 permits specific production paths, not component-owned runtimes generally.
-`main.ts` is bootstrap only. H4 moves the existing mixed-role shell and Run
-components to frozen app.ts/console-home.ts; do not copy their orchestration.
-H5 retires those exact fences and assembly edges with its runtime migration. Shared-session coordination and the frozen Verification adapter migration
+`main.ts` is bootstrap only. App and ConsoleHome now render readonly operator ports; no
+component/directive may inherit a composition/integration role. H5 retires H4
+fences/assembly edges. Main wires fresh integration factories using the creating
+component's DestroyRef; do not replace them with cached route/root lifetimes. Shared-session coordination and the frozen Verification adapter migration
 remain pending in the [enforcement index](../../docs/development/harness-rules.md#remaining-hardening).
 
 Use reviewed `.ts` source; alternate executable JS/TS formats are rejected even

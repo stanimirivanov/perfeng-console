@@ -61,4 +61,5 @@ import/cycle gate; use `pnpm check:imports` for a focused import check.
 Qualified BFF examples: [lazy reader](src/bff/run-reader.ts) and
 [composition boundary](src/bff/transport.ts). The
 [Run-detail admission](docs/development/runtime-ownership.md#run-detail-browser-admission-m05-pr22)
-is narrow; mixed Angular composition and shared-session coordination remain debt.
+is narrow; [H5 runtime boundaries](docs/development/harness-rules.md#h5-runtime-boundary-receipt)
+are enforced, while shared-session coordination remains pending.

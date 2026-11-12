@@ -123,13 +123,15 @@ test('browser admits only the public contract alias as a type', () => {
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
 
-test('SignalStore authority is confined to the reviewed Run detail store', () => {
+test('SignalStore authority is confined to the reviewed feature stores', () => {
   const root = mkdtempSync(join(tmpdir(), 'run-store-admission-'));
   try {
     mkdirSync(join(root, 'src'));
     const source = "import { signalStore } from '@ngrx/signals';";
-    writeFileSync(join(root, 'src/run-detail-store.ts'), source);
-    assert.deepEqual(checkApp(root), []);
+    for (const name of ['run-detail-store.ts', 'local-session.store.ts']) {
+      writeFileSync(join(root, 'src', name), source);
+      assert.deepEqual(checkApp(root), []);
+    }
     writeFileSync(join(root, 'src/main.ts'), source);
     assert.match(checkApp(root).join('\n'), /Forbidden browser dependency @ngrx\/signals/);
   } finally { rmSync(root, { recursive: true, force: true }); }
@@ -175,11 +177,12 @@ test('both source scanners refuse file and directory symlinks before following t
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
 
-test('extracted shell and Run modules inherit only the moved Effect admission', () => {
-  const root = mkdtempSync(join(tmpdir(), 'extracted-effect-'));
+test('Effect package authority follows adapters, operations and integrations, never components', () => {
+  const root = mkdtempSync(join(tmpdir(), 'feature-effect-'));
   try {
     mkdirSync(join(root, 'src'));
-    for (const [name, allowed] of [['app.ts', true], ['console-home.ts', true],
+    for (const [name, allowed] of [['run-lookup.integration.ts', true], ['local-session.integration.ts', true],
+      ['run-lookup.operation.ts', true], ['app.ts', false], ['console-home.ts', false],
       ['main.ts', false], ['other.ts', false]] as const) {
       const path = join(root, 'src', name);
       writeFileSync(path, "import { Effect } from 'effect'; export const task = Effect.void;");

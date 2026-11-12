@@ -47,12 +47,12 @@ export function checkApp(root: string): string[] {
         const name = target.text;
         const internal = name.startsWith("./") || name.startsWith("../");
         const contractAlias = name === "#perfeng/contracts" && ts.isImportDeclaration(node) && node.importClause?.isTypeOnly === true;
-        const storePackage = name === "@ngrx/signals" && relative(resolve(root, "src"), file) === "run-detail-store.ts";
+        const storePackage = name === "@ngrx/signals" && ["run-detail-store.ts", "local-session.store.ts"].includes(relative(resolve(root, "src"), file));
         const allowed = storePackage || contractAlias || (internal
           ? !relative(resolve(root, "src"), resolve(dirname(file), name)).startsWith("..")
           : ["@angular/core", "@angular/platform-browser", "@angular/router",
              "@angular/common", "@angular/material/button",
-             ...(["app.ts", "console-home.ts", "session-client.ts", "run-client.ts"].includes(relative(resolve(root, "src"), file)) ? ["effect"] : []),
+             ...(["run-lookup.integration.ts", "local-session.integration.ts", "run-lookup.operation.ts", "session-client.ts", "run-client.ts"].includes(relative(resolve(root, "src"), file)) ? ["effect"] : []),
              ...(file.endsWith(".spec.ts") ? ["@angular/core/testing", "@ngrx/signals", "effect"] : [])].includes(name));
         if (!allowed || (!file.endsWith(".spec.ts") && name.includes(".spec")) || (/[%?\\]/u.test(name) || (name.includes("#") && name !== "#perfeng/contracts")))
           report(node, "dependency", "Forbidden browser dependency " + name);

@@ -47,9 +47,8 @@ try {
   try {
     writeFileSync(home, changed);
     if (readFileSync(home, 'utf8') !== changed || changed === original) throw Error('Template fault was not injected.');
-    // H4 freezes extraction bytes without bypassing the template compiler or ownership checks.
-    run("make", ["build"], false, /missingProperty/);
-    run("make", ["verify"], false, /H4 frozen extraction changed/);
+    // H5 retires the byte fences: aggregate failure must now be the Angular diagnostic.
+    run("make", ["verify"], false, /missingProperty/);
   } finally { writeFileSync(home, original); }
 
   const unit = join(target, "apps/console/src/verification/probe.spec.ts");

@@ -43,7 +43,8 @@ calculations; use Angular for rendering and framework lifecycle integration.
 ## Dependency direction and placement
 
 Keep existing top-level layers. Within apps/console/src, distinguish component,
-store, operation, adapter and composition responsibilities in the module policy.
+store, operation, adapter, framework integration and composition responsibilities
+in the module policy. Components/directives cannot be declared in a runtime role.
 Concrete module paths must be registered with their role when the first consumer
 is implemented; this document does not create empty feature directories.
 
@@ -132,16 +133,18 @@ general session coordination and mutation lifetimes remain unimplemented.
 
 `apps/console/src/run-detail-store.ts` is the sole SignalStore writer for the
 Run-detail observation, safe artifact claims and the bounded session observation
-log. `run-detail.ts` renders readonly inputs. H4 mechanically moves the existing
-Run component to `console-home.ts`; its temporary composition role admits the
-unchanged Effect fiber, generation guard and teardown. The shell is in `app.ts`,
-routes in `app.routes.ts`, and main.ts only bootstraps them. The two mixed component
-files are frozen until H5, not component reference patterns. See the
-[H4 extraction receipt](harness-rules.md#h4-extraction-receipt). `run-client.ts`
-owns same-origin bounded reads. Refresh keeps only actually observed revisions
-for the same Run; invalidation removes evidence. This narrow feature admission
-does not implement general shared-session coordination, polling or mutation
-ownership. The existing Verification adapter allowance remains frozen.
+log. `run-detail.ts` renders readonly inputs. H5 retires H4's temporary mixed
+component registrations/fences and exact assembly exceptions. App and ConsoleHome
+now consume readonly operator ports. Main wires fresh integration factories with
+the creating component's DestroyRef; the integrations own execution and rejection
+of disposed/superseded results. Run expiry is a store-independent Effect operation.
+Local session presentation also has one SignalStore writer; its owner interrupts
+pending requests and prevents completion/focus delivery after disposal.
+See the [H5 receipt](harness-rules.md#h5-runtime-boundary-receipt).
+
+This remains the local paired slice. Shared session/capability revocation, general
+polling and mutation uncertainty still require their owning scopes; the frozen
+Verification adapter allowance remains until H6. No provider authority moves here.
 
 The BFF uses the generated `#perfeng/run-transitions` entry to project pinned
 topology. The browser consumes it as DTO data, without fetching schemas or
