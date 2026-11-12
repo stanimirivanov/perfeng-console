@@ -24,9 +24,10 @@ Main bootstraps app.config.ts; app.routes.ts is a framework integration/configur
 boundary. Provider modules assemble dependencies but cannot execute Effects or I/O. Only registered composition/integration roles execute Effects; component
 or directive declarations require the component role, including imported aliases;
 adapter/store relabeling cannot evade the declaration check either.
-VerificationAccess remains a separate exact hash-bound mixed-ownership allowance.
-Local disposal/replacement guards do not implement shared-session coordination,
-general polling or mutation uncertainty. Those obligations remain pending.
+Verification access now has a native adapter, Effect integration and SignalStore;
+its mixed-ownership hash allowance is retired. A shared epoch store invalidates
+session presentation, Run observations and capability reads together. General
+polling, upstream health/provider epochs and mutation uncertainty remain pending.
 
 ## Scanner coverage
 
@@ -79,7 +80,7 @@ framework internals are not scanned by these handwritten-source rules.
 The ordinary Node fixtures run under make test and make verify. No new standalone
 or optional-only gate is introduced. H3 did not activate the future component-in-composition prohibition or move
 components. H4 performed only the mechanical extraction; H5 now separates runtime execution.
-H6/H7 still own shared revocation, VerificationAccess retirement and tools roles.
+H6 adds shared revocation and retires VerificationAccess; H7 still owns tools roles.
 
 ## Required sensors
 
@@ -162,7 +163,7 @@ example, executable proof, corrective guide and remaining judgment.
 The approved H1–H10 remediation identifiers are not M05 PR numbers. H1 changes
 only guides and review process. H2 adds compiler coverage and H3 adds the
 format/scheduling rules described above. H4 extracted the existing Angular code and H5 now enforces runtime boundaries.
-H6–H10 remain pending and are not admissions.
+H6 implements the local session boundary below. H7–H10 remain pending and are not admissions.
 
 | Task | Remaining scope |
 |---|---|
@@ -170,7 +171,7 @@ H6–H10 remain pending and are not admissions.
 | H3 | Implemented in [issue #53](https://github.com/stanimirivanov/perfeng-console/issues/53): fail-closed workspace formats and native scheduling fixtures |
 | H4 | Implemented in [issue #55](https://github.com/stanimirivanov/perfeng-console/issues/55): mechanical bootstrap/shell/Run extraction with exact migration fences |
 | H5 | Implemented in [issue #57](https://github.com/stanimirivanov/perfeng-console/issues/57): scoped integrations, readonly component ports, decorator rejection and H4 fence/exception retirement |
-| H6 | Shared-session denial/epoch coordination and VerificationAccess allowance retirement; scoped resource denial must not fabricate global logout |
+| H6 | Implemented in [issue #59](https://github.com/stanimirivanov/perfeng-console/issues/59): shared local-session epoch, typed denial scope and VerificationAccess allowance retirement; no general upstream-health/polling claim |
 | H7 | Exact incoming server/CLI/preview tools ownership and native-I/O admission |
 | H8 | Corrective diagnostics, generation-lock guidance and automated alias-document parity |
 | H9 | Byte-safe distribution scanning without skipping binary files |
@@ -212,21 +213,59 @@ signals. runs/run.operation.ts returns a discriminated outcome with absolute mon
 expiry instead of calling a UI completion sink. Transit timing starts before fiber
 launch; the facade checks remaining validity before publication. Existing deadlines,
 revision and failure messages remain. Verification exposes a separate capability
-port; its exact hash-bound legacy implementation remains H6's responsibility.
+port; H6 subsequently splits its implementation and retires the legacy allowance.
 
 Real Angular component-injector tests cover pending headers/body, transport abort,
 late completion, refusing further acquisition, isolation between simultaneous views
 and fresh state on recreation. The Chromium suite retains rapid replacement,
 expiry/reconnect, artifact denial, route teardown, keyboard/focus and visibility
 invalidation. Static declaration checks plus these cases do not prove arbitrary
-JavaScript or eventual cleanup of all future work. H6 must extend this single
-session presentation owner for cross-feature revocation rather than add a second
-competing cache; legacy capability refresh still has its own pending migration.
+JavaScript or eventual cleanup of all future work. H6 extends this single session
+presentation owner for cross-feature invalidation; it does not add a competing
+session cache. See the H6 receipt for the separate epoch and capability writers.
 
 After fence retirement, the copied-tree template probe still requires exactly one
 changed anchor and finally restoration. Its make verify failure must now contain
 the Angular missingProperty diagnostic, not a frozen-byte assertion. Existing
 compiler/accounting/Chromium fault probes remain mandatory in quality CI.
+
+## H6 shared-session receipt
+
+The application injector provides one session/session-boundary.store.ts. It owns
+only a monotonic epoch and synchronous invalidation subscriptions, never session
+mode, CSRF, Run data or capabilities. The shell's component-scoped SessionFacade
+still owns private CSRF and SessionStore is still the sole session-presentation
+writer. RunFacade and VerificationAccess subscribe through session-boundary.port.ts
+and release subscriptions on injector teardown.
+
+Pair/replacement and logout advance the epoch before dispatch. An authoritative
+local-session denial advances it before clearing all feature owners. Readers capture
+both their local sequence and session epoch; interruption and late-result guards
+prevent an old response from restoring evidence, access or a replaced session.
+Verification's own sequence also rejects a stale grant after a scoped denial. Its
+store is separate capability state, not a second copy of session presentation.
+
+The existing BFF Run/artifact routes emit 401 only for a missing/expired local
+session; provider failures are projected separately. These 401s return to pairing
+and clear CSRF, Run/history and capability work. Scoped
+Run/artifact 403/404, every non-204 capability reply and Run transport failures never fabricate
+global logout. The optional capability endpoint has no implemented local-session
+denial contract; its 401 is scoped rather than guessed to mean global session loss.
+A failed session operation clears local authority without claiming
+that an interrupted logout completed on the server. There are no automatic retries.
+
+Verification permission is hidden while unknown/denied. A mounted Lab cannot render
+its content from a withdrawn grant, and revocation leaves its route. Native fetch,
+3 s deadline and interruptible signal live in access-client.ts; access.ts owns
+Effect execution and access.store.ts owns its readonly grant. The BFF remains the
+operation authority; the epoch coordinator grants no permission.
+
+Angular injector regressions cover shared invalidation, late grants, abort and
+logout-before-dispatch clearing. Chromium covers Run/artifact session
+denial, scoped capability 401, retained shell after scoped denial, denied deep links
+and actual HTTPS
+session expiry during lookup. These are event-driven checks; no polling, cross-tab
+logout broadcast, SSO, upstream-health epoch or mutation reconciliation is admitted.
 
 ## Structural sensor receipt (2026-11-07, issue #33; historical scope)
 
@@ -242,11 +281,11 @@ OWN-01 through OWN-04 now have executable structural fixtures. OWN-05 retains ex
 browser/server/asset guards and adds role-edge checks. OWN-06/07 now exercise the production Node transport through real TLS and an isolated lifecycle host. OWN-08 has since gained the narrow Run-detail browser evidence above; general
 session/polling coverage and OWN-09 mutation behavior remain pending. OWN-10 retains the existing offline contract/validator gates.
 
-The transport legacy allowance is retired. One exact mixed-ownership allowance remains
-frozen by SHA-256: apps/console/src/verification/access.ts (remove with the M05 browser integration
-migration, before adopting its pattern for other features). Its current bytes pass;
-edits fail until the allowance is retired in the reviewed migration. This exposes
-existing debt without changing production code or giving a directory-wide exemption.
+Both the transport and VerificationAccess legacy allowances are retired. H6 removes
+the hash exception mechanism: verification/access.ts is now an integration and
+cannot dispatch native I/O; access-client.ts is an adapter and cannot execute
+Effects; access.store.ts is the capability writer. Exact package checks remain
+independent from roles. Regression fixtures reject reintroducing mixed ownership.
 
 Runtime-name checks are deliberately conservative: reserved execution names are
 restricted even when a local function has the same spelling. Import aliases and

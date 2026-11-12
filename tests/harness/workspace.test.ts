@@ -128,7 +128,7 @@ test('SignalStore authority is confined to the reviewed feature stores', () => {
   try {
     mkdirSync(join(root, 'src'));
     const source = "import { signalStore } from '@ngrx/signals';";
-    for (const name of ['runs/run.store.ts', 'session/session.store.ts']) {
+    for (const name of ['runs/run.store.ts', 'session/session.store.ts', 'session/session-boundary.store.ts', 'verification/access.store.ts']) {
       mkdirSync(dirname(join(root, 'src', name)), { recursive: true });
       writeFileSync(join(root, 'src', name), source);
       assert.deepEqual(checkApp(root), []);
@@ -184,7 +184,8 @@ test('Effect package authority follows adapters, operations and integrations, ne
     mkdirSync(join(root, 'src'));
     for (const [name, allowed] of [['runs/run.facade.ts', true], ['session/session.facade.ts', true],
       ['runs/run.operation.ts', true], ['shell/app.ts', false], ['runs/run-lookup.ts', false],
-      ['runs/nested/run.facade.ts', false],
+      ['runs/nested/run.facade.ts', false], ['verification/access.ts', true],
+      ['verification/access-client.ts', true], ['verification/access.store.ts', false],
       ['main.ts', false], ['other.ts', false]] as const) {
       const path = join(root, 'src', name);
       mkdirSync(dirname(path), { recursive: true });

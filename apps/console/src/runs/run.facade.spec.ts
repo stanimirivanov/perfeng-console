@@ -1,3 +1,4 @@
+import { provideSessionBoundary } from '../session/session.providers';
 import { Component, inject } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { provideRunLookup } from './run.providers';
@@ -5,6 +6,7 @@ import { RUN_UI } from './run-ui';
 
 @Component({ template: '', providers: provideRunLookup() })
 class Host { readonly ui = inject(RUN_UI); }
+beforeEach(() => TestBed.configureTestingModule({ providers: [provideSessionBoundary()] }));
 afterEach(() => { TestBed.resetTestingModule(); vi.unstubAllGlobals(); });
 const id = 'perf-20260902-120000-abcdef12';
 for (const phase of ['headers', 'body'] as const) {

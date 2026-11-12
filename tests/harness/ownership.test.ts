@@ -67,13 +67,11 @@ test('an adapter role alone does not grant native HTTP dispatch', () => {
 test('presentation rejects runtime dependencies', () => {
   assert.match(inspect({ 'src/presentation/view.ts': "import { Effect } from 'effect';" }, { 'src/presentation/view.ts': 'presentation' }), /OWN-04/);
 });
-test('legacy allowance cannot admit edited source', () => {
-  const root = mkdtempSync(join(tmpdir(), 'legacy-ownership-'));
-  try {
-    mkdirSync(join(root, 'apps/console/src/verification'), { recursive: true });
-    writeFileSync(join(root, 'apps/console/src/verification/access.ts'), 'export const changed = true;');
-    assert.match(checkOwnership(root).join('\n'), /legacy source changed/);
-  } finally { rmSync(root, { recursive: true, force: true }); }
+test('Verification facade cannot regain native I/O through the retired legacy allowance', () => {
+  assert.equal(productionRoles['apps/console/src/verification/access.ts'], 'integration');
+  assert.match(inspect({ 'apps/console/src/verification/access.ts': 'fetch("/");' }), /OWN-03/);
+  assert.equal(productionRoles['apps/console/src/verification/access-client.ts'], 'adapter');
+  assert.equal(productionRoles['apps/console/src/verification/access.store.ts'], 'store');
 });
 test('namespace-import runtime authority cannot hide behind computed access', () => {
   assert.match(inspect({ [file]: "import * as R from 'effect/Effect'; R[method](job)" }, { [file]: 'operation' }), /OWN-02|OWN-03/);

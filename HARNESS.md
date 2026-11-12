@@ -155,7 +155,7 @@ The Angular app in apps/console owns ordinary operations and the Verification ro
 Run make stack-admission to compile the isolated pinned-stack fixture and exercise
 Material overlays in Chromium under the BFF-owned nonce renderer. CI's browser job
 runs it after the product browser suite. The fixture is outside the production entry;
-the dedicated test config discovers only its own stack.spec.ts. The Angular workspace admits NgRx only in the Run/local-session stores and Effect
+the dedicated test config discovers only its own stack.spec.ts. The Angular workspace admits NgRx only in the exact Run, session, epoch and capability stores and Effect
 only in the exact adapters, operation and integrations. App/ConsoleHome render
 feature-local readonly ports. Component metadata provides each facade and SignalStore
 in the component injector; facades inject DestroyRef. Main only bootstraps app.config.
@@ -165,6 +165,10 @@ H4 mixed-role fences and assembly exceptions are retired. See the
 [H5 receipt](docs/development/harness-rules.md#h5-runtime-boundary-receipt) and
 [active boundary and debt](docs/development/harness-rules.md#current-baseline).
 See docs/development/stack-admission.md for the gate receipt and remaining obligations.
+H6 adds shared local-session epoch invalidation and splits Verification adapter,
+facade and store, retiring the last mixed-ownership allowance. Read the
+[denial-scope receipt](docs/development/harness-rules.md#h6-shared-session-receipt)
+before changing session or capability handling.
 
 ## M05-PR2 failure propagation
 

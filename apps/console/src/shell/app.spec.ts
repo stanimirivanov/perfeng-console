@@ -1,8 +1,10 @@
+import { provideSessionBoundary } from '../session/session.providers';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { provideVerificationAccess } from '../verification/providers';
 import { App } from './app';
 
+beforeEach(() => TestBed.configureTestingModule({ providers: [provideSessionBoundary()] }));
 afterEach(() => { TestBed.resetTestingModule(); vi.unstubAllGlobals(); });
 
 it('pairing clears the code, focuses main, denies Verification and logout returns to pairing', async () => {

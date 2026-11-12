@@ -1,3 +1,4 @@
+import { provideSessionBoundary } from './session.providers';
 import { Component, inject, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { provideSession } from './session.providers';
@@ -8,6 +9,7 @@ const refresh = vi.fn(async () => false);
 @Component({ template: '', providers: [...provideSession(),
   { provide: VERIFICATION_ACCESS, useValue: { granted: signal(false), refresh } }] })
 class Host { readonly ui = inject(SESSION_UI); }
+beforeEach(() => TestBed.configureTestingModule({ providers: [provideSessionBoundary()] }));
 afterEach(() => { TestBed.resetTestingModule(); vi.unstubAllGlobals(); vi.clearAllMocks(); });
 it('disposing the Angular session scope aborts pairing and refuses a late grant', async () => {
   let signal: AbortSignal | null | undefined;

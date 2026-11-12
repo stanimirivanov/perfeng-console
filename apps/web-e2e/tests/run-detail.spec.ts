@@ -59,7 +59,7 @@ test('contract graph changes are displayed and artifact outages never become emp
   await expect(page.getByRole('heading', { name: 'Current Run' })).toHaveCount(0);
 });
 
-test('failed execution exposes its code and a lost artifact authorization clears the Run', async ({ page }) => {
+test('failed execution exposes its code and artifact session loss returns to pairing', async ({ page }) => {
   let denied = false;
   await page.route('**/console/api/runs/' + id, route => route.fulfill({ json: { ...detail(3), value: { ...detail(3).value, state: 'TEST_FAILURE', failureCode: 'TOOL_ERROR' } } }));
   await page.route('**/console/api/runs/' + id + '/artifacts', route => denied
@@ -72,6 +72,7 @@ test('failed execution exposes its code and a lost artifact authorization clears
   await expect(page.getByText('a'.repeat(64), { exact: true })).toHaveCount(0);
   denied = true;
   await page.getByRole('button', { name: 'Refresh Run detail' }).click();
-  await expect(page.getByRole('status')).toContainText('unavailable');
+  await expect(page.getByRole('heading', { name: 'Pair local console' })).toBeVisible();
+  await expect(page.getByRole('navigation', { name: 'Workspace' })).toHaveCount(0);
   await expect(page.getByRole('heading', { name: 'Current Run' })).toHaveCount(0);
 });

@@ -145,9 +145,14 @@ Feature reader contracts stay separate from UI contracts. Cross-feature private
 imports and provider wiring outside component metadata are mechanically rejected.
 See the [H5 receipt](harness-rules.md#h5-runtime-boundary-receipt).
 
-This remains the local paired slice. Shared session/capability revocation, general
-polling and mutation uncertainty still require their owning scopes; the frozen
-Verification adapter allowance remains until H6. No provider authority moves here.
+This remains the local paired slice. H6 adds an application-scoped epoch SignalStore
+through a public invalidation port; component-scoped session and Run owners remain.
+The epoch coordinator has no credential or presentation cache. Session loss/replacement
+invalidates both feature observations and Verification capability work before late
+responses can publish. Scoped denials do not log out the operator. Verification now
+has separate adapter, integration and store, with no frozen allowance. General
+polling, upstream-health/provider epochs, cross-tab coordination and mutation
+uncertainty remain out of scope. See the [H6 receipt](harness-rules.md#h6-shared-session-receipt).
 
 The BFF uses the generated `#perfeng/run-transitions` entry to project pinned
 topology. The browser consumes it as DTO data, without fetching schemas or

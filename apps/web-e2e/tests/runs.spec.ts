@@ -125,3 +125,44 @@ test('hidden evidence stays cleared on resume until an explicit fresh lookup', a
   await page.getByLabel('Run ID').press('Enter');
   await expect(page.getByRole('heading', { name: 'Current Run' })).toBeFocused();
 });
+
+test('a local-session denial clears the shell and cannot be undone by a late capability grant', async ({ page }) => {
+  const grant = deferred();
+  let requested!: () => void;
+  const capabilityRequested = new Promise<void>(resolve => { requested = resolve; });
+  await page.route('**/console/api/verification/access', async route => {
+    requested(); await grant.promise; await route.fulfill({ status: 204 });
+  });
+  await page.route(path, route => route.fulfill({ status: 401 }));
+  await page.goto('/');
+  await capabilityRequested;
+  await page.getByLabel('Run ID').fill(id);
+  await page.getByLabel('Run ID').press('Enter');
+  await expect(page.getByRole('heading', { name: 'Pair local console' })).toBeVisible();
+  grant.resolve();
+  await expect(page.getByRole('navigation', { name: 'Workspace' })).toHaveCount(0);
+  await expect(page.getByRole('heading', { name: 'Current Run' })).toHaveCount(0);
+});
+
+for (const status of [403, 404]) {
+  test('scoped Run denial ' + status + ' clears evidence without global logout', async ({ page }) => {
+    await page.route('**/console/api/verification/access', route => route.fulfill({ status: 204 }));
+    await page.route(path, route => route.fulfill({ status }));
+    await page.goto('/');
+    await page.getByLabel('Run ID').fill(id);
+    await page.getByLabel('Run ID').press('Enter');
+    await expect(page.getByRole('heading', { name: 'Current Run' })).toHaveCount(0);
+    await expect(page.getByRole('heading', { name: 'Perfeng Console' })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Verification' })).toBeVisible();
+  });
+}
+
+test('artifact local-session denial also returns to pairing', async ({ page }) => {
+  await page.route(path, route => route.fulfill({ json: observation(1) }));
+  await page.route(path + '/artifacts', route => route.fulfill({ status: 401 }));
+  await page.goto('/');
+  await page.getByLabel('Run ID').fill(id);
+  await page.getByLabel('Run ID').press('Enter');
+  await expect(page.getByRole('heading', { name: 'Pair local console' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Current Run' })).toHaveCount(0);
+});

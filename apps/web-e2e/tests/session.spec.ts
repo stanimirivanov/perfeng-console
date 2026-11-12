@@ -119,7 +119,8 @@ test('loopback HTTPS pairing is keyboard usable and session boundaries fail clos
       now += 899_999;
       expect((await context.request.get(base)).status()).toBe(403);
       now += 1;
-      await page.reload();
+      await runId.fill(example.id);
+      await runId.press('Enter');
       await expect(page.getByRole('heading', { name: 'Pair local console' })).toBeVisible();
       await expect(page.getByRole('navigation', { name: 'Workspace' })).toHaveCount(0);
     } finally {

@@ -1,7 +1,6 @@
-import { existsSync, readdirSync, readFileSync } from 'node:fs';
+import { existsSync, readdirSync } from 'node:fs';
 import { resolve, relative, join } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { createHash } from 'node:crypto';
 import ts from 'typescript';
 import { inspectImports } from './boundaries.ts';
 import { featureImportAllowed, componentProviders } from './angular-features.ts';
@@ -27,7 +26,12 @@ export const roles: Readonly<Record<string, Role>> = {
   'apps/console/src/session/session.facade.ts': 'integration',
   'apps/console/src/session/session.store.ts': 'store',
   'apps/console/src/verification/lab.ts': 'component',
-  'apps/console/src/verification/access.ts': 'adapter',
+  'apps/console/src/verification/access.ts': 'integration',
+  'apps/console/src/verification/access-client.ts': 'adapter',
+  'apps/console/src/verification/access-reader.port.ts': 'port',
+  'apps/console/src/verification/access.store.ts': 'store',
+  'apps/console/src/session/session-boundary.port.ts': 'port',
+  'apps/console/src/session/session-boundary.store.ts': 'store',
   'src/bff/config.ts': 'adapter',
   'src/bff/csp.ts': 'adapter',
   'src/bff/session.ts': 'adapter',
@@ -43,10 +47,6 @@ export const roles: Readonly<Record<string, Role>> = {
   'src/bff/transport.ts': 'composition',
   'src/bff/run-reader.ts': 'adapter',
   'src/bff/transport-result.ts': 'port',
-};
-// Issue #33: freeze existing mixed ownership until its migration, never copy it.
-const legacyHashes: Readonly<Record<string, string>> = {
-  'apps/console/src/verification/access.ts': '124a443f1e5680bf84769e491ff37cda77ebacf75fdab16e1ec3757e9f993008'
 };
 const edges: Record<Role, readonly Role[]> = {
   component: ['component', 'store', 'port', 'presentation', 'contract'],
@@ -104,11 +104,6 @@ export function checkOwnership(root: string, registry: Readonly<Record<string, R
             !(ts.isExportDeclaration(statement) && statement.isTypeOnly))
           report(statement, 'OWN-04', 'Shared contracts contain only type declarations and type-only imports/exports.');
       }
-    }
-    // A hash-bound legacy allowance cannot grow while production code is held unchanged.
-    const legacy = registry === roles && Object.hasOwn(legacyHashes, name);
-    if (legacy && createHash('sha256').update(readFileSync(file)).digest('hex') !== legacyHashes[name]) {
-      report(source, 'OWN-01', 'Issue #33 legacy source changed; remove the allowance with its ownership migration.');
     }
     const providerBindings = new Set<ts.Symbol>();
     inspectImports(source, (node, specifier) => {
@@ -201,7 +196,7 @@ export function checkOwnership(root: string, registry: Readonly<Record<string, R
             report(decorator, 'OWN-01', 'A component or directive requires the component role; it cannot inherit runtime, adapter or store authority.');
         }
       }
-      if (!legacy && role !== 'adapter' && ts.isBindingElement(node) && node.propertyName &&
+      if (role !== 'adapter' && ts.isBindingElement(node) && node.propertyName &&
           ts.isComputedPropertyName(node.propertyName) && ts.isStringLiteralLike(node.propertyName.expression) &&
           ioNames.has(node.propertyName.expression.text))
         report(node, 'OWN-03', 'Computed binding cannot move I/O or native scheduling out of an admitted adapter.');
@@ -210,14 +205,14 @@ export function checkOwnership(root: string, registry: Readonly<Record<string, R
         // Imported aliases retain the original member even without installed fixture packages.
         const declaration = symbol?.declarations?.find(ts.isImportSpecifier);
         const original = declaration ? (declaration.propertyName ?? declaration.name).text : node.text;
-        if (!legacy && ioNames.has(original) && role !== 'adapter' && !(original === 'AbortSignal' && ts.isTypeReferenceNode(node.parent))) report(node, 'OWN-03', 'I/O, native abort and scheduling belong in an admitted adapter; use Angular render hooks for rendering.');
+        if (ioNames.has(original) && role !== 'adapter' && !(original === 'AbortSignal' && ts.isTypeReferenceNode(node.parent))) report(node, 'OWN-03', 'I/O, native abort and scheduling belong in an admitted adapter; use Angular render hooks for rendering.');
         if (original === 'ManagedRuntime' && !canExecute) report(node, 'OWN-02', 'Managed runtime creation belongs at registered composition/integration boundaries.');
         if (runtimes.has(original) && !canExecute) report(node, 'OWN-02', 'Execute Effects only at registered composition/integration boundaries.');
       }
       if (ts.isElementAccessExpression(node)) {
         const member = node.argumentExpression;
         if (ts.isStringLiteralLike(member)) {
-          if (!legacy && ioNames.has(member.text) && role !== 'adapter') report(node, 'OWN-03', 'Indirect I/O and native scheduling must stay in an admitted adapter.');
+          if (ioNames.has(member.text) && role !== 'adapter') report(node, 'OWN-03', 'Indirect I/O and native scheduling must stay in an admitted adapter.');
           if (runtimes.has(member.text) && !canExecute) report(node, 'OWN-02', 'Indirect runtime execution is forbidden here.');
         } else if (/^(window|globalThis|self|scheduler|Effect|ManagedRuntime|Runtime)$/.test(authority(node.expression))) report(node, 'OWN-03', 'Computed authority is not reviewable.');
       }

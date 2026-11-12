@@ -11,7 +11,7 @@ export function lookupRun(id: string) {
     });
     if (response.status === 400) return { message: 'Enter a valid exact Run ID.' };
     if (response.status === 404) return { message: 'Run not found in this operator scope.' };
-    if (response.status === 401) return { message: 'Session expired. Reload to pair again.' };
+    if (response.status === 401) return { message: 'Session expired. Pair the console again.', sessionDenied: true };
     if (!response.ok) throw new Error('Lookup unavailable');
     const body: unknown = await response.json();
     if (!body || typeof body !== 'object' || !('value' in body) || !('validForMs' in body) ||
@@ -32,6 +32,7 @@ export function lookupRun(id: string) {
       !Array.isArray(edges) || edges.some(edge => typeof edge !== 'string' || !Object.hasOwn(transitions, edge))))
       throw new Error('Invalid transition graph');
     const artifacts = await artifactClaims(id, signal);
+    if (artifacts.sessionDenied) return { message: 'Session expired. Pair the console again.', sessionDenied: true };
     if (artifacts.denied) throw new Error('Observation scope lost');
     return { observation: { value: { id, state: value.state, revision: value.revision, updatedAt: value.updatedAt,
       createdAt: value.createdAt, finishedAt: value.finishedAt, failureCode: value.failureCode,
@@ -39,13 +40,14 @@ export function lookupRun(id: string) {
   }).pipe(Effect.timeout(3000), Effect.catch(() => Effect.succeed({ message: 'Run lookup unavailable. Try again when connected.' })));
 }
 
-async function artifactClaims(id: string, signal: AbortSignal): Promise<{ value: ArtifactObservation; validForMs: number; denied?: boolean }> {
+async function artifactClaims(id: string, signal: AbortSignal): Promise<{ value: ArtifactObservation; validForMs: number; denied?: boolean; sessionDenied?: true }> {
   let denied = false;
   try {
     const response = await fetch('/console/api/runs/' + encodeURIComponent(id) + '/artifacts', {
       signal, credentials: 'same-origin', cache: 'no-store', redirect: 'error', headers: { 'X-Perfeng-CSRF': 'read' },
     });
-    denied = response.status === 401 || response.status === 403 || response.status === 404;
+    if (response.status === 401) return { value: { status: 'unavailable' }, validForMs: 10_000, sessionDenied: true };
+    denied = response.status === 403 || response.status === 404;
     if (!response.ok) throw new Error('Artifacts unavailable');
     const body: unknown = await response.json();
     if (!body || typeof body !== 'object' || !('validForMs' in body) || typeof body.validForMs !== 'number' ||
