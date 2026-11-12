@@ -109,6 +109,13 @@ The hook uses the checkout's installed development tools. Rebootstrap after a lo
 
 A typical diagnostic reads `src/browser/view.ts:1 [layer] browser cannot import bff`. Locate the credential or upstream operation in the BFF and consume its safe view model through the local protocol. Run `make architecture`, then `make verify`. For a type failure fix the schema/type boundary and rerun `make typecheck`. For a behavior failure preserve the reproduction and rerun `make test`. Capture the failing rule and the results of the corrected run in the PR.
 
+H8 diagnostics include source/rule, a corrective next step, the targeted rerun and
+a guide. Source-path/specifier control characters are escaped into a single log
+line; alias config failures omit raw values/parser snippets and distribution errors
+never print matched secret bytes. Fix the source ownership, not the sensor threshold.
+`make check-imports` also checks the reviewed alias table in docs/IMPORTS.md; it does
+not automatically authorize or rewrite new public surfaces.
+
 The architecture sensor checks static module syntax, including exports, type references and literal dynamic imports. It cannot prove runtime secrecy, detect every form of global access or establish exactly-once external effects. Those properties require process isolation, negative integration tests, credential canaries and human review. The scenario restrictions are product obligations until implemented and tested.
 
 ## Dependency review
@@ -226,6 +233,9 @@ contracts-check rejects orphan modules, missing outputs, symlinks and stale byte
 Explicit regeneration refuses edited previous output and unowned files, then
 removes unchanged retired outputs. A local exclusive lock prevents concurrent
 writers; interruption or a failed check requires review rather than forced cleanup.
+Read [generation lock recovery](docs/development/generation-locks.md) before any
+manual recovery. A collision never authorizes automatic lock removal, output
+overwrite or regeneration just to get green.
 This guard does not activate the blocked Effect candidate or retire Ajv.
 
 ## Fixed-origin upstream transport

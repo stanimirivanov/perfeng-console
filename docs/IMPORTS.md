@@ -27,8 +27,10 @@ this specific rule.
 ## Reviewed aliases
 
 This is the single durable alias table. `harness/imports.ts` owns the executable
-map and checks Node/compiler parity; it does not yet check this Markdown table
-(see H8 in the [enforcement index](development/harness-rules.md#remaining-hardening)).
+map. `make check-imports` checks this table against that map before dependency-graph
+inspection, in addition to Node/compiler parity. Missing, extra, duplicate, malformed
+or retargeted entries fail. Keep Alias and Target cells code-formatted; an optional
+parenthesized note may follow the target. Code review still governs permission changes.
 
 | Alias | Target |
 |---|---|

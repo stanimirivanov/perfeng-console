@@ -39,7 +39,7 @@ These scopes are distinct; a check passing in one row does not extend another.
 | workspace.ts | apps/console/src; .ts (including specs); rejects alternate executable JS/TS formats at every depth | Browser package/local-import and inline-template/theme resource policy; source symlinks refused | Unsupported formats do not gain admission from an installed parser or a spec-like filename |
 | ownership.ts | tools plus apps/console/src; src/browser,bff,presentation,shared; executable .ts/.tsx/.mts/.cts/.js/.jsx/.mjs/.cjs candidates | Exact role registry, role edges, runtime execution and selected I/O names; exact tools module/member/native admission; unsupported formats rejected after registration | .spec.ts excluded outside tools; no scenarios/simulator/generated role scan; tools qualification and user-guide are separate owners; reserved scheduling names are checked; reflective JS and arbitrary resource cleanup are not proven safe |
 | project-imports.ts / public-boundaries ESLint | apps,src,tools,tests,harness,scripts; JS/TS variants plus CSS/SCSS resources in CLI | Owner-relative edges, exact aliases, literal/type/lazy imports, symlinks, narrow qualification exceptions | node_modules omitted; generated directory names are not exclusions; no runtime-lifetime proof |
-| check-imports.ts / dependency-cruiser | Same six roots; resolved runtime/type graph | Alias parity, unresolved product imports, module/owner cross-owner cycles, presentation isolation | Does not follow installed dependencies; optional qualification outputs are outside unresolved-product gate |
+| check-imports.ts / dependency-cruiser | Same six roots; resolved runtime/type graph | Node/compiler/document alias parity, unresolved product imports, module/owner cross-owner cycles, presentation isolation | Does not follow installed dependencies; optional qualification outputs are outside unresolved-product gate |
 | assets.ts | Reviewed Angular build inputs and emitted browser distribution | Local Material resource admission, known secret/fixture/execution markers, distribution symlink refusal | Known-marker regression check, not general secret detection; binary robustness work remains H9 |
 | product-release.ts | Exact server source/dependency closure | Reviewed bundle inputs, built-ins, type-only shared DTO use, external dependency closure | Not a compiler/role registry for all tools; installed isolation requires its separate target |
 
@@ -165,7 +165,8 @@ example, executable proof, corrective guide and remaining judgment.
 The approved H1–H10 remediation identifiers are not M05 PR numbers. H1 changes
 only guides and review process. H2 adds compiler coverage and H3 adds the
 format/scheduling rules described above. H4 extracted the existing Angular code and H5 now enforces runtime boundaries.
-H6 implements the local session boundary; H7 adds the tools scope below. H8–H10 remain pending and are not admissions.
+H6 implements the local session boundary, H7 tools ownership and H8 actionable/safe
+diagnostics and alias-document parity. H9/H10 remain pending and are not admissions.
 
 | Task | Remaining scope |
 |---|---|
@@ -175,7 +176,7 @@ H6 implements the local session boundary; H7 adds the tools scope below. H8–H1
 | H5 | Implemented in [issue #57](https://github.com/stanimirivanov/perfeng-console/issues/57): scoped integrations, readonly component ports, decorator rejection and H4 fence/exception retirement |
 | H6 | Implemented in [issue #59](https://github.com/stanimirivanov/perfeng-console/issues/59): shared local-session epoch, typed denial scope and VerificationAccess allowance retirement; no general upstream-health/polling claim |
 | H7 | Implemented in [issue #61](https://github.com/stanimirivanov/perfeng-console/issues/61): incoming server/CLI/preview/public-entry roles and exact imports/native capabilities |
-| H8 | Corrective diagnostics, generation-lock guidance and automated alias-document parity |
+| H8 | Implemented in [issue #63](https://github.com/stanimirivanov/perfeng-console/issues/63): corrective/single-line diagnostics, safe lock guidance and checked alias-document parity |
 | H9 | Byte-safe distribution scanning without skipping binary files |
 | H10 | Measured CI duplication/cache improvements; release-age exception disposition; retain full staged verification by default |
 
@@ -304,6 +305,34 @@ Preview JavaScript is parsed for ownership, not typechecked by this change.
 These static checks do not prove arbitrary reflection, malicious reassignment,
 bind addresses, filesystem path safety or resource cleanup; runtime tests and
 human review remain necessary. No directory-wide platform or hash exemption exists.
+
+## H8 actionable and safe failure receipt
+
+Architecture/source diagnostics retain file/line/rule/reason and add a corrective
+Next step, exact Rerun command and Guide. Runtime, I/O, DTO, feature-entry, provider
+and tool corrections steer code to its owner; they do not suggest relabeling roles
+or broadening an allowlist. Control characters in source paths/specifiers are
+escaped rather than emitted as terminal/CI control lines. Distribution errors name
+the file and make build without printing matched secret bytes; H9 binary scanning
+remains separate. Third-party compiler/test failures keep their native diagnostics.
+
+Alias config diagnostics identify the offending file and inheritance/map issue,
+never raw config values or parser excerpts. check-imports additionally validates
+the single Alias/Target table in docs/IMPORTS.md against publicImports, rejecting
+missing/extra/duplicate/malformed/retargeted rows before running the dependency
+graph. The read-only document check does not authorize new surfaces or run inside
+config-only product-release checks; isolated packaging does not require the docs.
+
+Both read/write generation-lock collisions explain coordination and point to
+[lock recovery](generation-locks.md). No recovery automation, lock stealing or
+output overwrite is introduced; exclusive creation, preflight and acquired-lock
+cleanup remain. Tests preserve another writer's lock, ledger and output bytes and
+ensure lock contents stay out of the error. A stale-looking lock is not evidence
+that its writer is absent; uncertain recovery must stop with the checkout owner.
+
+These messages are guidance, not automated repair or proof of arbitrary log safety.
+The alias table checks semantic inventory, not prose accuracy. Existing contract
+and permission gates remain authoritative and full staged verification remains on.
 
 ## Structural sensor receipt (2026-11-07, issue #33; historical scope)
 

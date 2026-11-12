@@ -1,3 +1,4 @@
+import { diagnostic } from './diagnostics.ts';
 import { readdirSync, readFileSync } from "node:fs";
 import { resolve, relative, dirname } from "node:path";
 import ts from "typescript";
@@ -10,7 +11,7 @@ export function checkApp(root: string): string[] {
     for (const entry of readdirSync(dir, { withFileTypes: true })) {
       const file = resolve(dir, entry.name);
       if (entry.isSymbolicLink()) {
-        errors.push(file + " symlink forbidden");
+        errors.push(diagnostic(relative(root, file), 1, 'symlink', 'symlink forbidden'));
         continue;
       }
       if (entry.isDirectory()) {
@@ -19,7 +20,7 @@ export function checkApp(root: string): string[] {
       }
       if (!/\.[cm]?[jt]sx?$/.test(file)) continue;
       if (!file.endsWith('.ts')) {
-        errors.push(file + ':1 [extension] Only reviewed .ts browser source is supported; review format admission before adding executable files.');
+        errors.push(diagnostic(relative(root, file), 1, 'extension', 'Only reviewed .ts browser source is supported; review format admission before adding executable files.'));
         continue;
       }
       const text = readFileSync(file, "utf8");
@@ -31,7 +32,7 @@ export function checkApp(root: string): string[] {
       );
       const report = (node: ts.Node, rule: string, reason: string) => {
         const line = tree.getLineAndCharacterOfPosition(node.getStart(tree)).line + 1;
-        errors.push(file + ":" + line + " [" + rule + "] " + reason);
+        errors.push(diagnostic(relative(root, file), line, rule, reason));
       };
       // The scaffold uses inline templates and one reviewed global Material theme.
       const checkResources = (node: ts.Node) => {

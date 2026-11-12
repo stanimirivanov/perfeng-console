@@ -1,3 +1,4 @@
+import { diagnostic } from './diagnostics.ts';
 import { readdirSync, lstatSync } from 'node:fs';
 import { resolve, relative, join } from 'node:path';
 import { pathToFileURL } from 'node:url';
@@ -78,10 +79,10 @@ export function checkOwnership(root: string, registry: Readonly<Record<string, R
   const walk = (dir: string) => {
     const info = lstatSync(dir, { throwIfNoEntry: false });
     if (!info) return;
-    if (info.isSymbolicLink()) { errors.push(`${dir} [OWN-01] Symlinks cannot change ownership.`); return; }
+    if (info.isSymbolicLink()) { errors.push(diagnostic(relative(root, dir), 1, 'OWN-01', 'Symlinks cannot change ownership.')); return; }
     for (const entry of readdirSync(dir, { withFileTypes: true })) {
       const file = join(dir, entry.name);
-      if (entry.isSymbolicLink()) { errors.push(`${file} [OWN-01] Symlinks cannot change ownership.`); continue; }
+      if (entry.isSymbolicLink()) { errors.push(diagnostic(relative(root, file), 1, 'OWN-01', 'Symlinks cannot change ownership.')); continue; }
       if (entry.isDirectory() && !separateToolOwner(relative(root, file))) walk(file);
       else if (/\.(?:[cm]?[jt]sx?)$/.test(file) && (!file.endsWith('.spec.ts') || relative(root, file).startsWith('tools/'))) files.push(file);
     }
@@ -94,11 +95,11 @@ export function checkOwnership(root: string, registry: Readonly<Record<string, R
   for (const file of files) {
     const name = relative(root, file);
     const role = registry[name];
-    if (!role) { errors.push(`${name}:1 [OWN-01] Register this executable module's role.`); continue; }
-    if (!file.endsWith('.ts') && name !== 'tools/preview.mjs') { errors.push(`${name}:1 [OWN-01] Only reviewed TypeScript source is supported.`); continue; }
+    if (!role) { errors.push(diagnostic(name, 1, 'OWN-01', "Register this executable module's role.")); continue; }
+    if (!file.endsWith('.ts') && name !== 'tools/preview.mjs') { errors.push(diagnostic(name, 1, 'OWN-01', 'Only reviewed TypeScript source is supported.')); continue; }
     const source = program.getSourceFile(file)!;
     const report = (node: ts.Node, rule: string, reason: string) => {
-      errors.push(`${name}:${source.getLineAndCharacterOfPosition(node.getStart(source)).line + 1} [${rule}] ${reason}`);
+      errors.push(diagnostic(name, source.getLineAndCharacterOfPosition(node.getStart(source)).line + 1, rule, reason));
     };
     if (role === 'entry' && source.statements.some(statement => !ts.isExportDeclaration(statement) || !statement.moduleSpecifier || !statement.exportClause || !ts.isNamedExports(statement.exportClause)))
       report(source, 'OWN-01', 'Public entries contain only explicit named re-exports.');
