@@ -12,8 +12,9 @@ Root tooling and tests are not Angular projects; their internal relatives remain
 
 Browser → shared DTO types only → same-origin BFF → generated public provider
 contracts and qualified server adapters. Shared contracts contain type declarations
-and type-only exports. Presentation owns pure transformations and may use generated
-provider types; other owners cannot import presentation internals. Scientific verdicts
+and type-only exports. The BFF owns safe provider-to-DTO projection, including removal of private
+messages and storage locations. Presentation owns pure display formatting and may
+use generated provider types; other owners cannot import presentation internals. Scientific verdicts
 remain provider-owned. Simulator/evaluator authority stays outside browser/BFF.
 
 A public alias does not grant runtime authority. Existing boundaries.ts and
@@ -24,6 +25,10 @@ entry modules, are rejected. Same-owner cycles are not addressed by
 this specific rule.
 
 ## Reviewed aliases
+
+This is the single durable alias table. `harness/imports.ts` owns the executable
+map and checks Node/compiler parity; it does not yet check this Markdown table
+(see H8 in the [enforcement index](development/harness-rules.md#remaining-hardening)).
 
 | Alias | Target |
 |---|---|

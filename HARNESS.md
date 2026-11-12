@@ -1,6 +1,10 @@
 # Working with the console harness
 
-Start at [AGENTS.md](AGENTS.md). Read the one task and layer guide that own the change. The planning baseline contains the license and two M05 planning documents. This bootstrap introduces strict TypeScript, native Node ESM, pnpm, ESLint, the TypeScript compiler and Node's test runner for the harness. Product libraries enter through the M05 dependency review. Layer directories currently contain guides.
+Start at [AGENTS.md](AGENTS.md), then read the task and owning layer guide.
+This map covers the current Angular Console, BFF, independently released verifier
+boundaries and verification commands. Use the [harness-rule index](docs/development/harness-rules.md)
+for scanner coverage, active admission and remaining hardening; executable policy
+is authoritative for enforcement. Historical receipts below retain their scope/date.
 
 ## Repository map
 
@@ -25,7 +29,9 @@ tsconfig.json                strict compiler checks
 .node-version                pinned Node runtime
 package.json, pnpm-lock.yaml exact tooling and dependency integrity
 .githooks/pre-commit         opt-in staged snapshot check
-.github/workflows/harness.yml  pull request and main verification
+.github/workflows/quality.yml  aggregate, browser/isolation and audit jobs
+.github/workflows/user-guide.yml  guide artifact from tagged journeys
+.github/pull_request_template.md  evidence, semantic review and rollback
 ```
 
 ## Application ownership specification
@@ -33,26 +39,42 @@ package.json, pnpm-lock.yaml exact tooling and dependency integrity
 Read [runtime and state ownership](docs/development/runtime-ownership.md) for the
 Angular/SignalStore/Effect split and [harness rules](docs/development/harness-rules.md)
 for required proof. Structural ownership sensors now run in make architecture; the rule specification records remaining behavioral and production-admission gaps.
-The following layer matrix describes the existing coarse policy; it does not admit
-production Effect adapters or replace the finer ownership requirements.
+The coarse `src` layer policy is not the Angular app admission policy. The
+following map describes effective public boundaries, not permission to import every
+module in a listed layer. Use the [canonical alias table](docs/IMPORTS.md#reviewed-aliases)
+and exact role/package policies for concrete edges.
 
 ## Ownership and allowed edges
 
-Within-layer imports are allowed. The matrix lists cross-layer dependencies. External packages and Node built-ins require an exact entry in the executable policy. Keep package admission and permission to import that package separate in review.
+Within-owner relative imports still obey the role policy. External packages and
+Node built-ins require exact executable-policy admission. Installing or admitting
+a package does not permit every module to import it.
 
-| Owner | Owns | May import |
+| Owner | Owns | Effective boundary |
 |---|---|---|
-| browser | Render state, accessible intents, same-origin BFF calls | presentation, shared, generated |
-| bff | Server session, fixed-origin calls, safe errors | presentation, shared, generated |
-| presentation | Pure display models | generated |
-| shared | Browser–BFF DTOs | none |
-| generated | Vendored-contract bindings | own layer |
-| scenarios | Frozen expectations and independent comparisons | generated |
-| simulator | Journal, approval, public-API driver, offline analysis adapter | scenarios, generated |
+| apps/console | Angular rendering and narrow admitted browser reads/state | Local reviewed roles/packages and shared DTOs through declaration-level import type; no provider runtime or runner |
+| src/browser | Reserved browser layer | No permission to bypass the narrower shared-DTO boundary or app admission |
+| bff | Session, qualified fixed-origin reads, safe DTO projection | Reviewed shared/generated inputs; exact adapter/package admission |
+| presentation | Pure display formatting | Own modules/generated types; external consumers are currently forbidden by the graph gate |
+| shared/contracts | Data-only browser–BFF DTOs | Type declarations and type-only imports/exports |
+| generated | Offline bindings and validators | Compiler-owned inventory; schema/consumer package exceptions are separately scoped |
+| scenarios | Frozen expectations and independent comparisons | Own layer/generated contracts; no runner authority |
+| simulator | Journal, approved driver and analysis adapter | Scenarios/generated contracts; no authority in browser/BFF |
 
-Public Perfeng contracts belong to perfeng-contracts. The control plane owns platform state and authorization. Environment owns disposable fault injection. Use a fixed local protocol between BFF and simulator. Exception requests change the policy and a negative test together and identify the new authority granted.
+Public Perfeng contracts belong to perfeng-contracts. The control plane owns
+platform state and authorization. Environment owns disposable fault injection.
+Any future BFF–simulator integration requires its reviewed local protocol; it is
+not implemented or admitted by this map. Exception requests change the policy and
+a negative test together and identify the new authority granted.
 
-Write native ESM with explicit file extensions. Use PascalCase for types, camelCase for functions and kebab-case for new module filenames. Keep state and side effects with their owner. Type untrusted data at its parsing boundary. Prefer a narrow function to a forwarding class. Keep focused tests beside their architectural concern under tests/. Naming and clarity are review criteria.
+Use native Node ESM with explicit file extensions for Node-executed source.
+Angular bundler code currently uses extensionless within-owner imports; preserve
+that convention rather than changing resolution globally. Cross-owner imports use
+reviewed aliases. Use PascalCase for types, camelCase for functions and kebab-case
+for modules. Keep state and side effects with their owner and parse untrusted data
+at its boundary. Colocate Angular `.spec.ts` files with their feature; Node harness
+and integration tests live under `tests/`. Follow the
+[rationale-comment policy](CONTRIBUTING.md#rationale-comments-and-review).
 
 ## Sensors and failure handling
 
@@ -61,13 +83,23 @@ Write native ESM with explicit file extensions. Use PascalCase for types, camelC
 | Toolchain | `make doctor` | Node or pnpm differs from the exact pins |
 | Bootstrap | `make bootstrap` | Frozen lock/install fails. Lifecycle scripts are disabled |
 | Lint | `make lint` | ESLint error or warning, inline config suppression, forbidden TS directive, eval or focused/skipped method |
-| Types | `make typecheck` | Strict type errors across harness, tests and present product TS |
+| Types | `make typecheck` | Root Node and e2e TS programs; the production CLI coverage gap is recorded in the enforcement index |
 | Architecture | `make architecture` | Unknown source owner, unadmitted package/edge, computed import, CommonJS loader, source symlink or missing scoped guide |
 | Behavior | `make test` | A Node test fails, the suite is empty, or TAP reports any skipped or todo cases. Boundary tests exercise actual TS syntax on temporary source trees |
-| Local aggregate | `make verify` | Any offline sensor above fails after explicit bootstrap |
+| Local aggregate | `make verify` | Toolchain, offline contracts, lint/imports, types, architecture, Node tests, Angular tests/accounting and production build/distribution scan |
+| Browser | `make browser-test` | Chromium journeys or browser accounting fail |
+| Installation | `make console-isolation-check` | Product-only build, archive install or startup with verifier absent fails |
+| Stack fixture | `make stack-admission` | Pinned Material/CSP/runtime qualification fixture fails |
+| Harness faults | `make harness-self-test` | An injected fault fails to trigger its intended product/accounting gate |
+| Guide artifact | `make guide` | Tagged journey/capture/provenance fails; output stays outside Git |
 | Supply chain | `make supply-chain` | Registry audit reports high/critical vulnerability or the check cannot complete |
 | Pre-commit | `make hooks` once per checkout | Verifies the staged snapshot with the installed modules. Unstaged edits cannot mask a bad staged source |
-| Hosted CI | job `verify` in Console harness | Fresh frozen bootstrap, same aggregate and registry audit. Read-only GitHub permissions, pinned actions, ten-minute deadline |
+| Hosted CI | `quality.yml` jobs `verify`, `browser`, `supply-chain` | Frozen bootstrap; aggregate, browser/installation/stack/self-test and audit respectively; read-only contents permission and ten-minute job limits |
+
+`make verify` does not run browser, installation, stack-admission, guide or
+harness-self-test targets. Quality CI runs browser, installation, stack-admission and self-test separately; the
+[user-guide workflow](.github/workflows/user-guide.yml) publishes passing tagged journeys.
+The self-test itself invokes verify; making it a verify dependency would recurse.
 
 The hook uses the checkout's installed development tools. Rebootstrap after a lock change. CI installs the committed lock on a clean runner. A repository administrator can require the hosted job in branch rules and require human review of sensor changes. Installing the local hook does not change GitHub branch settings.
 
@@ -77,7 +109,18 @@ The architecture sensor checks static module syntax, including exports, type ref
 
 ## Dependency review
 
-The installed packages are development-only. TypeScript (Apache-2.0) supplies both strict typechecking and its AST for import inspection. ESLint, typescript-eslint and Node types (MIT) supply lint and pinned runtime declarations. Node's built-in test runner avoids another runtime dependency. Use the full graph in pnpm-lock.yaml for dependency upgrades and retain audit output. The 26.13.0 runtime and pnpm 12.16.1 pins match this console bootstrap machine. The adjacent Playwright repository has its own Node 24 policy.
+Runtime dependencies now include Angular/Material, NgRx, Effect and the qualified
+Node adapter; installed packages are not all development-only. Read the
+[dependency policy](docs/development/dependency-policy.md) and the separate
+[product release closure](harness/product-release.ts) before admitting dependencies.
+Use the exact pins and frozen lock, not sibling-repository defaults. The Node
+version is in `.node-version`, pnpm in `package.json`; their current values are
+26.13.0 and 12.16.1. TypeScript supplies compiler/AST checks; Node's test runner,
+Angular's test builder and Playwright have distinct accounting gates.
+
+Node tests use `--test-isolation=none`. Tests that mutate cwd, environment or globals
+must restore them with finally/framework teardown. This is a review obligation,
+not proof that arbitrary state leaks are mechanically detected.
 
 At bootstrap the registry reported a moderate minimatch advisory through ESLint and typescript-eslint. Their compatible ranges still select major 10. Lint processes repository-controlled patterns in the bounded verification job. Recheck upstream compatible releases on each toolchain update. The high/critical audit threshold remains active and lower-severity findings remain visible. [Advisory](https://github.com/advisories/GHSA-g3hv-75wg-m249)
 
@@ -85,7 +128,7 @@ At bootstrap the registry reported a moderate minimatch advisory through ESLint 
 
 | When | Promote guide to sensor | Required negative proof |
 |---|---|---|
-| Bootstrap, this PR | Source ownership, literal import graph, strict compiler, lint and staged/hosted gates | Forbidden browser/server edge fails with path, allowed edge passes, evaluator cannot import runner |
+| Original bootstrap receipt | Source ownership, literal import graph, strict compiler, lint and staged/hosted gates | Forbidden browser/server edge fails with path, allowed edge passes, evaluator cannot import runner |
 | M05 PR2–PR6, provider client and browser available | Real browser gate, checksum closure, offline generation parity, TLS/CSRF/session and freshness | Modified schema digest, wrong CA, stale late response and credential canary all fail |
 | M05 PR8–PR17, simulator available | Reviewed manifest admission, independent result accounting, crash journal and budget clock | Edited expectation rejected, all repetitions accounted, uncertain mutation never redispatched |
 | M05 PR29–PR41, disposable target available | Reviewed public-API fixture, target-bound fault approvals and dated acceptance receipts | Wrong target refused, outage clears live state, partial journal exported after crash |
@@ -108,8 +151,10 @@ The Angular app in apps/console owns ordinary operations and the Verification ro
 Run make stack-admission to compile the isolated pinned-stack fixture and exercise
 Material overlays in Chromium under the BFF-owned nonce renderer. CI's browser job
 runs it after the product browser suite. The fixture is outside the production entry;
-the dedicated test config discovers only its own stack.spec.ts. The root policy allows
-NgRx/Effect and TestBed only in Angular spec files until production consumers are reviewed.
+the dedicated test config discovers only its own stack.spec.ts. The Angular workspace now also admits exact production paths: NgRx in
+run-detail-store.ts; Effect in main.ts, session-client.ts and run-client.ts.
+This is not blanket package or component-runtime admission. See the
+[active boundary and debt](docs/development/harness-rules.md#current-baseline).
 See docs/development/stack-admission.md for the gate receipt and remaining obligations.
 
 ## M05-PR2 failure propagation
@@ -165,7 +210,8 @@ This guard does not activate the blocked Effect candidate or retire Ajv.
 
 ## Fixed-origin upstream transport
 
-The BFF currently exposes one typed Run read at its upstream boundary.
+The BFF supports exact Run and bound artifact-list reads at its upstream boundary.
+Artifact metadata/digests are claims; this does not qualify artifact-body transfer.
 Deployment configuration provides the approved HTTPS origin, CA file and
 bearer file. Load the files at transport construction and reconstruct the
 transport to rotate either. On Linux with procfs, use canonical absolute
@@ -176,7 +222,8 @@ by the effective service user. Keep them outside source and build output.
 The defaults cap the whole read at three seconds and one MiB. The transport
 uses explicit TLS trust, refuses redirects, and returns bounded reason codes
 for failures. The integration test uses OpenSSL and loopback HTTPS. Session
-binding and safe browser presentation belong to later slices.
+binding and safe browser presentation are implemented for the local paired
+Run-detail slice; shared identity and general session coordination remain separate.
 
 ## Effect Node transport admission (issue #33)
 

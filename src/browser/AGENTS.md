@@ -14,5 +14,9 @@ cleanup behind the same-origin adapter. Bridge Angular DI/destruction to explici
 route/session scopes; create runtimes only at registered integration boundaries.
 Reject late results by identity/epochs even after interruption. Do not add component
 HTTP, independent timers, duplicate caches or mutation retries. Production NgRx/Effect
-imports require narrow admission and behavioral proof; current spec-only allowance
-is not production approval.
+imports require narrow admission and behavioral proof. The existing
+[Run-detail admission](../../docs/development/runtime-ownership.md#run-detail-browser-admission-m05-pr22)
+permits specific production paths, not component-owned runtimes generally.
+`main.ts` still mixes components with composition authority; do not copy that
+pattern. Shared-session coordination and the frozen Verification adapter migration
+remain pending in the [enforcement index](../../docs/development/harness-rules.md#remaining-hardening).

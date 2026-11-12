@@ -8,3 +8,7 @@ Follow [runtime ownership](../../docs/development/runtime-ownership.md). Use pla
 TypeScript for deterministic formatting and mappings. Do not import Angular, NgRx,
 Effect runtime, timers or I/O. Public view models carry safe data, not runtime handles.
 Generated types and boundary validation remain authoritative.
+
+Safe provider-to-browser projection belongs to the BFF even when implemented as
+a pure function: dropping storage URIs/private failure text is a security boundary,
+not display formatting. Do not move that authority here for stylistic symmetry.
