@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
+import { mkdtempSync, mkdirSync, writeFileSync, rmSync, symlinkSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { checkOwnership, roles as productionRoles, type Role } from '#perfeng/harness/ownership';
@@ -252,4 +252,59 @@ test('provider metadata does not acquire runtime execution or native I/O', () =>
   for (const code of ["import { Effect } from 'effect'; Effect.runFork(job);", 'fetch("/");']) {
     assert.match(inspect({ [file]: code }, { [file]: 'provider' }), /OWN-02|OWN-03/);
   }
+});
+
+test('tools scan rejects unregistered deep/spec-like modules, alternate formats and symlinks', () => {
+  for (const name of ['tools/helper.ts', 'tools/nested/helper.spec.ts', 'tools/generated/helper.js', 'tools/preview-copy.mjs'])
+    assert.match(inspect({ [name]: 'export {};' }), /OWN-01/);
+  assert.match(inspect({ 'tools/helper.mts': 'export {};' }, { 'tools/helper.mts': 'adapter' }), /OWN-01.*TypeScript/);
+  const root = mkdtempSync(join(tmpdir(), 'tools-symlink-'));
+  try {
+    mkdirSync(join(root, 'tools'));
+    writeFileSync(join(root, 'outside.ts'), 'export {};');
+    symlinkSync(join(root, 'outside.ts'), join(root, 'tools/console-server.ts'));
+    assert.match(checkOwnership(root).join('\n'), /Symlinks/);
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+test('incoming listeners and CLI filesystem access use exact named platform imports', () => {
+  assert.equal(inspect({ 'tools/console-server.ts': "import { createServer as listen } from 'node:https'; new AbortController(); const server = listen({}); server.setTimeout(5000, () => {});" }), '');
+  assert.equal(inspect({ 'tools/serve-console.ts': "import { readFile as load } from 'node:fs/promises'; load('cert');" }), '');
+  assert.equal(inspect({ 'tools/preview.mjs': "import { createServer } from 'node:http'; createServer(() => {});" }), '');
+  for (const code of ["import { request as send } from 'node:https';", "import { get } from 'node:https';",
+    "import * as http from 'node:https';", "const http = await import('node:https');", "type T = import('node:https');",
+    "import { createServer } from 'https';", "import { execFile } from 'node:child_process';", 'fetch("/");',
+    'globalThis["fetch"]("/");', 'setTimeout(() => {}, 1);',
+    'const fake = {}; fake.setTimeout(5000);', 'const { fetch: send } = globalThis; send("/");',
+    'process.getBuiltinModule("https").request("/");',
+    "import { Effect as E } from 'effect'; E.runFork(job);"])
+    assert.match(inspect({ 'tools/console-server.ts': code }), /OWN-02|OWN-03|OWN-13/, code);
+  assert.match(inspect({ 'tools/serve-console.ts': "import { writeFile } from 'node:fs/promises';" }), /OWN-13/);
+  assert.match(inspect({ 'tools/preview.mjs': 'new AbortController();' }), /OWN-03/);
+});
+test('tools cannot acquire undeclared helper edges or leak a native namespace through their public entry', () => {
+  assert.match(inspect({ 'tools/console-server.ts': "import './helper.ts';", 'tools/helper.ts': 'export {};' },
+    { ...productionRoles, 'tools/helper.ts': 'adapter' }), /OWN-13/);
+  assert.match(inspect({ 'tools/public-api.ts': "export { createServer } from 'node:https';" }), /OWN-01|OWN-13/);
+  assert.match(inspect({ 'tools/console-server.ts': "import { createRunTransport } from '#perfeng/bff';" }), /OWN-13.*type/);
+  assert.equal(inspect({ 'tools/public-api.ts': "export { startConsole } from './console-server.ts';",
+    'tools/console-server.ts': 'export function startConsole() {}' }), '');
+});
+test('a symlinked tools root cannot turn an external tree into reviewed tooling', () => {
+  const root = mkdtempSync(join(tmpdir(), 'tools-root-link-'));
+  try {
+    mkdirSync(join(root, 'external'));
+    writeFileSync(join(root, 'external/console-server.ts'), 'export {};');
+    for (const directory of ['external', 'missing']) {
+      symlinkSync(join(root, directory), join(root, 'tools'), 'dir');
+      assert.match(checkOwnership(root).join('\n'), /Symlinks/);
+      rmSync(join(root, 'tools'));
+    }
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+test('tool native loaders cannot hide behind computed names or assigned process aliases', () => {
+  for (const code of ["process['getBuiltinModule']('https').request('/');",
+    "const p = process; p['binding']('tcp_wrap');",
+    "const { ['getBuiltinModule']: load } = process; load('https');",
+    'const p = process; p[method]("https");'])
+    assert.match(inspect({ 'tools/console-server.ts': code }), /OWN-03|OWN-13/, code);
 });

@@ -1,13 +1,15 @@
-import { existsSync, readdirSync } from 'node:fs';
+import { readdirSync, lstatSync } from 'node:fs';
 import { resolve, relative, join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import ts from 'typescript';
 import { inspectImports } from './boundaries.ts';
+import { toolRoles, toolImportError, separateToolOwner, toolGlobalAllowed, toolListenerTimerAllowed } from './tools-ownership.ts';
 import { featureImportAllowed, componentProviders } from './angular-features.ts';
 
 export type Role = 'component' | 'store' | 'operation' | 'port' | 'adapter' | 'composition' | 'integration' | 'presentation' | 'contract' | 'entry' | 'provider';
 // Register concrete consumers in review; a directory name never grants authority.
 export const roles: Readonly<Record<string, Role>> = {
+  ...toolRoles,
   'apps/console/src/main.ts': 'composition',
   'apps/console/src/app.config.ts': 'provider',
   'apps/console/src/runs/run-ui.ts': 'port',
@@ -67,30 +69,33 @@ const ioNames = new Set(['fetch', 'XMLHttpRequest', 'WebSocket', 'EventSource', 
   'setTimeout', 'setInterval', 'queueMicrotask', 'setImmediate', 'requestAnimationFrame', 'requestIdleCallback',
   'scheduler', 'postTask']);
 const runtimes = new Set(['runPromise', 'runPromiseExit', 'runFork', 'runSync', 'runSyncExit', 'runCallback', 'runForkWith', 'runPromiseWith']);
+const toolLoaders = new Set(['getBuiltinModule', 'binding', '_linkedBinding', 'dlopen']);
 
 /** Inspect handwritten ownership; behavioral guarantees remain integration-test duties. */
 export function checkOwnership(root: string, registry: Readonly<Record<string, Role>> = roles): string[] {
   const errors: string[] = [];
   const files: string[] = [];
   const walk = (dir: string) => {
-    if (!existsSync(dir)) return;
+    const info = lstatSync(dir, { throwIfNoEntry: false });
+    if (!info) return;
+    if (info.isSymbolicLink()) { errors.push(`${dir} [OWN-01] Symlinks cannot change ownership.`); return; }
     for (const entry of readdirSync(dir, { withFileTypes: true })) {
       const file = join(dir, entry.name);
       if (entry.isSymbolicLink()) { errors.push(`${file} [OWN-01] Symlinks cannot change ownership.`); continue; }
-      if (entry.isDirectory()) walk(file);
-      else if (/\.(?:[cm]?[jt]sx?)$/.test(file) && !file.endsWith('.spec.ts')) files.push(file);
+      if (entry.isDirectory() && !separateToolOwner(relative(root, file))) walk(file);
+      else if (/\.(?:[cm]?[jt]sx?)$/.test(file) && (!file.endsWith('.spec.ts') || relative(root, file).startsWith('tools/'))) files.push(file);
     }
   };
-  for (const dir of ['apps/console/src', 'src/browser', 'src/bff', 'src/presentation', 'src/shared']) walk(resolve(root, dir));
+  for (const dir of ['apps/console/src', 'src/browser', 'src/bff', 'src/presentation', 'src/shared', 'tools']) walk(resolve(root, dir));
   const config = ts.findConfigFile(root, ts.sys.fileExists, 'tsconfig.json');
   const options = config ? ts.parseJsonConfigFileContent(ts.readConfigFile(config, ts.sys.readFile).config, ts.sys, root).options : {};
-  const program = ts.createProgram(files, { ...options, noEmit: true });
+  const program = ts.createProgram(files, { ...options, allowJs: true, noEmit: true });
   const checker = program.getTypeChecker();
   for (const file of files) {
     const name = relative(root, file);
     const role = registry[name];
     if (!role) { errors.push(`${name}:1 [OWN-01] Register this executable module's role.`); continue; }
-    if (!file.endsWith('.ts')) { errors.push(`${name}:1 [OWN-01] Only reviewed TypeScript source is supported.`); continue; }
+    if (!file.endsWith('.ts') && name !== 'tools/preview.mjs') { errors.push(`${name}:1 [OWN-01] Only reviewed TypeScript source is supported.`); continue; }
     const source = program.getSourceFile(file)!;
     const report = (node: ts.Node, rule: string, reason: string) => {
       errors.push(`${name}:${source.getLineAndCharacterOfPosition(node.getStart(source)).line + 1} [${rule}] ${reason}`);
@@ -105,10 +110,16 @@ export function checkOwnership(root: string, registry: Readonly<Record<string, R
           report(statement, 'OWN-04', 'Shared contracts contain only type declarations and type-only imports/exports.');
       }
     }
+    const tool = name.startsWith('tools/');
+    const nativeAllowed = (member: string, node: ts.Node) => role === 'adapter' && (!tool ||
+      toolGlobalAllowed(name, member) || (member === 'setTimeout' && toolListenerTimerAllowed(name, node, checker)));
     const providerBindings = new Set<ts.Symbol>();
     inspectImports(source, (node, specifier) => {
       if (!specifier || !ts.isStringLiteralLike(specifier)) { report(node, 'OWN-01', 'Use literal imports.'); return; }
       const spec = specifier.text;
+      const toolError = tool ? toolImportError(name, node, spec) : undefined;
+      if (toolError) report(node, 'OWN-13', toolError);
+      const admittedToolImport = tool && !toolError;
       const target = ts.resolveModuleName(spec, file, options, ts.sys).resolvedModule;
       if (target && !target.isExternalLibraryImport) {
         const targetName = relative(root, target.resolvedFileName);
@@ -126,19 +137,21 @@ export function checkOwnership(root: string, registry: Readonly<Record<string, R
             else providerBindings.add(symbol);
           }
         }
-        if (role === 'entry' && targetName !== (name === 'src/bff/public-api.ts' ? 'src/bff/transport.ts' : 'src/bff/config.ts'))
+        const entryOwner = name === 'tools/public-api.ts' ? 'tools/console-server.ts' :
+          name === 'src/bff/public-api.ts' ? 'src/bff/transport.ts' : 'src/bff/config.ts';
+        if (role === 'entry' && targetName !== entryOwner)
           report(node, 'OWN-01', 'Public entry must re-export only its reviewed owner.');
         if (targetRole === 'contract' && !(ts.isImportDeclaration(node) && node.importClause?.isTypeOnly === true) &&
             !(role === 'contract' && ts.isExportDeclaration(node) && node.isTypeOnly))
           report(node, 'OWN-04', 'Consume shared contracts through declaration-level import type.');
         if (targetName.startsWith('src/generated/')) return;
-        if ((!targetRole || !edges[role].includes(targetRole)) && !providerEdge) {
+        if ((!targetRole || !edges[role].includes(targetRole)) && !providerEdge && !admittedToolImport) {
           report(node, 'OWN-01', `${role} cannot depend on ${targetRole ?? 'unregistered module'} ${targetName}. Use a port.`);
         }
       }
-      if (['node:http', 'node:https', 'http', 'https'].includes(spec)) report(node, 'OWN-03', 'Native dispatch needs explicit platform admission, not just an adapter role.');
+      if (['node:http', 'node:https', 'http', 'https'].includes(spec) && !admittedToolImport) report(node, 'OWN-03', 'Native dispatch needs explicit platform admission, not just an adapter role.');
       if ((role === 'presentation' || role === 'contract') && !spec.startsWith('.') && spec !== '#perfeng/contracts') report(node, 'OWN-04', 'Presentation and shared contracts stay framework/runtime independent.');
-      if ((spec.startsWith('node:') || spec.startsWith('effect/http') || spec.startsWith('@effect/platform-node')) && role !== 'adapter')
+      if ((spec.startsWith('node:') || spec.startsWith('effect/http') || spec.startsWith('@effect/platform-node')) && role !== 'adapter' && !admittedToolImport)
         report(node, 'OWN-03', 'Platform I/O belongs in a reviewed adapter.');
     }, report);
     const authority = (expression: ts.Expression, seen = new Set<ts.Symbol>()): string => {
@@ -196,25 +209,32 @@ export function checkOwnership(root: string, registry: Readonly<Record<string, R
             report(decorator, 'OWN-01', 'A component or directive requires the component role; it cannot inherit runtime, adapter or store authority.');
         }
       }
-      if (role !== 'adapter' && ts.isBindingElement(node) && node.propertyName &&
+      if (ts.isBindingElement(node) && node.propertyName &&
           ts.isComputedPropertyName(node.propertyName) && ts.isStringLiteralLike(node.propertyName.expression) &&
-          ioNames.has(node.propertyName.expression.text))
+          ioNames.has(node.propertyName.expression.text) && !nativeAllowed(node.propertyName.expression.text, node))
         report(node, 'OWN-03', 'Computed binding cannot move I/O or native scheduling out of an admitted adapter.');
+      if (tool && ts.isBindingElement(node) && node.propertyName && ts.isComputedPropertyName(node.propertyName) &&
+          ts.isStringLiteralLike(node.propertyName.expression) && toolLoaders.has(node.propertyName.expression.text))
+        report(node, 'OWN-13', 'Computed binding cannot move native loaders outside reviewed imports.');
       if (ts.isIdentifier(node)) {
         const symbol = checker.getSymbolAtLocation(node);
         // Imported aliases retain the original member even without installed fixture packages.
         const declaration = symbol?.declarations?.find(ts.isImportSpecifier);
+        if (tool && toolLoaders.has(node.text))
+          report(node, 'OWN-13', 'Native module loaders cannot bypass reviewed tool imports.');
         const original = declaration ? (declaration.propertyName ?? declaration.name).text : node.text;
-        if (ioNames.has(original) && role !== 'adapter' && !(original === 'AbortSignal' && ts.isTypeReferenceNode(node.parent))) report(node, 'OWN-03', 'I/O, native abort and scheduling belong in an admitted adapter; use Angular render hooks for rendering.');
+        if (ioNames.has(original) && !nativeAllowed(original, node) && !(original === 'AbortSignal' && ts.isTypeReferenceNode(node.parent))) report(node, 'OWN-03', 'I/O, native abort and scheduling belong in an admitted adapter; use Angular render hooks for rendering.');
         if (original === 'ManagedRuntime' && !canExecute) report(node, 'OWN-02', 'Managed runtime creation belongs at registered composition/integration boundaries.');
         if (runtimes.has(original) && !canExecute) report(node, 'OWN-02', 'Execute Effects only at registered composition/integration boundaries.');
       }
       if (ts.isElementAccessExpression(node)) {
         const member = node.argumentExpression;
         if (ts.isStringLiteralLike(member)) {
-          if (ioNames.has(member.text) && role !== 'adapter') report(node, 'OWN-03', 'Indirect I/O and native scheduling must stay in an admitted adapter.');
+          if (tool && toolLoaders.has(member.text)) report(node, 'OWN-13', 'Computed native loaders cannot bypass reviewed tool imports.');
+          if (ioNames.has(member.text) && !nativeAllowed(member.text, node)) report(node, 'OWN-03', 'Indirect I/O and native scheduling must stay in an admitted adapter.');
           if (runtimes.has(member.text) && !canExecute) report(node, 'OWN-02', 'Indirect runtime execution is forbidden here.');
-        } else if (/^(window|globalThis|self|scheduler|Effect|ManagedRuntime|Runtime)$/.test(authority(node.expression))) report(node, 'OWN-03', 'Computed authority is not reviewable.');
+        } else if (/^(window|globalThis|self|scheduler|Effect|ManagedRuntime|Runtime)$/.test(authority(node.expression)) ||
+            (tool && /^(?:(?:globalThis|global)\.)?process$|^global$/.test(authority(node.expression)))) report(node, 'OWN-03', 'Computed authority is not reviewable.');
       }
       if (ts.isImportDeclaration(node) && node.moduleSpecifier && ts.isStringLiteral(node.moduleSpecifier) &&
         /effect\/(ManagedRuntime|Runtime)$/.test(node.moduleSpecifier.text) && !canExecute) report(node, 'OWN-02', 'Runtime modules belong at registered composition/integration boundaries.');

@@ -56,6 +56,7 @@ import/cycle gate; use `pnpm check:imports` for a focused import check.
 - [Harness rule specification](docs/development/harness-rules.md)
 - [BFF ownership](src/bff/AGENTS.md)
 - [Browser ownership](src/browser/AGENTS.md)
+- [Incoming server, CLI and preview ownership](tools/AGENTS.md)
 - [Fixed-origin acceptance](HARNESS.md#fixed-origin-upstream-transport)
 
 Qualified BFF examples: [lazy reader](src/bff/run-reader.ts) and

@@ -98,6 +98,16 @@ Retain openapi-typescript and Ajv. Effect runtime adoption does not qualify an O
 generator, authorize an alternate validator or permit broader imports. Validate untrusted
 inputs/outputs at boundaries; keep trusted internal transformations pure.
 
+## Incoming tools boundary (H7)
+
+The incoming HTTPS server is a native adapter, separate from qualified upstream
+HTTP. CLI composition may read certificates and create that adapter/BFF transport;
+the preview listener remains a non-production browser fixture entry. Exact named
+module/member permissions and public entries live in harness/tools-ownership.ts.
+No generic adapter label grants upstream dispatch, filesystem writes or Effect
+execution. See [tools guidance](../../tools/AGENTS.md) and the
+[H7 receipt](harness-rules.md#h7-tools-ownership-receipt) for scan limits and gates.
+
 ## Server adapter admission
 
 Qualify the exact pinned Effect APIs and platform implementation before replacement.

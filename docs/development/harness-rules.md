@@ -37,7 +37,7 @@ These scopes are distinct; a check passing in one row does not extend another.
 |---|---|---|---|
 | boundaries.ts | src; .ts/.tsx/.d.mts; rejects other non-document/style formats except exact generated artifacts | Layer/package edges, loaders, literal imports, aliases/config inheritance, scoped-guide presence | No apps/tools scan; generated JS/manifest bytes belong to contracts-check |
 | workspace.ts | apps/console/src; .ts (including specs); rejects alternate executable JS/TS formats at every depth | Browser package/local-import and inline-template/theme resource policy; source symlinks refused | Unsupported formats do not gain admission from an installed parser or a spec-like filename |
-| ownership.ts | apps/console/src; src/browser,bff,presentation,shared; executable .ts/.tsx/.mts/.cts/.js/.jsx/.mjs/.cjs candidates | Exact role registry, role edges, runtime execution and selected I/O names; unsupported formats rejected after registration | .spec.ts excluded; no tools/scenarios/simulator/generated role scan; reserved scheduling names are checked; reflective JS and arbitrary resource cleanup are not proven safe |
+| ownership.ts | tools plus apps/console/src; src/browser,bff,presentation,shared; executable .ts/.tsx/.mts/.cts/.js/.jsx/.mjs/.cjs candidates | Exact role registry, role edges, runtime execution and selected I/O names; exact tools module/member/native admission; unsupported formats rejected after registration | .spec.ts excluded outside tools; no scenarios/simulator/generated role scan; tools qualification and user-guide are separate owners; reserved scheduling names are checked; reflective JS and arbitrary resource cleanup are not proven safe |
 | project-imports.ts / public-boundaries ESLint | apps,src,tools,tests,harness,scripts; JS/TS variants plus CSS/SCSS resources in CLI | Owner-relative edges, exact aliases, literal/type/lazy imports, symlinks, narrow qualification exceptions | node_modules omitted; generated directory names are not exclusions; no runtime-lifetime proof |
 | check-imports.ts / dependency-cruiser | Same six roots; resolved runtime/type graph | Alias parity, unresolved product imports, module/owner cross-owner cycles, presentation isolation | Does not follow installed dependencies; optional qualification outputs are outside unresolved-product gate |
 | assets.ts | Reviewed Angular build inputs and emitted browser distribution | Local Material resource admission, known secret/fixture/execution markers, distribution symlink refusal | Known-marker regression check, not general secret detection; binary robustness work remains H9 |
@@ -52,7 +52,8 @@ exact consumer. Angular AOT/strict templates are checked by build in make verify
 The compiler-inventory regression is tests/harness/compiler-coverage.test.ts.
 Injected CLI/server TS2322 probes run in the existing CI harness-self-test and
 restore their temporary source even on failure. This does not add tools runtime
-ownership, JavaScript typechecking or qualification-package admission (H7 remains).
+ownership in H2. H7 now adds the tools role/import scan below; JavaScript typechecking
+and qualification-package admission are still separate obligations.
 
 ## Native scheduling scope
 
@@ -80,7 +81,7 @@ framework internals are not scanned by these handwritten-source rules.
 The ordinary Node fixtures run under make test and make verify. No new standalone
 or optional-only gate is introduced. H3 did not activate the future component-in-composition prohibition or move
 components. H4 performed only the mechanical extraction; H5 now separates runtime execution.
-H6 adds shared revocation and retires VerificationAccess; H7 still owns tools roles.
+H6 adds shared revocation and retires VerificationAccess; H7 adds exact tools roles and native admission.
 
 ## Required sensors
 
@@ -102,6 +103,7 @@ No new Make commands are proposed; extend the existing gates.
 | OWN-10 | Contract bytes and runtime validation remain authoritative | Generated drift, invalid response accepted, Effect/generator adoption silently replaces Ajv | make contracts-check and make test; existing contract fixtures plus consumer tests |
 | OWN-11 | Feature implementations remain private; cross-feature dependencies use reviewed entries | Type-only, lazy or barrel access to another feature's private store/facade/reader | make architecture; feature-edge negative fixtures |
 | OWN-12 | Components assemble providers only through reviewed Component.providers calls | Provider function invoked in a method/field, namespace import or unreviewed factory | make architecture; metadata-scope negative fixtures |
+| OWN-13 | Exact tool import/member admission; reviewed incoming listeners and CLI composition | Native upstream request/get, namespace/lazy imports, undeclared helpers or native loaders | make architecture; tools-ownership.ts and negative fixtures |
 
 Resolve aliases/re-exports to owners, inspect literal dynamic and type-only imports,
 and reject computed module loading as today. Do not rely on filename substrings or
@@ -163,7 +165,7 @@ example, executable proof, corrective guide and remaining judgment.
 The approved H1–H10 remediation identifiers are not M05 PR numbers. H1 changes
 only guides and review process. H2 adds compiler coverage and H3 adds the
 format/scheduling rules described above. H4 extracted the existing Angular code and H5 now enforces runtime boundaries.
-H6 implements the local session boundary below. H7–H10 remain pending and are not admissions.
+H6 implements the local session boundary; H7 adds the tools scope below. H8–H10 remain pending and are not admissions.
 
 | Task | Remaining scope |
 |---|---|
@@ -172,7 +174,7 @@ H6 implements the local session boundary below. H7–H10 remain pending and are 
 | H4 | Implemented in [issue #55](https://github.com/stanimirivanov/perfeng-console/issues/55): mechanical bootstrap/shell/Run extraction with exact migration fences |
 | H5 | Implemented in [issue #57](https://github.com/stanimirivanov/perfeng-console/issues/57): scoped integrations, readonly component ports, decorator rejection and H4 fence/exception retirement |
 | H6 | Implemented in [issue #59](https://github.com/stanimirivanov/perfeng-console/issues/59): shared local-session epoch, typed denial scope and VerificationAccess allowance retirement; no general upstream-health/polling claim |
-| H7 | Exact incoming server/CLI/preview tools ownership and native-I/O admission |
+| H7 | Implemented in [issue #61](https://github.com/stanimirivanov/perfeng-console/issues/61): incoming server/CLI/preview/public-entry roles and exact imports/native capabilities |
 | H8 | Corrective diagnostics, generation-lock guidance and automated alias-document parity |
 | H9 | Byte-safe distribution scanning without skipping binary files |
 | H10 | Measured CI duplication/cache improvements; release-age exception disposition; retain full staged verification by default |
@@ -266,6 +268,42 @@ denial, scoped capability 401, retained shell after scoped denial, denied deep l
 and actual HTTPS
 session expiry during lookup. These are event-driven checks; no polling, cross-tab
 logout broadcast, SSO, upstream-health epoch or mutation reconciliation is admitted.
+
+## H7 tools ownership receipt
+
+make architecture/verify now scans tools recursively, including nested/generated
+and spec-like executable helpers. All executable candidates need an exact role;
+only .ts and the existing tools/preview.mjs are supported. File/directory/root
+symlinks, including dangling root links, fail before resolution. Qualification and
+user-guide are separately owned and explicitly excluded here; project import,
+compiler/lint and their own qualification/guide checks remain independent.
+
+harness/tools-ownership.ts registers incoming console-server as an adapter,
+serve-console as composition, preview as an adapter and public-api as an entry.
+It admits exact static named imports/exports and members, not whole Node modules.
+Incoming node:https/createServer and preview node:http/createServer never admit
+request/get. CLI admits only its existing certificate readFile, server entry and
+BFF transport factory. Incoming server consumes the BFF factory as a type only;
+its public entry exports only startConsole. New helper imports need explicit review.
+No runtime implementation or upstream authority changes in H7.
+
+Only the incoming server may construct AbortController for disconnect handling.
+Its connection setTimeout method is admitted only on a local listener initialized
+by a named node:https/createServer import, including renamed imports. This narrow
+syntactic provenance rule is not global timer admission. Tool loaders, including
+literal-computed forms and recognized process aliases, cannot bypass imports.
+Effect execution remains forbidden in the incoming/preview adapters; the BFF's
+qualified upstream transport and exact browser package admission are unchanged.
+
+Negative fixtures cover unregistered/spec-like/deep files, unsupported formats,
+symlinks, native dispatch/member aliases, namespace/lazy/type namespace imports,
+undeclared helper edges, global timers/fetch and native loader access. Existing
+production-tools compiler, release bundle closure, real HTTPS session/transport,
+Chromium preview and isolated installed CLI checks remain separate evidence.
+Preview JavaScript is parsed for ownership, not typechecked by this change.
+These static checks do not prove arbitrary reflection, malicious reassignment,
+bind addresses, filesystem path safety or resource cleanup; runtime tests and
+human review remain necessary. No directory-wide platform or hash exemption exists.
 
 ## Structural sensor receipt (2026-11-07, issue #33; historical scope)
 
