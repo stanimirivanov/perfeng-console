@@ -1,5 +1,6 @@
 import { DestroyRef, inject, Injectable, InjectionToken } from '@angular/core';
 import { Effect, Fiber } from 'effect';
+import { SESSION_BOUNDARY } from '../session/session-boundary.port';
 import { RunStore } from './run.store';
 import { readRun } from './run.operation';
 import type { RunRead } from './run-reader.port';
@@ -9,6 +10,7 @@ export const RUN_READ = new InjectionToken<RunRead>('Run reader');
 
 @Injectable()
 export class RunFacade implements RunUi {
+  private readonly boundary = inject(SESSION_BOUNDARY);
   private readonly owner = inject(DestroyRef);
   private readonly read = inject(RUN_READ);
   private readonly store = inject(RunStore);
@@ -20,7 +22,8 @@ export class RunFacade implements RunUi {
   private work?: Fiber.Fiber<void>;
   private disposed = false;
   constructor() {
-    this.owner.onDestroy(() => { this.clear(''); this.disposed = true; });
+    const unsubscribe = this.boundary.subscribe(() => this.clear('Session changed. Run evidence cleared.'));
+    this.owner.onDestroy(() => { unsubscribe(); this.clear(''); this.disposed = true; });
   }
   invalidate(reason: RunInvalidation) {
     this.clear({ input: 'Ready to look up this Run.', offline: 'Connection unavailable. Run evidence cleared.',
@@ -37,12 +40,15 @@ export class RunFacade implements RunUi {
     if (this.disposed) return;
     this.clear('Looking up Run…', true);
     if (!navigator.onLine) { this.store.setStatus('Connection unavailable. Try again when connected.'); return; }
+    const epoch = this.boundary.epoch();
     const generation = this.generation;
     const started = performance.now();
     this.work = Effect.runFork(Effect.gen({ self: this }, function* () {
       const result = yield* readRun(id, this.read, started);
-      if (this.disposed || generation !== this.generation) return;
-      if (result.kind === 'failed') { this.store.clear(); this.store.setStatus(result.message); return; }
+      if (this.disposed || generation !== this.generation || epoch !== this.boundary.epoch()) return;
+      if (result.kind === 'failed') {
+        if (result.sessionDenied) { this.boundary.invalidate(); return; }
+        this.store.clear(); this.store.setStatus(result.message); return; }
       // Recheck absolute expiry at publication; processing never extends evidence validity.
       const remaining = result.expiresAt - performance.now();
       if (remaining > 0) {

@@ -62,4 +62,5 @@ Qualified BFF examples: [lazy reader](src/bff/run-reader.ts) and
 [composition boundary](src/bff/transport.ts). The
 [Run-detail admission](docs/development/runtime-ownership.md#run-detail-browser-admission-m05-pr22)
 is narrow; [H5 runtime boundaries](docs/development/harness-rules.md#h5-runtime-boundary-receipt)
-are enforced, while shared-session coordination remains pending.
+are enforced. [H6 session invalidation](docs/development/harness-rules.md#h6-shared-session-receipt)
+coordinates local-session epochs; general polling/provider-health coordination remains pending.

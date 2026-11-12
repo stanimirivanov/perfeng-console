@@ -48,3 +48,11 @@ test("malformed preview path does not interrupt subsequent requests", async ({ r
   expect((await request.get("/%zz")).status()).toBe(400);
   expect((await request.get("/verification")).status()).toBe(200);
 });
+
+test('an unspecified capability 401 withdraws access without fabricating global logout', async ({ page }) => {
+  await page.route(access, route => route.fulfill({ status: 401 }));
+  await page.goto('/verification');
+  await expect(page.getByRole('heading', { name: 'Perfeng Console' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Scenario Lab' })).toHaveCount(0);
+  await expect(page.getByRole('link', { name: 'Verification' })).toHaveCount(0);
+});

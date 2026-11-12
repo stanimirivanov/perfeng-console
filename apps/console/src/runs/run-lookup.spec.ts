@@ -1,6 +1,8 @@
+import { provideSessionBoundary } from '../session/session.providers';
 import { TestBed } from '@angular/core/testing';
 import { ConsoleHome } from './run-lookup';
 
+beforeEach(() => TestBed.configureTestingModule({ providers: [provideSessionBoundary()] }));
 afterEach(() => { TestBed.resetTestingModule(); vi.unstubAllGlobals(); });
 
 it('route destruction aborts its pending lookup and clears the Run observation', async () => {

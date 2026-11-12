@@ -22,8 +22,13 @@ consume feature-local readonly UI ports. Their Component.providers metadata inst
 feature facades and stores; facades inject DestroyRef. Never construct stores manually
 or pass component lifetime handles through root factories. Read the feature map in
 [console guidance](../../apps/console/AGENTS.md). H5 retires H4 fences/assembly edges.
-Shared-session coordination and the frozen Verification adapter migration
-remain pending in the [enforcement index](../../docs/development/harness-rules.md#remaining-hardening).
+Use the public session epoch port for cross-feature invalidation. Pair/replacement,
+logout and authoritative local-session denial advance the epoch before clearing
+observations; capture it alongside each reader's local generation. A scoped resource
+or capability denial must not fabricate global logout. Keep presentation owners
+component-scoped; the application coordinator owns only epochs/subscriptions.
+Verification now uses a separate adapter/facade/store with no legacy exception.
+See the [H6 receipt](../../docs/development/harness-rules.md#h6-shared-session-receipt).
 
 Use reviewed `.ts` source; alternate executable JS/TS formats are rejected even
 under nested or spec-like paths. Native microtask/immediate/frame/idle/task APIs

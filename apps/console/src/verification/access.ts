@@ -1,25 +1,46 @@
-import { Injectable, signal } from "@angular/core";
+import { DestroyRef, Injectable, InjectionToken, inject } from '@angular/core';
+import { Router } from '@angular/router';
+import { Effect, Exit, Fiber } from 'effect';
+import { SESSION_BOUNDARY } from '../session/session-boundary.port';
+import { AccessStore } from './access.store';
+import type { AccessRead, AccessReply } from './access-reader.port';
+import type { VerificationAccessPort } from './access.port';
 
-// Private same-origin BFF capability probe. Only an explicit grant enables UI.
-@Injectable({ providedIn: "root" })
-export class VerificationAccess {
-  readonly granted = signal(false);
+export const ACCESS_READ = new InjectionToken<AccessRead>('Verification reader');
+@Injectable()
+export class VerificationAccess implements VerificationAccessPort {
+  private readonly store = inject(AccessStore);
+  private readonly boundary = inject(SESSION_BOUNDARY);
+  private readonly router = inject(Router);
+  private readonly read = inject(ACCESS_READ);
+  readonly granted = this.store.granted;
   private revision = 0;
-
+  private disposed = false;
+  private work?: Fiber.Fiber<AccessReply>;
+  constructor() {
+    const unsubscribe = this.boundary.subscribe(() => { this.clear(); this.leave(); });
+    inject(DestroyRef).onDestroy(() => { unsubscribe(); this.clear(); this.disposed = true; });
+  }
+  private clear() {
+    this.revision++;
+    if (this.work) Effect.runFork(Fiber.interrupt(this.work));
+    this.store.setGranted(false);
+  }
+  private leave() {
+    if (this.router.url.split(/[?#]/)[0] === '/verification') void this.router.navigateByUrl('/');
+  }
   async refresh(): Promise<boolean> {
-    const current = ++this.revision;
-    let granted = false;
-    try {
-      const response = await fetch("/console/api/verification/access", {
-        credentials: "same-origin", cache: "no-store", redirect: "error",
-        signal: AbortSignal.timeout(3000),
-      });
-      granted = response.status === 204;
-    } catch {
-      // An absent provider or an expired session grants no access.
-    }
-    if (current !== this.revision) return false;
-    this.granted.set(granted);
+    if (this.disposed) return false;
+    this.clear();
+    const revision = this.revision;
+    const epoch = this.boundary.epoch();
+    const work = Effect.runFork(this.read());
+    this.work = work;
+    const result = await Effect.runPromiseExit(Fiber.join(work));
+    if (this.disposed || revision !== this.revision || epoch !== this.boundary.epoch()) return false;
+    const granted = Exit.isSuccess(result) && result.value === 'granted';
+    this.store.setGranted(granted);
+    if (!granted) this.leave();
     return granted;
   }
 }
