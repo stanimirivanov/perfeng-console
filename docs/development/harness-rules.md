@@ -15,12 +15,13 @@ allowance. Exact package paths are admitted in transport.ts/run-reader.ts; TLS,
 raw headers, limits, identity and lifecycle have behavioral tests. The incoming
 HTTPS server in tools is a separate boundary, not an upstream transport exception.
 
-Production Angular admission is narrow: Effect in main.ts, session-client.ts and
-run-client.ts; NgRx in run-detail-store.ts. run-detail.ts renders inputs; the store
+Production Angular admission is narrow: Effect in app.ts, console-home.ts,
+session-client.ts and run-client.ts; NgRx in run-detail-store.ts. run-detail.ts renders inputs; the store
 writes Run/artifact observations and bounded session history. Existing Chromium
 fixtures cover lookup freshness, late results, reconnect and evidence claims.
-`main.ts` still declares components while registered as composition: that grants
-those components execution authority. This is debt, not an example to copy.
+`main.ts` now only bootstraps App and the routes. The mechanically extracted
+app.ts and console-home.ts retain temporary composition roles and their existing
+component-owned orchestration. These mixed roles are debt, not examples to copy.
 VerificationAccess remains a separate exact hash-bound mixed-ownership allowance.
 Neither admission proves a shared-session coordinator, general polling or mutation
 lifetimes. Those behaviors remain pending.
@@ -74,9 +75,9 @@ scheduler identifiers or resolved aliases is rejected; arbitrary reflection or
 dynamic code is not proven safe. Installed
 framework internals are not scanned by these handwritten-source rules.
 The ordinary Node fixtures run under make test and make verify. No new standalone
-or optional-only gate is introduced. H3 does not activate the future component-
-in-composition prohibition, move components, extend tools roles or retire the
-VerificationAccess allowance; H4–H7 still own those changes.
+or optional-only gate is introduced. H3 did not activate the future component-in-composition prohibition or move
+components. H4 performs only the mechanical extraction described below; H5–H7
+still own runtime separation, VerificationAccess retirement and tools roles.
 
 ## Required sensors
 
@@ -156,13 +157,15 @@ example, executable proof, corrective guide and remaining judgment.
 
 The approved H1–H10 remediation identifiers are not M05 PR numbers. H1 changes
 only guides and review process. H2 adds compiler coverage and H3 adds the
-format/scheduling rules described above. H4–H10 remain pending and are not admissions.
+format/scheduling rules described above. H4 extracts the existing Angular code;
+H5–H10 remain pending and are not admissions.
 
 | Task | Remaining scope |
 |---|---|
 | H2 | Implemented in [issue #51](https://github.com/stanimirivanov/perfeng-console/issues/51): explicit production-tool compiler coverage and injected CLI/server type-error proof |
 | H3 | Implemented in [issue #53](https://github.com/stanimirivanov/perfeng-console/issues/53): fail-closed workspace formats and native scheduling fixtures |
-| H4/H5 | Mechanical Angular extraction, then runtime integration; enforce component/composition separation only with migration |
+| H4 | Implemented in [issue #55](https://github.com/stanimirivanov/perfeng-console/issues/55): mechanical bootstrap/shell/Run extraction with exact migration fences |
+| H5 | Runtime integration and retirement of H4 mixed-role fences/assembly edges; enforce component/composition separation only with migration |
 | H6 | Shared-session denial/epoch coordination and VerificationAccess allowance retirement; scoped resource denial must not fabricate global logout |
 | H7 | Exact incoming server/CLI/preview tools ownership and native-I/O admission |
 | H8 | Corrective diagnostics, generation-lock guidance and automated alias-document parity |
@@ -173,6 +176,32 @@ The Playwright minimumReleaseAgeExclude entries name versions but lack durable
 reason/expiry records required by dependency-policy.md. H1 reports the gap; H10
 must remove unnecessary matured exclusions or obtain a real scoped approval.
 Do not invent historical authorization or silently renew them.
+
+## H4 extraction receipt
+
+`main.ts` wires bootstrap/providers; `app.routes.ts` retains the original routes,
+including guarded lazy Verification. `app.ts` owns the unchanged pairing shell;
+`console-home.ts` owns the unchanged Run lookup component. No request ordering,
+state/expiry logic, template, focus behavior or scope lifetime was redesigned.
+The new colocated specs and Chromium route-teardown characterization supplement
+the existing pairing/denial, freshness, late-result and keyboard journeys.
+
+The two mixed component files remain registered as composition and their exact
+reviewed bytes are frozen by tests/harness/angular-extraction.test.ts. Only the
+three bootstrap→App/routes and routes→ConsoleHome assembly edges are added; no
+general composition→composition permission is introduced. The fixture pair proves
+reviewed assembly passes and an unapproved composition caller still fails.
+Effect admission moves from main.ts to these two exact consumers. All I/O checks
+still apply; these fences do not use the legacy hash mechanism’s I/O bypass.
+H5 must retire both frozen-byte assertions, both mixed registrations and the exact
+assembly exceptions with its reviewed runtime migration. VerificationAccess’s
+separate existing legacy allowance remains unchanged until H6.
+
+The self-test edits exactly one heading in console-home.ts, refuses missing or
+ambiguous anchors, and verifies the changed bytes. It checks both the actual
+Angular build’s missingProperty diagnostic and make verify’s frozen-extraction
+failure, then restores the copied source in finally. Self-test output does not
+claim the hash assertion proves template correctness; these are distinct sensors.
 
 ## Structural sensor receipt (2026-11-07, issue #33; historical scope)
 

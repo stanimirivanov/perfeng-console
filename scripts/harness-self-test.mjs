@@ -39,11 +39,18 @@ try {
     }
   }
 
-  const main = join(target, "apps/console/src/main.ts");
-  const original = readFileSync(main, "utf8");
-  writeFileSync(main, original.replace("<h1>Perfeng Console", "<h1>{{ missingProperty }} Perfeng Console"));
-  run("make", ["verify"], false, /missingProperty/);
-  writeFileSync(main, original);
+  const home = join(target, "apps/console/src/console-home.ts");
+  const original = readFileSync(home, "utf8");
+  const anchor = '<h1>Perfeng Console';
+  if (original.split(anchor).length !== 2) throw Error('Template probe needs exactly one anchor; refusing a no-op or ambiguous edit.');
+  const changed = original.replace(anchor, '<h1>{{ missingProperty }} Perfeng Console');
+  try {
+    writeFileSync(home, changed);
+    if (readFileSync(home, 'utf8') !== changed || changed === original) throw Error('Template fault was not injected.');
+    // H4 freezes extraction bytes without bypassing the template compiler or ownership checks.
+    run("make", ["build"], false, /missingProperty/);
+    run("make", ["verify"], false, /H4 frozen extraction changed/);
+  } finally { writeFileSync(home, original); }
 
   const unit = join(target, "apps/console/src/verification/probe.spec.ts");
   writeFileSync(unit, 'it("harness-probe", () => { expect(1).toBe(2); });');

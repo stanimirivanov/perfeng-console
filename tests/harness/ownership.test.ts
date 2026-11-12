@@ -3,9 +3,9 @@ import assert from 'node:assert/strict';
 import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
-import { checkOwnership, type Role } from '#perfeng/harness/ownership';
+import { checkOwnership, roles as productionRoles, type Role } from '#perfeng/harness/ownership';
 
-function inspect(files: Record<string, string>, roles: Record<string, Role>) {
+function inspect(files: Record<string, string>, roles: Readonly<Record<string, Role>> = productionRoles) {
   const root = mkdtempSync(join(tmpdir(), 'ownership-'));
   try {
     for (const [file, content] of Object.entries(files)) {
@@ -187,4 +187,13 @@ test('computed scheduler authority cannot hide behind assigned or destructured a
   }
   assert.match(inspect({ [file]: 'const s = scheduler; s[method](() => {});' },
     { [file]: 'adapter' }), /Computed authority/);
+});
+
+test('H4 composition assembly is confined to the extracted bootstrap and routes', () => {
+  const app = 'apps/console/src/app.ts';
+  assert.equal(inspect({ 'apps/console/src/main.ts': "import './app.ts'; import './app.routes.ts';",
+    [app]: 'export {};', 'apps/console/src/app.routes.ts': "import './console-home.ts';",
+    'apps/console/src/console-home.ts': 'export {};' }), '');
+  assert.match(inspect({ 'apps/console/src/other.ts': "import './app.ts';", [app]: 'export {};' },
+    { 'apps/console/src/other.ts': 'composition', [app]: 'composition' }), /OWN-01.*composition/);
 });

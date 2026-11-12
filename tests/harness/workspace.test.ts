@@ -174,3 +174,17 @@ test('both source scanners refuse file and directory symlinks before following t
     }
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
+
+test('extracted shell and Run modules inherit only the moved Effect admission', () => {
+  const root = mkdtempSync(join(tmpdir(), 'extracted-effect-'));
+  try {
+    mkdirSync(join(root, 'src'));
+    for (const [name, allowed] of [['app.ts', true], ['console-home.ts', true],
+      ['main.ts', false], ['other.ts', false]] as const) {
+      const path = join(root, 'src', name);
+      writeFileSync(path, "import { Effect } from 'effect'; export const task = Effect.void;");
+      assert.equal(checkApp(root).length === 0, allowed, name);
+      rmSync(path);
+    }
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
