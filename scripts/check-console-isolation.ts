@@ -12,7 +12,7 @@ const installed = join(temporary, 'installed');
 const inputs = [
   '.node-version', 'LICENSE', 'package.json', 'pnpm-lock.yaml', 'pnpm-workspace.yaml',
   'tsconfig.paths.json', 'angular.json', 'nx.json', 'tsconfig.base.json', 'Makefile', 'apps/console',
-  'harness/imports.ts', 'harness/assets.ts', 'harness/workspace.ts', 'harness/angular-features.ts', 'harness/boundaries.ts', 'harness/product-release.ts',
+  'harness/imports.ts', 'harness/diagnostics.ts', 'harness/assets.ts', 'harness/workspace.ts', 'harness/angular-features.ts', 'harness/boundaries.ts', 'harness/product-release.ts',
   'scripts/package-console.ts', 'tools/serve-console.ts', 'tools/console-server.ts',
   'src/shared/contracts/public-api.ts', 'src/bff/public-api.ts', 'src/bff/config-public-api.ts',
   'tools/public-api.ts', 'src/bff/session.ts', 'src/bff/csp.ts', 'src/bff/runs.ts', 'src/bff/config.ts',

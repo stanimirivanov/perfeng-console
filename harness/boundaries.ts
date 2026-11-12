@@ -1,3 +1,4 @@
+import { diagnostic } from './diagnostics.ts';
 import { lstatSync, readdirSync, readFileSync } from 'node:fs';
 import { dirname, join, relative, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
@@ -27,7 +28,7 @@ function inspectFile(root: string, file: string, owner: string): string[] {
   const errors: string[] = [];
   const report = (node: ts.Node, rule: string, message: string) => {
     const { line } = source.getLineAndCharacterOfPosition(node.getStart(source));
-    errors.push(`${relative(root, file)}:${line + 1} [${rule}] ${message}`);
+    errors.push(diagnostic(relative(root, file), line + 1, rule, message));
   };
   const checkSpecifier = (node: ts.Node, specifier: ts.Node | undefined) => {
     if (!specifier || !ts.isStringLiteralLike(specifier)) {
@@ -104,7 +105,7 @@ export function scan(root: string): string[] {
   const issues: string[] = [];
   function walk(path: string) {
     if (lstatSync(path).isSymbolicLink()) {
-      issues.push(`${relative(root, path)} [symlink] Keep source inside its owned directory.`);
+      issues.push(diagnostic(relative(root, path), 1, 'symlink', 'Keep source inside its owned directory.'));
       return;
     }
     if (lstatSync(path).isDirectory()) {
@@ -113,12 +114,12 @@ export function scan(root: string): string[] {
     }
     const name = relative(join(root, 'src'), path);
     const owner = name.split('/')[0]!;
-    if (!Object.hasOwn(policy, owner)) issues.push(`src/${name} [owner] Assign an explicit layer.`);
-    else if (owner === 'generated' && name.endsWith('.css')) issues.push('src/' + name + ' [resource] Generated schemas cannot own stylesheets.');
+    if (!Object.hasOwn(policy, owner)) issues.push(diagnostic('src/' + name, 1, 'owner', 'Assign an explicit layer.'));
+    else if (owner === 'generated' && name.endsWith('.css')) issues.push(diagnostic('src/' + name, 1, 'resource', 'Generated schemas cannot own stylesheets.'));
     else if (name.endsWith('.ts') || name.endsWith('.tsx') || name.endsWith('.d.mts')) issues.push(...inspectFile(root, path, owner));
     else if (name === 'generated/validators.mjs' || name === 'generated/generated-manifest.json') {
       // Bytes are regenerated and compared by the offline contract gate.
-    } else if (!/\.(md|css)$/u.test(name)) issues.push(`src/${name} [extension] Use TypeScript or review the source format.`);
+    } else if (!/\.(md|css)$/u.test(name)) issues.push(diagnostic('src/' + name, 1, 'extension', 'Use TypeScript or review the source format.'));
   }
   walk(join(root, 'src'));
   return issues;
@@ -128,7 +129,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1]
   const errors = [...scan(process.cwd()), ...checkImportMaps(process.cwd())];
   for (const layer of Object.keys(policy)) {
     const guide = join('src', layer, 'AGENTS.md');
-    if (!lstatSync(guide, { throwIfNoEntry: false })?.isFile()) errors.push(`${guide} [guide] Restore the layer's instructions.`);
+    if (!lstatSync(guide, { throwIfNoEntry: false })?.isFile()) errors.push(diagnostic(guide, 1, 'guide', "Restore the layer's instructions."));
   }
   if (errors.length) {
     console.error(errors.join('\n'));

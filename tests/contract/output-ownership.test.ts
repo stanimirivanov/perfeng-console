@@ -69,3 +69,30 @@ test("symlinked ancestors do not authorize writes through an ordinary root direc
     assert.equal(existsSync(join(area, "actual", "generated", "new.ts")), false);
   } finally { rmSync(area, { recursive: true, force: true }); }
 });
+
+test('both lock collisions preserve output/lock bytes and explain safe recovery without leaking contents', () => {
+  const root = mkdtempSync(join(tmpdir(), 'generated-lock-guidance-'));
+  try {
+    const outputs = new Map([['existing.ts', 'unchanged']]);
+    synchronizeOutputs(root, outputs, true);
+    const ledger = readFileSync(join(root, 'generated-manifest.json'), 'utf8');
+    const canary = 'private-lock-metadata-canary';
+    writeFileSync(join(root, '.generation.lock'), canary);
+    for (const write of [false, true]) {
+      assert.throws(() => synchronizeOutputs(root, new Map([['replacement.ts', 'new']]), write), error => {
+        if (write) assert.equal((error as NodeJS.ErrnoException).code, 'EEXIST');
+        const text = String(error);
+        assert.match(text, /\[generation-lock\]/);
+        assert.match(text, /confirm no writer/i);
+        assert.match(text, /make contracts-check/);
+        assert.match(text, /docs\/development\/generation-locks.md/);
+        assert.doesNotMatch(text, new RegExp(canary + '|rm -|--force'));
+        return true;
+      });
+      assert.equal(readFileSync(join(root, '.generation.lock'), 'utf8'), canary);
+      assert.equal(readFileSync(join(root, 'existing.ts'), 'utf8'), 'unchanged');
+      assert.equal(readFileSync(join(root, 'generated-manifest.json'), 'utf8'), ledger);
+      assert.equal(existsSync(join(root, 'replacement.ts')), false);
+    }
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});

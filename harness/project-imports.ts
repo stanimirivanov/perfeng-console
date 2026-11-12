@@ -1,3 +1,4 @@
+import { diagnostic } from './diagnostics.ts';
 import { lstatSync, readdirSync, readFileSync } from 'node:fs';
 import { dirname, join, relative, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
@@ -26,7 +27,7 @@ export function inspectProjectImports(root: string, file: string, text: string):
   const errors: string[] = [];
   const report = (node: ts.Node, reason: string) => {
     const line = source.getLineAndCharacterOfPosition(node.getStart(source)).line + 1;
-    errors.push(`${importer}:${line} ${reason} See docs/IMPORTS.md.`);
+    errors.push(diagnostic(importer, line, 'public-import', reason, 'imports'));
   };
   inspectImports(source, (node, literal) => {
     if (!literal || !ts.isStringLiteralLike(literal)) {
@@ -58,13 +59,13 @@ export function scanProjectImports(root: string): string[] {
       if (name === 'node_modules') continue;
       const file = join(dir, name);
       const info = lstatSync(file);
-      if (info.isSymbolicLink()) { errors.push(`${relative(root, file)}:1 Source symlink forbidden. See docs/IMPORTS.md.`); continue; }
+      if (info.isSymbolicLink()) { errors.push(diagnostic(relative(root, file), 1, 'public-import', 'Source symlink forbidden.', 'imports')); continue; }
       if (info.isDirectory()) walk(file);
       else if (/\.(css|scss)$/.test(file)) {
         const source = readFileSync(file, 'utf8');
         const styleErrors = relative(root, file) === 'apps/console/src/styles.scss' ? checkStyles(source) :
           (/@(?:import|use|forward)|url\s*\(/i.test(source) ? ['Stylesheet dependencies require explicit asset admission.'] : []);
-        errors.push(...styleErrors.map(error => `${relative(root, file)}:1 ${error} See docs/IMPORTS.md.`));
+        errors.push(...styleErrors.map(error => diagnostic(relative(root, file), 1, 'public-import', error, 'imports')));
       }
       else if (/\.[cm]?[jt]sx?$/.test(file)) errors.push(...inspectProjectImports(root, file, readFileSync(file, 'utf8')));
     }
@@ -101,7 +102,7 @@ export function checkOwnerCycles(modules: readonly DependencyModule[]): string[]
   const active: string[] = [];
   const visit = (node: string) => {
     const index = active.indexOf(node);
-    if (index >= 0) { errors.push(`[owner-cycle] ${[...active.slice(index), node].join(' -> ')}. See docs/IMPORTS.md.`); return; }
+    if (index >= 0) { errors.push(diagnostic('.dependency-cruiser.mjs', 1, 'owner-cycle', [...active.slice(index), node].join(' -> '), 'imports')); return; }
     if (visited.has(node)) return;
     visited.add(node);
     active.push(node);

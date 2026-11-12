@@ -17,8 +17,16 @@ export function synchronizeOutputs(root: string, outputs: ReadonlyMap<string, st
   const rootInfo = lstatSync(root);
   if (!rootInfo.isDirectory() || rootInfo.isSymbolicLink() || realpathSync(root) !== resolve(root)) throw Error("Unsafe generated root.");
   let lock: number | undefined;
-  if (write) lock = openSync(join(root, lockName), "wx", 0o600);
-  else if (existsSync(join(root, lockName))) throw Error("Generation is in progress.");
+  const locked = () => Object.assign(Error('[generation-lock] Generation is in progress (EEXIST): ' + join(root, lockName) +
+    '. Wait and confirm no writer uses this checkout before coordinated recovery; never delete a live lock. ' +
+    'Then rerun make contracts-check. Guide: docs/development/generation-locks.md.'), { code: 'EEXIST' });
+  if (write) {
+    try { lock = openSync(join(root, lockName), "wx", 0o600); }
+    catch (error) {
+      if ((error as NodeJS.ErrnoException).code === 'EEXIST') throw locked();
+      throw error;
+    }
+  } else if (existsSync(join(root, lockName))) throw locked();
   try {
     const names: string[] = [];
     function inventory(dir: string) {

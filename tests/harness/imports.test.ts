@@ -67,3 +67,59 @@ test('standalone import command rejects a resolvable native alias remap before g
       error => String((error as { stderr?: string }).stderr).includes('[imports]'));
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
+
+test('reviewed alias documentation rejects semantic drift and malformed inventories', async () => {
+  const { checkAliasDocumentation } = await import('#perfeng/harness/imports');
+  const root = mkdtempSync(join(tmpdir(), 'alias-docs-'));
+  const rows = Object.entries(publicImports).map(([alias, target]) => '| `' + alias + '` | `./' + target + '` |');
+  const header = '| Alias | Target |\n|---|---|\n';
+  try {
+    mkdirSync(join(root, 'docs'));
+    const file = join(root, 'docs/IMPORTS.md');
+    writeFileSync(file, header + rows.join('\n') + '\n');
+    assert.deepEqual(checkAliasDocumentation(root), []);
+    for (const text of [header + rows.slice(1).join('\n'), header + [...rows, rows[0]].join('\n'),
+      header + rows.join('\n') + '\n| `#perfeng/extra` | `./extra.ts` |',
+      header + rows.join('\n').replace('src/shared/contracts/public-api.ts', 'src/bff/config.ts'),
+      header + rows.join('\n').replace('| `#perfeng/contracts`', '| #perfeng/contracts'),
+      '# Missing alias inventory', header + rows.join('\n') + '\n' + header + rows.join('\n')]) {
+      writeFileSync(file, text);
+      assert.match(checkAliasDocumentation(root).join('\n'), /docs\/IMPORTS.md:\d+ \[alias-document\].*make check-imports/);
+    }
+    rmSync(file);
+    assert.match(checkAliasDocumentation(root).join('\n'), /alias-document.*docs\/IMPORTS.md/);
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test('standalone import command rejects documentation drift before dependency graph execution', async () => {
+  const { execFileSync } = await import('node:child_process');
+  const { cpSync, readFileSync } = await import('node:fs');
+  const { resolve } = await import('node:path');
+  const root = mkdtempSync(join(tmpdir(), 'alias-doc-cli-'));
+  try {
+    for (const file of ['package.json', 'tsconfig.paths.json', 'tsconfig.json', 'tsconfig.base.json', 'tools/tsconfig.json',
+      'apps/console/tsconfig.app.json', 'apps/console/tsconfig.spec.json', 'apps/web-e2e/tsconfig.json', 'docs/IMPORTS.md']) {
+      mkdirSync(dirname(join(root, file)), { recursive: true }); cpSync(file, join(root, file));
+    }
+    const doc = join(root, 'docs/IMPORTS.md');
+    writeFileSync(doc, readFileSync(doc, 'utf8').replace('`./src/shared/contracts/public-api.ts`', '`./src/bff/config.ts`'));
+    assert.throws(() => execFileSync(process.execPath, [resolve('harness/check-imports.ts')], { cwd: root, stdio: ['ignore', 'pipe', 'pipe'] }), error => {
+      const stderr = String((error as { stderr?: string }).stderr);
+      assert.match(stderr, /\[alias-document\]/);
+      assert.doesNotMatch(stderr, /dependency-cruiser|ERR_MODULE_NOT_FOUND/);
+      return true;
+    });
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test('invalid alias config diagnostics name the file without echoing configuration contents', () => {
+  const root = mkdtempSync(join(tmpdir(), 'safe-alias-config-'));
+  try {
+    const canary = 'private-config-value-canary';
+    writeFileSync(join(root, 'package.json'), '{"imports": ' + canary + '}');
+    writeFileSync(join(root, 'tsconfig.paths.json'), '{}');
+    const errors = checkImportMaps(root, false);
+    assert.match(errors.join('\n'), /package.json:1 \[imports\].*make check-imports/);
+    assert.doesNotMatch(errors.join('\n'), new RegExp(canary));
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});

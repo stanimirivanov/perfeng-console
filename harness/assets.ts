@@ -1,3 +1,4 @@
+import { diagnostic } from './diagnostics.ts';
 import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 
@@ -24,23 +25,23 @@ export function checkAssets(root: string) {
         const settings = value as Record<string, unknown>;
         return ["assets", "styles", "scripts", "browser", "index"].some(key => key in settings);
       }))
-    throw Error("Review browser build inputs before extending the asset boundary.");
+    throw Error(diagnostic('angular.json', 1, 'asset', 'Review browser build inputs before extending the asset boundary.'));
   const index = readFileSync(join(root, options.index), "utf8");
   if (/<(?:script|link|style)\b/i.test(index))
-    throw Error("Browser index cannot bypass reviewed script/style inputs.");
+    throw Error(diagnostic(options.index, 1, 'asset', 'Browser index cannot bypass reviewed script/style inputs.'));
   const errors = checkStyles(readFileSync(join(root, options.styles[0]), "utf8"));
-  if (errors.length) throw Error(errors.join("\n"));
+  if (errors.length) throw Error(errors.map(reason => diagnostic(options.styles[0], 1, 'asset', reason)).join('\n'));
 }
 
 export function checkDistribution(root: string) {
   for (const entry of readdirSync(root, { withFileTypes: true })) {
     const path = join(root, entry.name);
-    if (entry.isSymbolicLink()) throw Error("Distribution symlinks forbidden.");
+    if (entry.isSymbolicLink()) throw Error(diagnostic(path, 1, 'distribution', 'Distribution symlinks forbidden.', 'distribution'));
     if (entry.isDirectory()) checkDistribution(path);
     else {
       const bytes = readFileSync(path, "utf8");
       if (/PERFENG_SECRET_CANARY|BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY|gh[pousr]_[A-Za-z0-9]{30,}|Design fixture only|node:child_process/.test(bytes))
-        throw Error("Forbidden secret, fixture or execution marker in " + path);
+        throw Error(diagnostic(path, 1, 'distribution', 'Forbidden secret, fixture or execution marker.', 'distribution'));
     }
   }
 }
