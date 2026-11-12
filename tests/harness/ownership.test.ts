@@ -189,11 +189,69 @@ test('computed scheduler authority cannot hide behind assigned or destructured a
     { [file]: 'adapter' }), /Computed authority/);
 });
 
-test('H4 composition assembly is confined to the extracted bootstrap and routes', () => {
+test('composition assembly no longer needs H4 mixed-component exceptions', () => {
+  assert.equal(productionRoles['apps/console/src/shell/app.ts'], 'component');
+  assert.equal(productionRoles['apps/console/src/runs/run-lookup.ts'], 'component');
   const app = 'apps/console/src/app.ts';
-  assert.equal(inspect({ 'apps/console/src/main.ts': "import './app.ts'; import './app.routes.ts';",
-    [app]: 'export {};', 'apps/console/src/app.routes.ts': "import './console-home.ts';",
-    'apps/console/src/console-home.ts': 'export {};' }), '');
   assert.match(inspect({ 'apps/console/src/other.ts': "import './app.ts';", [app]: 'export {};' },
     { 'apps/console/src/other.ts': 'composition', [app]: 'composition' }), /OWN-01.*composition/);
+});
+for (const role of ['composition', 'integration', 'adapter', 'store', 'operation', 'port'] as const) {
+  test(role + ' cannot conceal a component or directive declaration', () => {
+    for (const code of [
+      "import { Component as View } from '@angular/core'; @View({}) class Screen {}",
+      "import * as ng from '@angular/core'; @ng.Directive({}) class Screen {}",
+      "import * as ng from '@angular/core'; const View = ng['Component']; @View({}) class Screen {}",
+    ]) assert.match(inspect({ [file]: code }, { [file]: role }), /OWN-01.*component|OWN-01.*directive/i);
+  });
+}
+test('registered framework integration executes Effects without gaining native I/O', () => {
+  assert.equal(inspect({ [file]: "import { Effect } from 'effect'; Effect.runFork(job);" },
+    { [file]: 'integration' }), '');
+  assert.match(inspect({ [file]: 'fetch("/")' }, { [file]: 'integration' }), /OWN-03/);
+});
+
+test('component declarations retain their component role', () => {
+  assert.equal(inspect({ [file]: "import { Component as View } from '@angular/core'; @View({}) class Screen {}" },
+    { [file]: 'component' }), '');
+});
+
+test('a re-exported decorator alias cannot conceal a component in an integration', () => {
+  assert.match(inspect({
+    [file]: "import { Screen } from './barrel.ts'; @Screen({}) class Hidden {}",
+    'apps/console/src/barrel.ts': "export { Component as Screen } from './decorator.ts';",
+    'apps/console/src/decorator.ts': 'export function Component(_options: unknown) { return (_target: unknown) => {}; }',
+  }, { [file]: 'integration', 'apps/console/src/barrel.ts': 'port', 'apps/console/src/decorator.ts': 'port' }), /OWN-01.*component/);
+});
+
+test('feature boundaries reject private and unapproved cross-feature imports in every import form', () => {
+  const view = 'apps/console/src/runs/probe.ts';
+  const session = 'apps/console/src/session/session.store.ts';
+  for (const code of ["import '../session/session.store.ts';", "export * from '../session/session.store.ts';",
+    "type X = import('../session/session.store.ts').X;", "import('../session/session.store.ts');"]) {
+    assert.match(inspect({ [view]: code, [session]: 'export interface X {}' },
+      { [view]: 'integration', [session]: 'store' }), /OWN-11.*feature/i);
+  }
+  assert.match(inspect({ [view]: "import '../session/session-ui.ts';",
+    'apps/console/src/session/session-ui.ts': 'export {};' },
+    { [view]: 'integration', 'apps/console/src/session/session-ui.ts': 'port' }), /OWN-11/);
+});
+test('component provider assembly is allowed only through the reviewed metadata entry', () => {
+  const view = 'apps/console/src/runs/run-lookup.ts';
+  const provider = 'apps/console/src/runs/run.providers.ts';
+  const imports = "import { Component as View } from '@angular/core'; import { provideRunLookup as setup } from './run.providers.ts'; ";
+  const registry: Record<string, Role> = { [view]: 'component', [provider]: 'provider' };
+  assert.equal(inspect({ [view]: imports + '@View({providers: setup()}) class Screen {}',
+    [provider]: 'export function provideRunLookup() { return []; }' }, registry), '');
+  for (const body of ['@View({}) class Screen { value = setup(); }',
+    '@View({}) class Screen { act() { return setup(); } }']) {
+    assert.match(inspect({ [view]: imports + body, [provider]: 'export function provideRunLookup() { return []; }' }, registry), /OWN-12/);
+  }
+  assert.match(inspect({ [view]: "import * as setup from './run.providers.ts';",
+    [provider]: 'export function provideRunLookup() { return []; }' }, registry), /OWN-12/);
+});
+test('provider metadata does not acquire runtime execution or native I/O', () => {
+  for (const code of ["import { Effect } from 'effect'; Effect.runFork(job);", 'fetch("/");']) {
+    assert.match(inspect({ [file]: code }, { [file]: 'provider' }), /OWN-02|OWN-03/);
+  }
 });

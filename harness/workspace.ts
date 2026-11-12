@@ -2,6 +2,7 @@ import { readdirSync, readFileSync } from "node:fs";
 import { resolve, relative, dirname } from "node:path";
 import ts from "typescript";
 import { inspectImports } from "./boundaries.ts";
+import { angularPackages, effectTypePorts } from "./angular-features.ts";
 
 export function checkApp(root: string): string[] {
   const errors: string[] = [];
@@ -47,12 +48,15 @@ export function checkApp(root: string): string[] {
         const name = target.text;
         const internal = name.startsWith("./") || name.startsWith("../");
         const contractAlias = name === "#perfeng/contracts" && ts.isImportDeclaration(node) && node.importClause?.isTypeOnly === true;
-        const storePackage = name === "@ngrx/signals" && relative(resolve(root, "src"), file) === "run-detail-store.ts";
-        const allowed = storePackage || contractAlias || (internal
+        const localPath = relative(resolve(root, "src"), file);
+        const reviewedPackage = (angularPackages[localPath] ?? []).includes(name);
+        const effectType = name === 'effect' && effectTypePorts.includes(localPath) &&
+          ts.isImportDeclaration(node) && node.importClause?.isTypeOnly === true;
+        const allowed = reviewedPackage || effectType || contractAlias || (internal
           ? !relative(resolve(root, "src"), resolve(dirname(file), name)).startsWith("..")
           : ["@angular/core", "@angular/platform-browser", "@angular/router",
              "@angular/common", "@angular/material/button",
-             ...(["app.ts", "console-home.ts", "session-client.ts", "run-client.ts"].includes(relative(resolve(root, "src"), file)) ? ["effect"] : []),
+
              ...(file.endsWith(".spec.ts") ? ["@angular/core/testing", "@ngrx/signals", "effect"] : [])].includes(name));
         if (!allowed || (!file.endsWith(".spec.ts") && name.includes(".spec")) || (/[%?\\]/u.test(name) || (name.includes("#") && name !== "#perfeng/contracts")))
           report(node, "dependency", "Forbidden browser dependency " + name);

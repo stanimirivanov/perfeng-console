@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { ConsoleHome } from './console-home';
+import { ConsoleHome } from './run-lookup';
 
 afterEach(() => { TestBed.resetTestingModule(); vi.unstubAllGlobals(); });
 

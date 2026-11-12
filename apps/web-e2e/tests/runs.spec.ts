@@ -103,3 +103,25 @@ test('leaving the Run route interrupts lookup and never restores its late result
   await expect(page.getByRole('heading', { name: 'Current Run' })).toHaveCount(0);
   await expect(input).toHaveValue('');
 });
+
+test('hidden evidence stays cleared on resume until an explicit fresh lookup', async ({ page }) => {
+  await page.route(path, route => route.fulfill({ json: observation(23) }));
+  await page.goto('/');
+  await page.getByLabel('Run ID').fill(id);
+  await page.getByLabel('Run ID').press('Enter');
+  await expect(page.getByRole('heading', { name: 'Current Run' })).toBeVisible();
+  // Test-owned visibility events characterize the existing framework host binding.
+  await page.evaluate(() => {
+    Object.defineProperty(document, 'hidden', { configurable: true, value: true });
+    document.dispatchEvent(new Event('visibilitychange'));
+  });
+  await expect(page.getByRole('heading', { name: 'Current Run' })).toHaveCount(0);
+  await page.evaluate(() => {
+    Object.defineProperty(document, 'hidden', { configurable: true, value: false });
+    document.dispatchEvent(new Event('visibilitychange'));
+  });
+  await expect(page.getByRole('status')).toContainText('Look up the Run again');
+  await expect(page.getByRole('heading', { name: 'Current Run' })).toHaveCount(0);
+  await page.getByLabel('Run ID').press('Enter');
+  await expect(page.getByRole('heading', { name: 'Current Run' })).toBeFocused();
+});

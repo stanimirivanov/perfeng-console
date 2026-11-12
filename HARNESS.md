@@ -96,6 +96,10 @@ and integration tests live under `tests/`. Follow the
 | Pre-commit | `make hooks` once per checkout | Verifies the staged snapshot with the installed modules. Unstaged edits cannot mask a bad staged source |
 | Hosted CI | `quality.yml` jobs `verify`, `browser`, `supply-chain` | Frozen bootstrap; aggregate, browser/installation/stack/self-test and audit respectively; read-only contents permission and ten-minute job limits |
 
+When a release-build harness module gains a local import, update the explicit input
+manifest in scripts/check-console-isolation.ts and run this installation gate.
+A normal workspace build cannot prove that the isolated source closure is complete.
+
 `make verify` does not run browser, installation, stack-admission, guide or
 harness-self-test targets. Quality CI runs browser, installation, stack-admission and self-test separately; the
 [user-guide workflow](.github/workflows/user-guide.yml) publishes passing tagged journeys.
@@ -151,11 +155,14 @@ The Angular app in apps/console owns ordinary operations and the Verification ro
 Run make stack-admission to compile the isolated pinned-stack fixture and exercise
 Material overlays in Chromium under the BFF-owned nonce renderer. CI's browser job
 runs it after the product browser suite. The fixture is outside the production entry;
-the dedicated test config discovers only its own stack.spec.ts. The Angular workspace now also admits exact production paths: NgRx in
-run-detail-store.ts; Effect in app.ts, console-home.ts, session-client.ts and
-run-client.ts. The two extracted mixed component files are frozen until H5;
-main.ts no longer admits Effect. See the [extraction receipt](docs/development/harness-rules.md#h4-extraction-receipt).
-This is not blanket package or component-runtime admission. See the
+the dedicated test config discovers only its own stack.spec.ts. The Angular workspace admits NgRx only in the Run/local-session stores and Effect
+only in the exact adapters, operation and integrations. App/ConsoleHome render
+feature-local readonly ports. Component metadata provides each facade and SignalStore
+in the component injector; facades inject DestroyRef. Main only bootstraps app.config.
+Cross-feature imports use reviewed entries; provider functions are admitted only in
+Component.providers metadata (OWN-11/12).
+H4 mixed-role fences and assembly exceptions are retired. See the
+[H5 receipt](docs/development/harness-rules.md#h5-runtime-boundary-receipt) and
 [active boundary and debt](docs/development/harness-rules.md#current-baseline).
 See docs/development/stack-admission.md for the gate receipt and remaining obligations.
 

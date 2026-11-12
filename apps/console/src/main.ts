@@ -1,8 +1,5 @@
-import { bootstrapApplication } from "@angular/platform-browser";
-import { provideRouter } from "@angular/router";
-import { App } from './app';
-import { routes } from './app.routes';
+import { bootstrapApplication } from '@angular/platform-browser';
+import { App } from './shell/app';
+import { appConfig } from './app.config';
 
-bootstrapApplication(App, { providers: [provideRouter(routes)] }).catch(() => {
-  document.body.textContent = "Application unavailable.";
-});
+bootstrapApplication(App, appConfig).catch(() => { document.body.textContent = 'Application unavailable.'; });

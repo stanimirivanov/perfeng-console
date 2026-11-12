@@ -1,10 +1,10 @@
 import { Effect } from 'effect';
-import type { Observation, RunDetail, ArtifactObservation, ArtifactClaim } from '#perfeng/contracts';
+import type { ArtifactObservation, ArtifactClaim } from '#perfeng/contracts';
 
-type Lookup = { observation: Observation<RunDetail>; artifacts: ArtifactObservation } | { message: string };
+import type { LookupResult } from './run-reader.port';
 
 export function lookupRun(id: string) {
-  return Effect.tryPromise(async (signal): Promise<Lookup> => {
+  return Effect.tryPromise(async (signal): Promise<LookupResult> => {
     const response = await fetch('/console/api/runs/' + encodeURIComponent(id), {
       signal, credentials: 'same-origin', cache: 'no-store', redirect: 'error',
       headers: { 'X-Perfeng-CSRF': 'read' },

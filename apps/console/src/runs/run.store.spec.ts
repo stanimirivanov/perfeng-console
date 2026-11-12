@@ -1,8 +1,8 @@
 import { TestBed } from '@angular/core/testing';
-import { RunDetailStore } from './run-detail-store';
+import { RunStore } from './run.store';
 
 it('keeps only actually observed revisions and clears all evidence on invalidation', () => {
-  const store = TestBed.runInInjectionContext(() => new RunDetailStore());
+  const store = TestBed.runInInjectionContext(() => new RunStore());
   const run = { id: 'fixture-run', state: 'RUNNING', revision: 2, createdAt: '', updatedAt: '', finishedAt: null, failureCode: null, transitions: {} };
   expect(store.observe(run, { status: 'unavailable' })).toBe(true);
   store.clear(true);
