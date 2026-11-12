@@ -139,3 +139,52 @@ test('qualification config entry contains only named re-exports of its config ow
     assert.match(checkOwnership(root).join('\n'), /OWN-01/);
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
+
+const schedulingCases = [
+  ...['queueMicrotask', 'setImmediate', 'requestAnimationFrame', 'requestIdleCallback'].flatMap(name => [
+    `${name}(() => {});`, `globalThis.${name}(() => {});`, `window['${name}'](() => {});`,
+    `const schedule = ${name}; schedule(() => {});`,
+    `const { ${name}: schedule } = globalThis; schedule(() => {});`,
+    `const { ['${name}']: schedule } = globalThis; schedule(() => {});`,
+  ]),
+  'scheduler.postTask(() => {});', 'globalThis.scheduler.postTask(() => {});',
+  "const s = scheduler; s['postTask'](() => {});",
+  'const { postTask: schedule } = scheduler; schedule(() => {});',
+  "import { setImmediate as schedule } from 'node:timers'; schedule(() => {});",
+  "import * as timers from 'node:timers'; timers['setImmediate'](() => {});",
+];
+for (const role of ['component', 'store', 'operation', 'composition'] as const) {
+  test(role + ' cannot own native microtask, immediate, rendering or task scheduling', () => {
+    const files = Object.fromEntries(schedulingCases.map((code, index) =>
+      ['apps/console/src/case-' + index + '.ts', code]));
+    const registry = Object.fromEntries(Object.keys(files).map(name => [name, role]));
+    const errors = inspect(files, registry);
+    for (const name of Object.keys(files)) {
+      assert.ok(errors.split('\n').some(error => error.startsWith(name + ':') && error.includes('[OWN-03]')), name);
+    }
+  });
+}
+test('an explicitly registered adapter can schedule but does not gain an Effect runtime', () => {
+  const files = Object.fromEntries(schedulingCases.map((code, index) =>
+    ['apps/console/src/adapter-' + index + '.ts', code]));
+  assert.equal(inspect(files, Object.fromEntries(Object.keys(files).map(name => [name, 'adapter' as const]))), '');
+  assert.match(inspect({ [file]: "import { Effect } from 'effect'; Effect.runFork(job);" },
+    { [file]: 'adapter' }), /OWN-02/);
+});
+test('framework rendering hooks and pure Effect descriptions do not confer native scheduling authority', () => {
+  assert.equal(inspect({ [file]: "import { afterNextRender } from '@angular/core'; afterNextRender(() => {});" },
+    { [file]: 'component' }), '');
+  assert.equal(inspect({ [file]: "import { Effect } from 'effect'; export const wait = Effect.sleep(10);" },
+    { [file]: 'operation' }), '');
+});
+
+test('computed scheduler authority cannot hide behind assigned or destructured aliases', () => {
+  for (const code of [
+    'const s = scheduler; s[method](() => {});',
+    "const { ['scheduler']: s } = globalThis; s[method](() => {});",
+  ]) {
+    assert.match(inspect({ [file]: code }, { [file]: 'component' }), /OWN-03/);
+  }
+  assert.match(inspect({ [file]: 'const s = scheduler; s[method](() => {});' },
+    { [file]: 'adapter' }), /Computed authority/);
+});

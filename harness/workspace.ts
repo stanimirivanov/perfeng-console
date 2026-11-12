@@ -16,7 +16,11 @@ export function checkApp(root: string): string[] {
         walk(file);
         continue;
       }
-      if (!file.endsWith(".ts")) continue;
+      if (!/\.[cm]?[jt]sx?$/.test(file)) continue;
+      if (!file.endsWith('.ts')) {
+        errors.push(file + ':1 [extension] Only reviewed .ts browser source is supported; review format admission before adding executable files.');
+        continue;
+      }
       const text = readFileSync(file, "utf8");
       const tree = ts.createSourceFile(
         file,

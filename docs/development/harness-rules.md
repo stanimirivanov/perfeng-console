@@ -32,8 +32,8 @@ These scopes are distinct; a check passing in one row does not extend another.
 | Sensor | Roots / extensions | Active checks | Exclusions and limits |
 |---|---|---|---|
 | boundaries.ts | src; .ts/.tsx/.d.mts; rejects other non-document/style formats except exact generated artifacts | Layer/package edges, loaders, literal imports, aliases/config inheritance, scoped-guide presence | No apps/tools scan; generated JS/manifest bytes belong to contracts-check |
-| workspace.ts | apps/console/src; .ts (including specs) | Browser package/local-import and inline-template/theme resource policy | Other executable extensions are skipped here; ownership currently rejects them, not a demonstrated aggregate bypass |
-| ownership.ts | apps/console/src; src/browser,bff,presentation,shared; executable .ts/.tsx/.mts/.cts/.js/.jsx/.mjs/.cjs candidates | Exact role registry, role edges, runtime execution and selected I/O names; unsupported formats rejected after registration | .spec.ts excluded; no tools/scenarios/simulator/generated role scan; reflective JS and all schedulers are not proven covered |
+| workspace.ts | apps/console/src; .ts (including specs); rejects alternate executable JS/TS formats at every depth | Browser package/local-import and inline-template/theme resource policy; source symlinks refused | Unsupported formats do not gain admission from an installed parser or a spec-like filename |
+| ownership.ts | apps/console/src; src/browser,bff,presentation,shared; executable .ts/.tsx/.mts/.cts/.js/.jsx/.mjs/.cjs candidates | Exact role registry, role edges, runtime execution and selected I/O names; unsupported formats rejected after registration | .spec.ts excluded; no tools/scenarios/simulator/generated role scan; reserved scheduling names are checked; reflective JS and arbitrary resource cleanup are not proven safe |
 | project-imports.ts / public-boundaries ESLint | apps,src,tools,tests,harness,scripts; JS/TS variants plus CSS/SCSS resources in CLI | Owner-relative edges, exact aliases, literal/type/lazy imports, symlinks, narrow qualification exceptions | node_modules omitted; generated directory names are not exclusions; no runtime-lifetime proof |
 | check-imports.ts / dependency-cruiser | Same six roots; resolved runtime/type graph | Alias parity, unresolved product imports, module/owner cross-owner cycles, presentation isolation | Does not follow installed dependencies; optional qualification outputs are outside unresolved-product gate |
 | assets.ts | Reviewed Angular build inputs and emitted browser distribution | Local Material resource admission, known secret/fixture/execution markers, distribution symlink refusal | Known-marker regression check, not general secret detection; binary robustness work remains H9 |
@@ -49,6 +49,34 @@ The compiler-inventory regression is tests/harness/compiler-coverage.test.ts.
 Injected CLI/server TS2322 probes run in the existing CI harness-self-test and
 restore their temporary source even on failure. This does not add tools runtime
 ownership, JavaScript typechecking or qualification-package admission (H7 remains).
+
+## Native scheduling scope
+
+[H3 / issue #53](https://github.com/stanimirivanov/perfeng-console/issues/53) adds
+queueMicrotask, setImmediate, requestAnimationFrame, requestIdleCallback and
+scheduler.postTask to OWN-03 scheduling authority. `scheduler` and `postTask` are
+reserved names too: acquiring/renaming the scheduling object must not hide its
+calls. Like the existing runtime-name checks, this is deliberately conservative
+and also rejects same-spelled local identifiers outside adapters.
+
+Components, stores, reusable operations and composition do not acquire native
+schedulers. Use Angular lifecycle/render hooks for rendering/focus and compose
+Effect operations for bounded asynchronous work; a pure Effect.sleep description
+does not launch a scheduler. New direct rendering schedulers need narrow reviewed
+adapter admission and behavioral cleanup proof. Existing registered adapters can
+use scheduling primitives, but do not thereby gain a package or Effect runtime.
+
+Fixtures exercise direct/global/property forms, assigned/destructured aliases,
+namespace/renamed imports, literal computed destructuring and computed access to
+the scheduling object, alongside
+permitted framework hooks and adapters. Nonliteral access to recognized global/
+scheduler identifiers or resolved aliases is rejected; arbitrary reflection or
+dynamic code is not proven safe. Installed
+framework internals are not scanned by these handwritten-source rules.
+The ordinary Node fixtures run under make test and make verify. No new standalone
+or optional-only gate is introduced. H3 does not activate the future component-
+in-composition prohibition, move components, extend tools roles or retire the
+VerificationAccess allowance; H4–H7 still own those changes.
 
 ## Required sensors
 
@@ -127,13 +155,13 @@ example, executable proof, corrective guide and remaining judgment.
 ## Remaining hardening
 
 The approved H1–H10 remediation identifiers are not M05 PR numbers. H1 changes
-only guides and review process. H2 adds the compiler checks described above;
-the other rows remain pending and are not new admissions.
+only guides and review process. H2 adds compiler coverage and H3 adds the
+format/scheduling rules described above. H4–H10 remain pending and are not admissions.
 
 | Task | Remaining scope |
 |---|---|
 | H2 | Implemented in [issue #51](https://github.com/stanimirivanov/perfeng-console/issues/51): explicit production-tool compiler coverage and injected CLI/server type-error proof |
-| H3 | Workspace extension coverage and scheduling authority classification |
+| H3 | Implemented in [issue #53](https://github.com/stanimirivanov/perfeng-console/issues/53): fail-closed workspace formats and native scheduling fixtures |
 | H4/H5 | Mechanical Angular extraction, then runtime integration; enforce component/composition separation only with migration |
 | H6 | Shared-session denial/epoch coordination and VerificationAccess allowance retirement; scoped resource denial must not fabricate global logout |
 | H7 | Exact incoming server/CLI/preview tools ownership and native-I/O admission |

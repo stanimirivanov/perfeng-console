@@ -1,9 +1,10 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
+import { mkdtempSync, mkdirSync, writeFileSync, rmSync, symlinkSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { checkApp } from "#perfeng/harness/workspace";
+import { checkOwnership } from "#perfeng/harness/ownership";
 test("app source cannot import the other app or node authority", () => {
   const root = mkdtempSync(join(tmpdir(), "workspace-check-"));
   try {
@@ -131,5 +132,45 @@ test('SignalStore authority is confined to the reviewed Run detail store', () =>
     assert.deepEqual(checkApp(root), []);
     writeFileSync(join(root, 'src/main.ts'), source);
     assert.match(checkApp(root).join('\n'), /Forbidden browser dependency @ngrx\/signals/);
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test('workspace and aggregate checks reject alternate executable formats at every source depth', () => {
+  const root = mkdtempSync(join(tmpdir(), 'workspace-formats-'));
+  const app = join(root, 'apps/console');
+  try {
+    for (const dir of ['', 'nested/']) {
+      mkdirSync(join(app, 'src', dir), { recursive: true });
+      for (const suffix of ['mts', 'cts', 'tsx', 'js', 'jsx', 'mjs', 'cjs', 'spec.mts', 'spec.js', 'd.mts']) {
+        const name = 'apps/console/src/' + dir + 'hidden.' + suffix;
+        const path = join(root, name);
+        writeFileSync(path, 'export {};');
+        assert.match(checkApp(app).join('\n'), /\[extension\]/, name);
+        assert.match(checkOwnership(root, { [name]: 'component' }).join('\n'), /OWN-01/, name);
+        rmSync(path);
+      }
+    }
+    const name = 'apps/console/src/nested/view.ts';
+    writeFileSync(join(root, name), "import { afterNextRender } from '@angular/core'; afterNextRender(() => {});");
+    writeFileSync(join(app, 'src/nested/README.md'), 'Documentation is not executable source.');
+    assert.deepEqual(checkApp(app), []);
+    assert.deepEqual(checkOwnership(root, { [name]: 'component' }), []);
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test('both source scanners refuse file and directory symlinks before following their targets', () => {
+  const root = mkdtempSync(join(tmpdir(), 'workspace-links-'));
+  const app = join(root, 'apps/console');
+  try {
+    mkdirSync(join(app, 'src/nested'), { recursive: true });
+    mkdirSync(join(root, 'outside'));
+    writeFileSync(join(root, 'outside/view.ts'), 'export {};');
+    for (const [target, name] of [['outside/view.ts', 'link.ts'], ['outside', 'linked-directory']]) {
+      const path = join(app, 'src/nested', name!);
+      symlinkSync(join(root, target!), path);
+      assert.match(checkApp(app).join('\n'), /symlink forbidden/);
+      assert.match(checkOwnership(root).join('\n'), /OWN-01.*Symlinks/);
+      rmSync(path);
+    }
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
