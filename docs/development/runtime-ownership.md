@@ -132,10 +132,12 @@ general session coordination and mutation lifetimes remain unimplemented.
 
 `apps/console/src/run-detail-store.ts` is the sole SignalStore writer for the
 Run-detail observation, safe artifact claims and the bounded session observation
-log. `run-detail.ts` renders readonly inputs. The existing `main.ts` contains
-components as well as composition; its file-level role admits the Effect fiber,
-generation guard and teardown. This mixed role is migration debt, not a component
-reference pattern (H4/H5). `run-client.ts`
+log. `run-detail.ts` renders readonly inputs. H4 mechanically moves the existing
+Run component to `console-home.ts`; its temporary composition role admits the
+unchanged Effect fiber, generation guard and teardown. The shell is in `app.ts`,
+routes in `app.routes.ts`, and main.ts only bootstraps them. The two mixed component
+files are frozen until H5, not component reference patterns. See the
+[H4 extraction receipt](harness-rules.md#h4-extraction-receipt). `run-client.ts`
 owns same-origin bounded reads. Refresh keeps only actually observed revisions
 for the same Run; invalidation removes evidence. This narrow feature admission
 does not implement general shared-session coordination, polling or mutation

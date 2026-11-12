@@ -152,7 +152,9 @@ Run make stack-admission to compile the isolated pinned-stack fixture and exerci
 Material overlays in Chromium under the BFF-owned nonce renderer. CI's browser job
 runs it after the product browser suite. The fixture is outside the production entry;
 the dedicated test config discovers only its own stack.spec.ts. The Angular workspace now also admits exact production paths: NgRx in
-run-detail-store.ts; Effect in main.ts, session-client.ts and run-client.ts.
+run-detail-store.ts; Effect in app.ts, console-home.ts, session-client.ts and
+run-client.ts. The two extracted mixed component files are frozen until H5;
+main.ts no longer admits Effect. See the [extraction receipt](docs/development/harness-rules.md#h4-extraction-receipt).
 This is not blanket package or component-runtime admission. See the
 [active boundary and debt](docs/development/harness-rules.md#current-baseline).
 See docs/development/stack-admission.md for the gate receipt and remaining obligations.

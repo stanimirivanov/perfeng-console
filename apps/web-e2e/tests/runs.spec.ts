@@ -77,3 +77,29 @@ test('a delayed generation cannot replace a newer result and a deadline clears e
   await expect(page.getByText('2', { exact: true })).toHaveCount(0);
   await expect(page.getByText('3', { exact: true })).toHaveCount(0);
 });
+
+test('leaving the Run route interrupts lookup and never restores its late result on return', async ({ page }) => {
+  await page.route('**/console/api/verification/access', route => route.fulfill({ status: 204 }));
+  const reply = deferred();
+  const finished = deferred();
+  let started = false;
+  await page.route(path, async route => {
+    started = true;
+    await reply.promise;
+    await route.fulfill({ json: observation(42) }).catch(() => {});
+    finished.resolve();
+  });
+  await page.goto('/');
+  const input = page.getByLabel('Run ID');
+  await input.fill(id);
+  await input.press('Enter');
+  await expect.poll(() => started).toBe(true);
+  await page.getByRole('link', { name: 'Verification' }).click();
+  await expect(page.getByRole('heading', { name: 'Scenario Lab' })).toBeVisible();
+  reply.resolve();
+  await finished.promise;
+  await page.getByRole('link', { name: 'Return to Console' }).click();
+  await expect(page.getByRole('status')).toContainText('Ready for exact Run lookup');
+  await expect(page.getByRole('heading', { name: 'Current Run' })).toHaveCount(0);
+  await expect(input).toHaveValue('');
+});

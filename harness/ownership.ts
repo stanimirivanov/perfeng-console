@@ -9,6 +9,10 @@ export type Role = 'component' | 'store' | 'operation' | 'port' | 'adapter' | 'c
 // Register concrete consumers in review; a directory name never grants authority.
 export const roles: Readonly<Record<string, Role>> = {
   'apps/console/src/main.ts': 'composition',
+  // Issue #55: temporary mixed roles; H5 retires them with the byte fences.
+  'apps/console/src/app.ts': 'composition',
+  'apps/console/src/console-home.ts': 'composition',
+  'apps/console/src/app.routes.ts': 'composition',
   'apps/console/src/verification/lab.ts': 'component',
   'apps/console/src/verification/access.ts': 'adapter',
   'src/bff/config.ts': 'adapter',
@@ -105,9 +109,11 @@ export function checkOwnership(root: string, registry: Readonly<Record<string, R
           report(node, 'OWN-04', 'Consume shared contracts through declaration-level import type.');
         if (targetName.startsWith('src/generated/')) return;
         if (!targetRole || !edges[role].includes(targetRole)) {
-          // Existing main consumes the existing capability adapter until the reviewed browser migration.
-          if (!(registry === roles && name === 'apps/console/src/main.ts' && targetName === 'apps/console/src/verification/access.ts'))
-            report(node, 'OWN-01', `${role} cannot depend on ${targetRole ?? 'unregistered module'} ${targetName}. Use a port.`);
+          // Issue #55: exact extraction assembly only; H5 removes these mixed-role edges.
+          const extractionEdge = registry === roles && role === 'composition' && targetRole === 'composition' &&
+            ((name === 'apps/console/src/main.ts' && ['apps/console/src/app.ts', 'apps/console/src/app.routes.ts'].includes(targetName)) ||
+             (name === 'apps/console/src/app.routes.ts' && targetName === 'apps/console/src/console-home.ts'));
+          if (!extractionEdge) report(node, 'OWN-01', `${role} cannot depend on ${targetRole ?? 'unregistered module'} ${targetName}. Use a port.`);
         }
       }
       if (['node:http', 'node:https', 'http', 'https'].includes(spec)) report(node, 'OWN-03', 'Native dispatch needs explicit platform admission, not just an adapter role.');
