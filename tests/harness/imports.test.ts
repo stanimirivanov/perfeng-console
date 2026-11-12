@@ -18,10 +18,21 @@ test('compiler and native aliases cannot drift or be overridden by consumer conf
     write('tsconfig.paths.json', { compilerOptions: { paths } });
     write('tsconfig.json', { extends: './tsconfig.paths.json' });
     write('tsconfig.base.json', { extends: './tsconfig.paths.json' });
+    write('tools/tsconfig.json', { extends: '../tsconfig.json' });
     write('apps/console/tsconfig.app.json', { extends: '../../tsconfig.base.json' });
     write('apps/web-e2e/tsconfig.json', { extends: '../../tsconfig.base.json' });
     write('apps/console/tsconfig.spec.json', { extends: '../../tsconfig.base.json' });
     assert.deepEqual(checkImportMaps(root), []);
+    for (const override of [
+      { extends: '../tsconfig.base.json' },
+      { extends: '../tsconfig.json', compilerOptions: { paths } },
+      { extends: '../tsconfig.json', compilerOptions: { baseUrl: '.' } },
+      { extends: '../tsconfig.json', compilerOptions: { baseUrl: '' } },
+    ]) {
+      write('tools/tsconfig.json', override);
+      assert.ok(checkImportMaps(root).length, 'Tools cannot change compiler inheritance or alias resolution');
+    }
+    write('tools/tsconfig.json', { extends: '../tsconfig.json' });
     for (const override of [{ compilerOptions: { paths, baseUrl: './alternate' } }, { extends: './alternate.json', compilerOptions: { paths } }]) {
       write('tsconfig.paths.json', override);
       assert.ok(checkImportMaps(root).length);
@@ -44,7 +55,7 @@ test('standalone import command rejects a resolvable native alias remap before g
   const { resolve } = await import('node:path');
   const root = mkdtempSync(join(tmpdir(), 'import-cli-'));
   try {
-    for (const file of ['package.json', 'tsconfig.paths.json', 'tsconfig.json', 'tsconfig.base.json',
+    for (const file of ['package.json', 'tsconfig.paths.json', 'tsconfig.json', 'tsconfig.base.json', 'tools/tsconfig.json',
       'apps/console/tsconfig.app.json', 'apps/console/tsconfig.spec.json', 'apps/web-e2e/tsconfig.json']) {
       mkdirSync(dirname(join(root, file)), { recursive: true });
       cpSync(file, join(root, file));

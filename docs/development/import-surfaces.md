@@ -13,7 +13,9 @@ runtime respectively; they are omitted from paths to preserve Playwright executi
 reviewed map in `harness/imports.ts` checks parity and rejects consumer overrides.
 The central paths file cannot inherit another config or set baseUrl. Standalone
 packaging checks its actual Node/compiler maps before bundling; the architecture
-gate additionally checks the browser, test and root config inheritance.
+gate additionally checks the browser, test, root and explicit production-tools
+config inheritance. tools/tsconfig.json extends the strict Node root; it cannot
+override paths or baseUrl. Independent qualification configs remain separate.
 Use exact names, not wildcard aliases. `baseUrl` is unnecessary: paths resolve
 relative to the config file. No runtime loader or dependency was added.
 

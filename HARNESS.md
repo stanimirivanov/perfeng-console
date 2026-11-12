@@ -83,7 +83,7 @@ and integration tests live under `tests/`. Follow the
 | Toolchain | `make doctor` | Node or pnpm differs from the exact pins |
 | Bootstrap | `make bootstrap` | Frozen lock/install fails. Lifecycle scripts are disabled |
 | Lint | `make lint` | ESLint error or warning, inline config suppression, forbidden TS directive, eval or focused/skipped method |
-| Types | `make typecheck` | Root Node and e2e TS programs; the production CLI coverage gap is recorded in the enforcement index |
+| Types | `make typecheck` | Explicit strict production-tools Node program, root Node and e2e programs; qualification packages retain separate configs |
 | Architecture | `make architecture` | Unknown source owner, unadmitted package/edge, computed import, CommonJS loader, source symlink or missing scoped guide |
 | Behavior | `make test` | A Node test fails, the suite is empty, or TAP reports any skipped or todo cases. Boundary tests exercise actual TS syntax on temporary source trees |
 | Local aggregate | `make verify` | Toolchain, offline contracts, lint/imports, types, architecture, Node tests, Angular tests/accounting and production build/distribution scan |
@@ -168,7 +168,8 @@ Official interfaces: https://vitest.dev/guide/reporters#json-reporter and
 https://playwright.dev/docs/api/class-reporter.
 
 make harness-self-test copies source into a temporary directory, links the installed
-toolchain and proves actual command failures for invalid template bindings,
+toolchain and proves actual command failures for injected production CLI/server
+type errors, invalid template bindings,
 component assertions, Angular skips and Playwright skips/failures. It never edits
 the working checkout and removes the temporary fixture on completion.
 CI runs it in the browser job with installed pinned Chromium.

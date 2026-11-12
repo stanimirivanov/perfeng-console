@@ -39,10 +39,16 @@ These scopes are distinct; a check passing in one row does not extend another.
 | assets.ts | Reviewed Angular build inputs and emitted browser distribution | Local Material resource admission, known secret/fixture/execution markers, distribution symlink refusal | Known-marker regression check, not general secret detection; binary robustness work remains H9 |
 | product-release.ts | Exact server source/dependency closure | Reviewed bundle inputs, built-ins, type-only shared DTO use, external dependency closure | Not a compiler/role registry for all tools; installed isolation requires its separate target |
 
-`make typecheck` checks root Node and e2e programs. E2e imports currently pull in
-tools/console-server.ts/public-api.ts; tools/serve-console.ts is absent from both
-programs. esbuild does not fill that compiler gap. Angular AOT/strict templates
-are checked by build in make verify. Explicit production-tool coverage remains H2.
+`make typecheck` checks the explicit production-tools Node program first, then
+root Node and e2e programs. `tools/tsconfig.json` extends the strict Node root and
+selects serve-console.ts, console-server.ts and public-api.ts with an empty include
+list, so test/qualification roots are not inherited. Imported production dependencies
+remain checked. Configuration inheritance and paths/baseUrl guards include this
+exact consumer. Angular AOT/strict templates are checked by build in make verify.
+The compiler-inventory regression is tests/harness/compiler-coverage.test.ts.
+Injected CLI/server TS2322 probes run in the existing CI harness-self-test and
+restore their temporary source even on failure. This does not add tools runtime
+ownership, JavaScript typechecking or qualification-package admission (H7 remains).
 
 ## Required sensors
 
@@ -121,11 +127,12 @@ example, executable proof, corrective guide and remaining judgment.
 ## Remaining hardening
 
 The approved H1–H10 remediation identifiers are not M05 PR numbers. H1 changes
-only guides and review process. Pending items below are not new admissions.
+only guides and review process. H2 adds the compiler checks described above;
+the other rows remain pending and are not new admissions.
 
 | Task | Remaining scope |
 |---|---|
-| H2 | Explicit production-tool compiler coverage and injected type-error proof |
+| H2 | Implemented in [issue #51](https://github.com/stanimirivanov/perfeng-console/issues/51): explicit production-tool compiler coverage and injected CLI/server type-error proof |
 | H3 | Workspace extension coverage and scheduling authority classification |
 | H4/H5 | Mechanical Angular extraction, then runtime integration; enforce component/composition separation only with migration |
 | H6 | Shared-session denial/epoch coordination and VerificationAccess allowance retirement; scoped resource denial must not fabricate global logout |

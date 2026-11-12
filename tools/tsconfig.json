@@ -1,0 +1,5 @@
+{
+  "extends": "../tsconfig.json",
+  "files": ["serve-console.ts", "console-server.ts", "public-api.ts"],
+  "include": []
+}
