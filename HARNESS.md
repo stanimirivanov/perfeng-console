@@ -204,7 +204,12 @@ Browser build inputs are explicitly reviewed in harness/assets.ts. The current
 scaffold permits inline component templates, one local Material Sass import and
 no copied asset scripts. Extending that boundary needs focused negative tests.
 The distribution guard scans lazy chunks, maps and other emitted files for known
-secret/fixture markers. This is a regression sensor, not a general secret detector.
+secret/fixture/execution markers in every regular file, including binary data.
+It uses bounded byte reads with overlap, checks raw ASCII and UTF-16LE/BE at both
+alignments, and never skips an extension, MIME class or NUL-containing file. Roots,
+links and special entries fail closed. No archive/decompression/base64 expansion
+or general secret-detection guarantee is claimed. See the
+[H9 receipt](docs/development/harness-rules.md#h9-byte-safe-distribution-receipt).
 No production fixture, arbitrary Sass import or server resource is permitted.
 The strict-template mechanism is documented at
 https://angular.dev/tools/cli/template-typecheck.

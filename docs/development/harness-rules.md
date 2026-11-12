@@ -40,7 +40,7 @@ These scopes are distinct; a check passing in one row does not extend another.
 | ownership.ts | tools plus apps/console/src; src/browser,bff,presentation,shared; executable .ts/.tsx/.mts/.cts/.js/.jsx/.mjs/.cjs candidates | Exact role registry, role edges, runtime execution and selected I/O names; exact tools module/member/native admission; unsupported formats rejected after registration | .spec.ts excluded outside tools; no scenarios/simulator/generated role scan; tools qualification and user-guide are separate owners; reserved scheduling names are checked; reflective JS and arbitrary resource cleanup are not proven safe |
 | project-imports.ts / public-boundaries ESLint | apps,src,tools,tests,harness,scripts; JS/TS variants plus CSS/SCSS resources in CLI | Owner-relative edges, exact aliases, literal/type/lazy imports, symlinks, narrow qualification exceptions | node_modules omitted; generated directory names are not exclusions; no runtime-lifetime proof |
 | check-imports.ts / dependency-cruiser | Same six roots; resolved runtime/type graph | Node/compiler/document alias parity, unresolved product imports, module/owner cross-owner cycles, presentation isolation | Does not follow installed dependencies; optional qualification outputs are outside unresolved-product gate |
-| assets.ts | Reviewed Angular build inputs and emitted browser distribution | Local Material resource admission, known secret/fixture/execution markers, distribution symlink refusal | Known-marker regression check, not general secret detection; binary robustness work remains H9 |
+| assets.ts | Reviewed Angular build inputs and emitted browser distribution | Local Material resource admission, known secret/fixture/execution markers, distribution symlink refusal | All regular files, raw ASCII/UTF-16 byte windows; no extension/MIME/NUL skips; known-marker check, not decompression or general secret detection |
 | product-release.ts | Exact server source/dependency closure | Reviewed bundle inputs, built-ins, type-only shared DTO use, external dependency closure | Not a compiler/role registry for all tools; installed isolation requires its separate target |
 
 `make typecheck` checks the explicit production-tools Node program first, then
@@ -166,7 +166,8 @@ The approved H1–H10 remediation identifiers are not M05 PR numbers. H1 changes
 only guides and review process. H2 adds compiler coverage and H3 adds the
 format/scheduling rules described above. H4 extracted the existing Angular code and H5 now enforces runtime boundaries.
 H6 implements the local session boundary, H7 tools ownership and H8 actionable/safe
-diagnostics and alias-document parity. H9/H10 remain pending and are not admissions.
+diagnostics and alias-document parity. H9 adds byte-safe distribution scanning;
+H10 remains pending and is not admission.
 
 | Task | Remaining scope |
 |---|---|
@@ -177,7 +178,7 @@ diagnostics and alias-document parity. H9/H10 remain pending and are not admissi
 | H6 | Implemented in [issue #59](https://github.com/stanimirivanov/perfeng-console/issues/59): shared local-session epoch, typed denial scope and VerificationAccess allowance retirement; no general upstream-health/polling claim |
 | H7 | Implemented in [issue #61](https://github.com/stanimirivanov/perfeng-console/issues/61): incoming server/CLI/preview/public-entry roles and exact imports/native capabilities |
 | H8 | Implemented in [issue #63](https://github.com/stanimirivanov/perfeng-console/issues/63): corrective/single-line diagnostics, safe lock guidance and checked alias-document parity |
-| H9 | Byte-safe distribution scanning without skipping binary files |
+| H9 | Implemented in [issue #65](https://github.com/stanimirivanov/perfeng-console/issues/65): bounded byte scanning, all regular files, ASCII/UTF-16LE/BE marker views, read overlap and root/special-file refusal |
 | H10 | Measured CI duplication/cache improvements; release-age exception disposition; retain full staged verification by default |
 
 The Playwright minimumReleaseAgeExclude entries name versions but lack durable
@@ -333,6 +334,36 @@ that its writer is absent; uncertain recovery must stop with the checkout owner.
 These messages are guidance, not automated repair or proof of arbitrary log safety.
 The alias table checks semantic inventory, not prose accuracy. Existing contract
 and permission gates remain authoritative and full staged verification remains on.
+
+## H9 byte-safe distribution receipt
+
+checkDistribution reads every regular file recursively with no extension, MIME,
+NUL or UTF-8-validity exclusion. A byte-preserving Latin-1 view matches the existing
+ASCII markers; UTF-16LE/BE views at both alignments also recognize those strings
+inside binary data, with or without a BOM. The previous scanner already caught
+contiguous ASCII in malformed/binary data; the failing encoding regressions are
+UTF-16 strings, not a claim that UTF-8 decoding skipped binary files.
+
+Reads use a fixed 64 KiB buffer plus a derived overlap: twice the longest required
+marker recognition window, minus one byte. This covers UTF-16 and tokens that
+cross reads without loading the entire file or limiting how far into a file the
+scan goes. All existing fixed markers and the five GitHub-token prefix families
+with at least 30 ASCII alphanumerics remain. The overlap needs only the minimum
+recognizable token prefix/suffix, not an entire unbounded token.
+
+Observed root/file/directory symlinks (including dangling root links) and special
+entries fail closed. On the supported Linux filesystem, opened file descriptors
+also reject final-component links and non-regular replacements before reading;
+nonblocking open avoids a substituted FIFO blocking that validation. Descriptors
+close in finally on success and failure. The tree is expected to be a completed
+build; this is not a transactional snapshot against concurrent hostile mutation.
+
+Fixtures cover every marker family, arbitrary bytes, UTF-16/BOM/alignment,
+threshold boundaries, late-file/read-boundary matches, links and a non-regular
+socket entry. Existing build/distribution and package gates call the same scanner;
+H8 errors retain file/rule/make build guidance without showing matched contents.
+No binary skip, blanket binary rejection, archive/base64/decompression traversal,
+machine-code analysis or general secret-detection guarantee is introduced.
 
 ## Structural sensor receipt (2026-11-07, issue #33; historical scope)
 
