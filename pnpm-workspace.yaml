@@ -1,7 +1,8 @@
-minimumReleaseAgeExclude:
-  - "@playwright/test@1.65.0"
-  - playwright-core@1.65.0
-  - playwright@1.65.0
+minimumReleaseAge: 1440
+minimumReleaseAgeStrict: true
+minimumReleaseAgeIgnoreMissingTime: false
+trustLockfile: false
+verifyStoreIntegrity: true
 verifyDepsBeforeRun: false
 allowBuilds:
   "@parcel/watcher": false

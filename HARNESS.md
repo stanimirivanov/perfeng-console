@@ -270,3 +270,14 @@ make verify runs the production parity tests, including real TLS1.1 rejection wi
 positive control, duplicate headers, limits, cancellation and a child-process shutdown.
 The lifecycle test host is a fixture, not a new production BFF server/auth route.
 See tools/qualification/effect-node/README.md for the qualification history.
+
+## H10 CI efficiency
+
+The quality verify job invokes the full aggregate once; it shares an explicit early
+check-imports prerequisite with lint, so the preflight still runs once before
+contract generation without a duplicate standalone invocation. Shared
+bootstrap caches only the pnpm store via the existing v6 action, keyed by the lock;
+frozen install and full checks still run on cache hits. The staged pre-commit hook
+remains unchanged and always verifies its checkout-index snapshot. Read the
+[measurement, age-policy and cache receipt](docs/development/ci-efficiency.md) before
+changing scheduling, exceptions or cache trust. No hosted speedup is asserted yet.
