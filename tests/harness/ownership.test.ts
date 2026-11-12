@@ -190,8 +190,8 @@ test('computed scheduler authority cannot hide behind assigned or destructured a
 });
 
 test('composition assembly no longer needs H4 mixed-component exceptions', () => {
-  assert.equal(productionRoles['apps/console/src/app.ts'], 'component');
-  assert.equal(productionRoles['apps/console/src/console-home.ts'], 'component');
+  assert.equal(productionRoles['apps/console/src/shell/app.ts'], 'component');
+  assert.equal(productionRoles['apps/console/src/runs/run-lookup.ts'], 'component');
   const app = 'apps/console/src/app.ts';
   assert.match(inspect({ 'apps/console/src/other.ts': "import './app.ts';", [app]: 'export {};' },
     { 'apps/console/src/other.ts': 'composition', [app]: 'composition' }), /OWN-01.*composition/);
@@ -222,4 +222,36 @@ test('a re-exported decorator alias cannot conceal a component in an integration
     'apps/console/src/barrel.ts': "export { Component as Screen } from './decorator.ts';",
     'apps/console/src/decorator.ts': 'export function Component(_options: unknown) { return (_target: unknown) => {}; }',
   }, { [file]: 'integration', 'apps/console/src/barrel.ts': 'port', 'apps/console/src/decorator.ts': 'port' }), /OWN-01.*component/);
+});
+
+test('feature boundaries reject private and unapproved cross-feature imports in every import form', () => {
+  const view = 'apps/console/src/runs/probe.ts';
+  const session = 'apps/console/src/session/session.store.ts';
+  for (const code of ["import '../session/session.store.ts';", "export * from '../session/session.store.ts';",
+    "type X = import('../session/session.store.ts').X;", "import('../session/session.store.ts');"]) {
+    assert.match(inspect({ [view]: code, [session]: 'export interface X {}' },
+      { [view]: 'integration', [session]: 'store' }), /OWN-11.*feature/i);
+  }
+  assert.match(inspect({ [view]: "import '../session/session-ui.ts';",
+    'apps/console/src/session/session-ui.ts': 'export {};' },
+    { [view]: 'integration', 'apps/console/src/session/session-ui.ts': 'port' }), /OWN-11/);
+});
+test('component provider assembly is allowed only through the reviewed metadata entry', () => {
+  const view = 'apps/console/src/runs/run-lookup.ts';
+  const provider = 'apps/console/src/runs/run.providers.ts';
+  const imports = "import { Component as View } from '@angular/core'; import { provideRunLookup as setup } from './run.providers.ts'; ";
+  const registry: Record<string, Role> = { [view]: 'component', [provider]: 'provider' };
+  assert.equal(inspect({ [view]: imports + '@View({providers: setup()}) class Screen {}',
+    [provider]: 'export function provideRunLookup() { return []; }' }, registry), '');
+  for (const body of ['@View({}) class Screen { value = setup(); }',
+    '@View({}) class Screen { act() { return setup(); } }']) {
+    assert.match(inspect({ [view]: imports + body, [provider]: 'export function provideRunLookup() { return []; }' }, registry), /OWN-12/);
+  }
+  assert.match(inspect({ [view]: "import * as setup from './run.providers.ts';",
+    [provider]: 'export function provideRunLookup() { return []; }' }, registry), /OWN-12/);
+});
+test('provider metadata does not acquire runtime execution or native I/O', () => {
+  for (const code of ["import { Effect } from 'effect'; Effect.runFork(job);", 'fetch("/");']) {
+    assert.match(inspect({ [file]: code }, { [file]: 'provider' }), /OWN-02|OWN-03/);
+  }
 });

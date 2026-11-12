@@ -39,7 +39,7 @@ try {
     }
   }
 
-  const home = join(target, "apps/console/src/console-home.ts");
+  const home = join(target, "apps/console/src/runs/run-lookup.ts");
   const original = readFileSync(home, "utf8");
   const anchor = '<h1>Perfeng Console';
   if (original.split(anchor).length !== 2) throw Error('Template probe needs exactly one anchor; refusing a no-op or ambiguous edit.');

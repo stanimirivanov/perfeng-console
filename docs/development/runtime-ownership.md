@@ -131,15 +131,18 @@ general session coordination and mutation lifetimes remain unimplemented.
 
 ## Run-detail browser admission (M05-PR22)
 
-`apps/console/src/run-detail-store.ts` is the sole SignalStore writer for the
+`apps/console/src/runs/run.store.ts` is the sole SignalStore writer for the
 Run-detail observation, safe artifact claims and the bounded session observation
-log. `run-detail.ts` renders readonly inputs. H5 retires H4's temporary mixed
+log. `runs/detail/run-detail.ts` renders readonly inputs. H5 retires H4's temporary mixed
 component registrations/fences and exact assembly exceptions. App and ConsoleHome
-now consume readonly operator ports. Main wires fresh integration factories with
-the creating component's DestroyRef; the integrations own execution and rejection
-of disposed/superseded results. Run expiry is a store-independent Effect operation.
-Local session presentation also has one SignalStore writer; its owner interrupts
-pending requests and prevents completion/focus delivery after disposal.
+now consume feature-local readonly UI ports. Their metadata installs feature providers;
+Angular scopes each facade and SignalStore to the component injector. Facades inject
+DestroyRef, own execution and reject disposed/superseded results. The Run operation
+returns a typed outcome with absolute monotonic expiry, independent of stores/UI.
+Session presentation has one SignalStore writer; its facade keeps CSRF private,
+interrupts pending requests and prevents completion/focus delivery after disposal.
+Feature reader contracts stay separate from UI contracts. Cross-feature private
+imports and provider wiring outside component metadata are mechanically rejected.
 See the [H5 receipt](harness-rules.md#h5-runtime-boundary-receipt).
 
 This remains the local paired slice. Shared session/capability revocation, general

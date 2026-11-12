@@ -2,7 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { mkdtempSync, mkdirSync, writeFileSync, rmSync, symlinkSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { join, dirname } from "node:path";
 import { checkApp } from "#perfeng/harness/workspace";
 import { checkOwnership } from "#perfeng/harness/ownership";
 test("app source cannot import the other app or node authority", () => {
@@ -128,7 +128,8 @@ test('SignalStore authority is confined to the reviewed feature stores', () => {
   try {
     mkdirSync(join(root, 'src'));
     const source = "import { signalStore } from '@ngrx/signals';";
-    for (const name of ['run-detail-store.ts', 'local-session.store.ts']) {
+    for (const name of ['runs/run.store.ts', 'session/session.store.ts']) {
+      mkdirSync(dirname(join(root, 'src', name)), { recursive: true });
       writeFileSync(join(root, 'src', name), source);
       assert.deepEqual(checkApp(root), []);
     }
@@ -181,10 +182,12 @@ test('Effect package authority follows adapters, operations and integrations, ne
   const root = mkdtempSync(join(tmpdir(), 'feature-effect-'));
   try {
     mkdirSync(join(root, 'src'));
-    for (const [name, allowed] of [['run-lookup.integration.ts', true], ['local-session.integration.ts', true],
-      ['run-lookup.operation.ts', true], ['app.ts', false], ['console-home.ts', false],
+    for (const [name, allowed] of [['runs/run.facade.ts', true], ['session/session.facade.ts', true],
+      ['runs/run.operation.ts', true], ['shell/app.ts', false], ['runs/run-lookup.ts', false],
+      ['runs/nested/run.facade.ts', false],
       ['main.ts', false], ['other.ts', false]] as const) {
       const path = join(root, 'src', name);
+      mkdirSync(dirname(path), { recursive: true });
       writeFileSync(path, "import { Effect } from 'effect'; export const task = Effect.void;");
       assert.equal(checkApp(root).length === 0, allowed, name);
       rmSync(path);

@@ -15,12 +15,13 @@ allowance. Exact package paths are admitted in transport.ts/run-reader.ts; TLS,
 raw headers, limits, identity and lifecycle have behavioral tests. The incoming
 HTTPS server in tools is a separate boundary, not an upstream transport exception.
 
-Production Angular admission is narrow: Effect in run/session adapters,
-run-lookup.operation.ts and the two exact *.integration.ts consumers; NgRx in
-run-detail-store.ts and local-session.store.ts. App and ConsoleHome are component
-modules consuming readonly operator ports, not concrete clients or runtimes.
-Main wires factories; app.routes.ts is a framework integration/configuration
-boundary. Only registered composition/integration roles execute Effects; component
+Production Angular admission is narrow: Effect in the exact runs/session adapters,
+runs/run.operation.ts and feature facades; NgRx in runs/run.store.ts and
+session/session.store.ts. Feature-local reader contracts admit only type-only Effect
+imports. Shell and Run components consume readonly UI ports, not concrete clients or
+runtimes. Component metadata installs feature providers in the component injector.
+Main bootstraps app.config.ts; app.routes.ts is a framework integration/configuration
+boundary. Provider modules assemble dependencies but cannot execute Effects or I/O. Only registered composition/integration roles execute Effects; component
 or directive declarations require the component role, including imported aliases;
 adapter/store relabeling cannot evade the declaration check either.
 VerificationAccess remains a separate exact hash-bound mixed-ownership allowance.
@@ -98,6 +99,8 @@ No new Make commands are proposed; extend the existing gates.
 | OWN-08 | Single writer/scheduler and epoch-checked observations | Older report success after health outage; route teardown; session replacement; expired value on resume; overlapping pollers | make component-test and make browser-test; new focused fixtures |
 | OWN-09 | Mutation interruption preserves uncertainty and intent identity | Timeout/reconnect causes redispatch or fabricates cancellation; forged/stale authority bypass | make test and make browser-test when mutation slice exists |
 | OWN-10 | Contract bytes and runtime validation remain authoritative | Generated drift, invalid response accepted, Effect/generator adoption silently replaces Ajv | make contracts-check and make test; existing contract fixtures plus consumer tests |
+| OWN-11 | Feature implementations remain private; cross-feature dependencies use reviewed entries | Type-only, lazy or barrel access to another feature's private store/facade/reader | make architecture; feature-edge negative fixtures |
+| OWN-12 | Components assemble providers only through reviewed Component.providers calls | Provider function invoked in a method/field, namespace import or unreviewed factory | make architecture; metadata-scope negative fixtures |
 
 Resolve aliases/re-exports to owners, inspect literal dynamic and type-only imports,
 and reject computed module loading as today. Do not rely on filename substrings or
@@ -189,26 +192,31 @@ legacy allowance is unchanged.
 
 ## H5 runtime boundary receipt
 
-Components own DOM events, input clearing and focus. `operator-ports.ts` supplies
-readonly signals and intent methods. Main wires factories that create fresh Run
-and local-session integrations using the creating component's DestroyRef. The
-factory runs synchronously in that component's injection context, so its private
-SignalStore also has the correct context. A cached route/root injector must not
-replace this per-view ownership. The route configuration has an integration role;
-it contains no component declaration or independent polling loop.
+Components own DOM events, input clearing and focus. Feature folders are shell,
+session, runs (including detail) and verification; root files configure bootstrap
+and routes. Each feature owns its UI and reader contracts. Shared DTOs remain in
+src/shared/contracts. harness/angular-features.ts records reviewed cross-feature
+entries and exact package admission; a directory name alone grants no authority.
 
-RunDetailStore owns status, Run/artifact observations and bounded history.
-LocalSessionStore owns local session presentation; its integration retains CSRF
-privately, never in UI signals. Integrations own execution, generation guards and
-disposal. `run-lookup.operation.ts` composes a supplied reader, monotonic clock and
-completion sink without importing stores/components. Transit timing starts before
-fiber launch; existing deadlines, validity, revision and failure messages remain.
-New runtime modules are not broad package/platform admission: components cannot
-import Effect, integrations cannot use native I/O, and adapters cannot execute
-Effects. Only the exact new consumers are admitted by the workspace package policy.
+Session and Run components declare provideSession()/provideRunLookup() in
+Component.providers. Angular creates a facade and SignalStore in each component's
+injector; facades inject their own DestroyRef and own execution, generation guards
+and disposal. No root lifetime factories, manual store construction or caller-supplied
+DestroyRef remain. Component imports of provider entries are limited to named
+reviewed functions used directly in Component.providers metadata. Provider modules
+have assembly authority only, not runtime execution or native I/O.
 
-Disposal tests cover pending headers/body, transport abort, late completion and
-refusing further acquisition. The Chromium suite retains rapid replacement,
+RunStore owns status, Run/artifact observations and bounded history. SessionStore
+owns local session presentation; SessionFacade retains CSRF privately, never in UI
+signals. runs/run.operation.ts returns a discriminated outcome with absolute monotonic
+expiry instead of calling a UI completion sink. Transit timing starts before fiber
+launch; the facade checks remaining validity before publication. Existing deadlines,
+revision and failure messages remain. Verification exposes a separate capability
+port; its exact hash-bound legacy implementation remains H6's responsibility.
+
+Real Angular component-injector tests cover pending headers/body, transport abort,
+late completion, refusing further acquisition, isolation between simultaneous views
+and fresh state on recreation. The Chromium suite retains rapid replacement,
 expiry/reconnect, artifact denial, route teardown, keyboard/focus and visibility
 invalidation. Static declaration checks plus these cases do not prove arbitrary
 JavaScript or eventual cleanup of all future work. H6 must extend this single

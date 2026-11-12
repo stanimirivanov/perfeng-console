@@ -1,9 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import type { DestroyRef } from '@angular/core';
-import { RUN_FEATURE } from './operator-ports';
-import { RunLookupIntegration } from './run-lookup.integration';
-import { lookupRun } from './run-client';
-import { ConsoleHome } from './console-home';
+import { ConsoleHome } from './run-lookup';
 
 afterEach(() => { TestBed.resetTestingModule(); vi.unstubAllGlobals(); });
 
@@ -15,8 +11,6 @@ it('route destruction aborts its pending lookup and clears the Run observation',
       requestSignal?.addEventListener('abort', () => reject(new DOMException('Test lookup aborted', 'AbortError')), { once: true });
     });
   }));
-  TestBed.configureTestingModule({ providers: [{ provide: RUN_FEATURE, useValue: (owner: DestroyRef) =>
-    new RunLookupIntegration(owner, lookupRun) }] });
   const fixture = TestBed.createComponent(ConsoleHome);
   fixture.detectChanges();
   expect(fixture.nativeElement.textContent).toContain('Ready for exact Run lookup');

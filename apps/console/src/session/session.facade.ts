@@ -1,31 +1,32 @@
-import type { DestroyRef } from '@angular/core';
+import { DestroyRef, inject, Injectable, InjectionToken } from '@angular/core';
 import { Effect, Exit, Fiber } from 'effect';
-import { LocalSessionStore } from './local-session.store';
-import type { SessionFeature, SessionReply, VerificationPort } from './operator-ports';
+import { SessionStore } from './session.store';
+import { VERIFICATION_ACCESS } from '../verification/access.port';
+import type { SessionUi } from './session-ui';
+import type { SessionRead, SessionReply } from './session-reader.port';
 
-type SessionRead = (action?: 'pair' | 'logout', credential?: string) => Effect.Effect<SessionReply>;
-export class LocalSessionIntegration implements SessionFeature {
-  private readonly store = new LocalSessionStore();
+export const SESSION_READ = new InjectionToken<SessionRead>('Session reader');
+export const SESSION_PREVIEW = new InjectionToken<boolean>('Local console preview', { providedIn: 'root', factory: () => false });
+@Injectable()
+export class SessionFacade implements SessionUi {
+  private readonly store = inject(SessionStore);
   readonly mode = this.store.mode;
   readonly pending = this.store.pending;
   readonly message = this.store.message;
-  readonly granted;
   private csrf = '';
   private disposed = false;
-  private started = false;
   private generation = 0;
   private work?: Fiber.Fiber<SessionReply>;
-  constructor(owner: DestroyRef, private readonly access: VerificationPort, private readonly read: SessionRead) {
-    this.granted = access.granted;
-    owner.onDestroy(() => {
+  private readonly read = inject(SESSION_READ);
+  private readonly access = inject(VERIFICATION_ACCESS);
+  constructor() {
+    inject(DestroyRef).onDestroy(() => {
       this.disposed = true; this.generation++; this.csrf = '';
       if (this.work) Effect.runFork(Fiber.interrupt(this.work));
       this.store.complete('pairing', '');
     });
-  }
-  start(preview: boolean) {
-    if (this.started || this.disposed) return;
-    this.started = true; this.store.initialize(preview);
+    const preview = inject(SESSION_PREVIEW);
+    this.store.initialize(preview);
     if (preview) void this.access.refresh(); else void this.request();
   }
   pair(code: string) { return this.pending() ? Promise.resolve(false) : this.request('pair', code); }

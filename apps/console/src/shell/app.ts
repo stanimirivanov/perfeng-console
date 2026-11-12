@@ -1,9 +1,12 @@
 import { Component, DestroyRef, inject } from '@angular/core';
 import { Router, RouterLink, RouterOutlet } from '@angular/router';
-import { SESSION_FEATURE } from './operator-ports';
+import { SESSION_UI } from '../session/session-ui';
+import { provideSession } from '../session/session.providers';
+import { VERIFICATION_ACCESS } from '../verification/access.port';
 
 @Component({
   selector: "app-root",
+  providers: provideSession(),
   imports: [RouterOutlet, RouterLink],
   template: `
     <a [attr.href]="router.url.split('#')[0] + '#main'">Skip to content</a>
@@ -32,14 +35,11 @@ import { SESSION_FEATURE } from './operator-ports';
 export class App {
   readonly router = inject(Router);
   private readonly owner = inject(DestroyRef);
-  private readonly session = inject(SESSION_FEATURE)(this.owner);
-  readonly access = this.session;
+  private readonly session = inject(SESSION_UI);
+  readonly access = inject(VERIFICATION_ACCESS);
   readonly mode = this.session.mode;
   readonly pending = this.session.pending;
   readonly message = this.session.message;
-  constructor() {
-    this.session.start(!!document.querySelector('meta[name="perfeng-console-preview"][content="true"]'));
-  }
   async pair(event: Event, input: HTMLInputElement, main: HTMLElement) {
     event.preventDefault();
     if (this.pending()) return;

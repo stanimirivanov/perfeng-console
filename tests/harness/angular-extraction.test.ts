@@ -5,7 +5,7 @@ import ts from 'typescript';
 import { roles } from '#perfeng/harness/ownership';
 
 test('components have component roles after H4 fence retirement', () => {
-  for (const file of ['apps/console/src/app.ts', 'apps/console/src/console-home.ts']) {
+  for (const file of ['apps/console/src/shell/app.ts', 'apps/console/src/runs/run-lookup.ts']) {
     assert.equal(roles[file], 'component');
   }
 });

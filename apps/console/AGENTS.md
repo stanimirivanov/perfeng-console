@@ -8,3 +8,19 @@ inside this single app. Register concrete role paths with their first implementa
 Verification uses the same rendering/state rules but never imports simulator authority.
 Use the [pending harness rules](../../docs/development/harness-rules.md) to identify
 required negative tests; do not treat this documentation as package admission.
+
+## Feature map and entry rules
+
+- `src/shell`: application chrome and local pairing UI; consumes session UI/provider entries.
+- `src/session`: private CSRF/lifetime owner, session store, adapter and reader contract.
+- `src/runs`: exact lookup, readonly UI contract, store, operation and adapter; `detail` renders evidence.
+- `src/verification`: lazy maintainer area and public capability port/provider; legacy access migration stays in H6.
+- Root `src/main.ts`, `app.config.ts`, `app.routes.ts`: bootstrap and configuration only.
+
+Keep reader contracts separate from UI contracts, local to their owning feature.
+Shared wire DTOs remain in `src/shared/contracts`. Register exact public entries in
+`harness/angular-features.ts`; cross-feature access to private implementations is forbidden.
+Components may call reviewed feature provider functions only directly in
+`Component.providers` metadata. Facades/stores live in the component injector, never
+root lifetime factories. Provider modules assemble dependencies without executing
+Effects or native I/O. No new package authority follows from a folder or role.

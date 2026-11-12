@@ -1,7 +1,7 @@
 import { patchState, signalStore, withState, withMethods } from '@ngrx/signals';
-import type { SessionMode } from './operator-ports';
+import type { SessionMode } from './session-ui';
 
-export const LocalSessionStore = signalStore(
+export const SessionStore = signalStore(
   withState({ mode: 'pairing' as SessionMode, pending: false, message: '' }),
   withMethods(store => ({
     initialize(preview: boolean) { patchState(store, { mode: preview ? 'preview' : 'pairing' }); },

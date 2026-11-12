@@ -1,7 +1,7 @@
 import { patchState, signalStore, withMethods, withState } from '@ngrx/signals';
 import type { RunDetail, ArtifactObservation } from '#perfeng/contracts';
 
-export const RunDetailStore = signalStore(
+export const RunStore = signalStore(
   withState({ status: 'Ready for exact Run lookup.', run: undefined as RunDetail | undefined, artifacts: { status: 'unavailable' } as ArtifactObservation,
     observations: [] as { id: string; revision: number; state: string; updatedAt: string }[] }),
   withMethods(store => ({

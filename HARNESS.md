@@ -153,7 +153,10 @@ Material overlays in Chromium under the BFF-owned nonce renderer. CI's browser j
 runs it after the product browser suite. The fixture is outside the production entry;
 the dedicated test config discovers only its own stack.spec.ts. The Angular workspace admits NgRx only in the Run/local-session stores and Effect
 only in the exact adapters, operation and integrations. App/ConsoleHome render
-readonly ports; main wires per-view integration factories with DestroyRef.
+feature-local readonly ports. Component metadata provides each facade and SignalStore
+in the component injector; facades inject DestroyRef. Main only bootstraps app.config.
+Cross-feature imports use reviewed entries; provider functions are admitted only in
+Component.providers metadata (OWN-11/12).
 H4 mixed-role fences and assembly exceptions are retired. See the
 [H5 receipt](docs/development/harness-rules.md#h5-runtime-boundary-receipt) and
 [active boundary and debt](docs/development/harness-rules.md#current-baseline).

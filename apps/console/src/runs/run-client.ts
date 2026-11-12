@@ -1,7 +1,7 @@
 import { Effect } from 'effect';
 import type { ArtifactObservation, ArtifactClaim } from '#perfeng/contracts';
 
-import type { LookupResult } from './operator-ports';
+import type { LookupResult } from './run-reader.port';
 
 export function lookupRun(id: string) {
   return Effect.tryPromise(async (signal): Promise<LookupResult> => {
