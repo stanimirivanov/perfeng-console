@@ -1,5 +1,5 @@
 import { diagnostic } from './diagnostics.ts';
-import { readFileSync, readdirSync } from "node:fs";
+import { readFileSync, readdirSync, lstatSync, openSync, readSync, closeSync, fstatSync, constants } from "node:fs";
 import { join } from "node:path";
 
 export function checkStyles(source: string): string[] {
@@ -33,16 +33,56 @@ export function checkAssets(root: string) {
   if (errors.length) throw Error(errors.map(reason => diagnostic(options.styles[0], 1, 'asset', reason)).join('\n'));
 }
 
+const literalMarkers = ['PERFENG_SECRET_CANARY', 'BEGIN PRIVATE KEY', 'BEGIN RSA PRIVATE KEY',
+  'BEGIN EC PRIVATE KEY', 'BEGIN OPENSSH PRIVATE KEY', 'Design fixture only', 'node:child_process'];
+const tokenSuffixMinimum = 30;
+const tokenMarker = new RegExp('gh[pousr]_[A-Za-z0-9]{' + tokenSuffixMinimum + ',}');
+// Recognition needs a prefix plus 30 token characters, not the entire unbounded token.
+// Double the longest required window for UTF-16, retaining all but one byte across reads.
+const overlapBytes = 2 * Math.max(4 + tokenSuffixMinimum, ...literalMarkers.map(value => value.length)) - 1;
+const marked = (text: string) => literalMarkers.some(marker => text.includes(marker)) || tokenMarker.test(text);
+
+function containsMarker(bytes: Buffer): boolean {
+  if (marked(bytes.toString('latin1'))) return true;
+  // Binary payloads need no BOM; a UTF-16 string can start at either byte alignment.
+  for (const offset of [0, 1]) {
+    const length = Math.floor((bytes.length - offset) / 2) * 2;
+    if (length <= 0) continue;
+    const aligned = bytes.subarray(offset, offset + length);
+    if (marked(aligned.toString('utf16le')) || marked(Buffer.from(aligned).swap16().toString('utf16le'))) return true;
+  }
+  return false;
+}
+
+const distributionError = (path: string, reason: string) => Error(diagnostic(path, 1, 'distribution', reason, 'distribution'));
+function scanDistributionFile(path: string) {
+  // Do not follow a replaced file symlink or block opening a substituted FIFO.
+  const fd = openSync(path, constants.O_RDONLY | constants.O_NOFOLLOW | constants.O_NONBLOCK);
+  try {
+    if (!fstatSync(fd).isFile()) throw distributionError(path, 'Distribution entries must be a regular file or directory.');
+    const chunk = Buffer.alloc(64 * 1024);
+    let tail = Buffer.alloc(0);
+    for (;;) {
+      const count = readSync(fd, chunk, 0, chunk.length, null);
+      if (!count) break;
+      const window = Buffer.concat([tail, chunk.subarray(0, count)]);
+      if (containsMarker(window)) throw distributionError(path, 'Forbidden secret, fixture or execution marker.');
+      tail = window.subarray(Math.max(0, window.length - overlapBytes));
+    }
+  } finally { closeSync(fd); }
+}
+
 export function checkDistribution(root: string) {
+  const info = lstatSync(root);
+  if (info.isSymbolicLink()) throw distributionError(root, 'Distribution symlinks forbidden.');
+  if (!info.isDirectory()) throw distributionError(root, 'Distribution root must be a directory.');
   for (const entry of readdirSync(root, { withFileTypes: true })) {
     const path = join(root, entry.name);
-    if (entry.isSymbolicLink()) throw Error(diagnostic(path, 1, 'distribution', 'Distribution symlinks forbidden.', 'distribution'));
-    if (entry.isDirectory()) checkDistribution(path);
-    else {
-      const bytes = readFileSync(path, "utf8");
-      if (/PERFENG_SECRET_CANARY|BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY|gh[pousr]_[A-Za-z0-9]{30,}|Design fixture only|node:child_process/.test(bytes))
-        throw Error(diagnostic(path, 1, 'distribution', 'Forbidden secret, fixture or execution marker.', 'distribution'));
-    }
+    const child = lstatSync(path);
+    if (child.isSymbolicLink()) throw distributionError(path, 'Distribution symlinks forbidden.');
+    if (child.isDirectory()) checkDistribution(path);
+    else if (child.isFile()) scanDistributionFile(path);
+    else throw distributionError(path, 'Distribution entries must be a regular file or directory.');
   }
 }
 if (process.argv[1]?.endsWith("assets.ts")) {
