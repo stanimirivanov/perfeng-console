@@ -14,8 +14,6 @@ jobs:
         with:
           persist-credentials: false
       - uses: ./.github/actions/bootstrap
-      - name: Check public imports and cross-owner cycles
-        run: pnpm check:imports
       - run: make verify
   browser:
     runs-on: ubuntu-24.04

@@ -19,6 +19,12 @@ Neither replaces the pinned generated client, validator or platform decisions.
 Record licenses, engines and peers from exact official registry manifests.
 Keep generated lock changes with their admission evidence. Run frozen bootstrap,
 make verify, make build, make browser-test and make supply-chain.
+H10 removes the three matured Playwright 1.65.0 age exemptions. The workspace
+explicitly enforces 1440 minutes, strict age checks and missing-time refusal, with
+lockfile supply-chain checks and store integrity enabled. See the
+[qualification and cache boundary](ci-efficiency.md). Cache hits still perform a
+frozen script-disabled install; they are not proof of admission or verification.
+
 High-severity audit findings block delivery; scanner failure is an unavailable check.
 Retain lower-severity findings and optional native/WASM peer warnings for review.
 

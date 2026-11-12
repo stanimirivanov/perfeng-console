@@ -167,9 +167,9 @@ only guides and review process. H2 adds compiler coverage and H3 adds the
 format/scheduling rules described above. H4 extracted the existing Angular code and H5 now enforces runtime boundaries.
 H6 implements the local session boundary, H7 tools ownership and H8 actionable/safe
 diagnostics and alias-document parity. H9 adds byte-safe distribution scanning;
-H10 remains pending and is not admission.
+H10 adds measured CI deduplication, store-only caching and release-age disposition below.
 
-| Task | Remaining scope |
+| Task | Status / scope |
 |---|---|
 | H2 | Implemented in [issue #51](https://github.com/stanimirivanov/perfeng-console/issues/51): explicit production-tool compiler coverage and injected CLI/server type-error proof |
 | H3 | Implemented in [issue #53](https://github.com/stanimirivanov/perfeng-console/issues/53): fail-closed workspace formats and native scheduling fixtures |
@@ -179,12 +179,11 @@ H10 remains pending and is not admission.
 | H7 | Implemented in [issue #61](https://github.com/stanimirivanov/perfeng-console/issues/61): incoming server/CLI/preview/public-entry roles and exact imports/native capabilities |
 | H8 | Implemented in [issue #63](https://github.com/stanimirivanov/perfeng-console/issues/63): corrective/single-line diagnostics, safe lock guidance and checked alias-document parity |
 | H9 | Implemented in [issue #65](https://github.com/stanimirivanov/perfeng-console/issues/65): bounded byte scanning, all regular files, ASCII/UTF-16LE/BE marker views, read overlap and root/special-file refusal |
-| H10 | Measured CI duplication/cache improvements; release-age exception disposition; retain full staged verification by default |
+| H10 | Implemented in [issue #67](https://github.com/stanimirivanov/perfeng-console/issues/67): remove redundant CI preflight, cache only pnpm store, retire matured exclusions and preserve full staged verification |
 
-The Playwright minimumReleaseAgeExclude entries name versions but lack durable
-reason/expiry records required by dependency-policy.md. H1 reports the gap; H10
-must remove unnecessary matured exclusions or obtain a real scoped approval.
-Do not invent historical authorization or silently renew them.
+H10 removed the three matured Playwright release-age exclusions rather than
+inventing historical approval or renewing them. Read the [measurement and policy
+receipt](ci-efficiency.md); future exceptions still require explicit review.
 
 ## H4 extraction receipt
 
@@ -364,6 +363,27 @@ socket entry. Existing build/distribution and package gates call the same scanne
 H8 errors retain file/rule/make build guidance without showing matched contents.
 No binary skip, blanket binary rejection, archive/base64/decompression traversal,
 machine-code analysis or general secret-detection guarantee is introduced.
+
+## H10 efficiency receipt
+
+Read [CI measurement and policy disposition](ci-efficiency.md) for the completed
+hosted baseline and local cold/warm qualification. Only the redundant standalone
+quality import step is removed; make verify owns the same import/graph gate as an explicit early prerequisite,
+shared with lint and executed once before contract generation.
+All browser, independent install, guide, audit and aggregate fault probes remain.
+The shared bootstrap enables the existing action's store cache, never node_modules
+or verified outputs, and never skips frozen script-disabled installation.
+
+The matured Playwright exclusions are removed. The 1440-minute floor is explicit
+and strict, missing publication time is refused, lockfile trust bypass stays false
+and store integrity verification stays true. Frozen qualification changed no pins
+or lock bytes. This does not claim an authenticated cache or a measured hosted
+speedup; cache data and a successful quality verdict are different things.
+
+The full staged hook remains byte-for-byte unchanged. A real disposable Git-index
+fixture proves unstaged good work cannot hide staged bad work; all fixture gates
+run from the staged tree. No fast/changed-only verification, new test suppression,
+path-filtered quality or result-cache shortcut is admitted.
 
 ## Structural sensor receipt (2026-11-07, issue #33; historical scope)
 

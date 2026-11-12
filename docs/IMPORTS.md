@@ -110,7 +110,7 @@ Run `pnpm lint` (or `make lint`) for ESLint plus the import/cycle gate.
 Run `pnpm check:imports` (or `make check-imports`) for the scanner and graph gate.
 Run `make typecheck` and `make verify` before review. The existing pre-commit hook
 runs make verify on the staged tree. Console quality CI explicitly runs
-pnpm check:imports, then make verify. Negative fixtures ship with the rules.
+make verify, which shares an early import preflight with its lint prerequisite. Negative fixtures ship with the rules.
 
 When adding a public surface, update its exact alias/entry and ownership policy,
 add an adversarial fixture, and verify compiler, Node and product-release resolution.

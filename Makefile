@@ -24,7 +24,7 @@ architecture:
 test:
 	sh harness/test.sh
 
-verify: doctor contracts-check lint typecheck architecture test component-test build
+verify: doctor check-imports contracts-check lint typecheck architecture test component-test build
 
 supply-chain: doctor
 	pnpm audit --audit-level high

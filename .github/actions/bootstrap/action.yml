@@ -8,5 +8,8 @@ runs:
         node-version-file: .node-version
         package-manager-cache: false
     - uses: pnpm/action-setup@v6
+      with:
+        cache: true
+        cache_dependency_path: pnpm-lock.yaml
     - shell: bash
       run: make bootstrap
