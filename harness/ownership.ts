@@ -42,7 +42,11 @@ const edges: Record<Role, readonly Role[]> = {
   contract: ['contract'],
   entry: ['composition', 'adapter'],
 };
-const ioNames = new Set(['fetch', 'XMLHttpRequest', 'WebSocket', 'EventSource', 'AbortController', 'AbortSignal', 'setTimeout', 'setInterval']);
+// Issue #53: native scheduling is platform authority, including rendering callbacks.
+// Angular render hooks remain framework-owned; these reserved names cannot create a second scheduler.
+const ioNames = new Set(['fetch', 'XMLHttpRequest', 'WebSocket', 'EventSource', 'AbortController', 'AbortSignal',
+  'setTimeout', 'setInterval', 'queueMicrotask', 'setImmediate', 'requestAnimationFrame', 'requestIdleCallback',
+  'scheduler', 'postTask']);
 const runtimes = new Set(['runPromise', 'runPromiseExit', 'runFork', 'runSync', 'runSyncExit', 'runCallback', 'runForkWith', 'runPromiseWith']);
 
 /** Inspect handwritten ownership; behavioral guarantees remain integration-test duties. */
@@ -131,21 +135,25 @@ export function checkOwnership(root: string, registry: Readonly<Record<string, R
       return variable?.initializer ? authority(variable.initializer, seen) : expression.text;
     };
     const visit = (node: ts.Node) => {
+      if (!legacy && role !== 'adapter' && ts.isBindingElement(node) && node.propertyName &&
+          ts.isComputedPropertyName(node.propertyName) && ts.isStringLiteralLike(node.propertyName.expression) &&
+          ioNames.has(node.propertyName.expression.text))
+        report(node, 'OWN-03', 'Computed binding cannot move I/O or native scheduling out of an admitted adapter.');
       if (ts.isIdentifier(node)) {
         const symbol = checker.getSymbolAtLocation(node);
         // Imported aliases retain the original member even without installed fixture packages.
         const declaration = symbol?.declarations?.find(ts.isImportSpecifier);
         const original = declaration ? (declaration.propertyName ?? declaration.name).text : node.text;
-        if (!legacy && ioNames.has(original) && role !== 'adapter' && !(original === 'AbortSignal' && ts.isTypeReferenceNode(node.parent))) report(node, 'OWN-03', 'I/O, native abort and timers belong in an admitted adapter.');
+        if (!legacy && ioNames.has(original) && role !== 'adapter' && !(original === 'AbortSignal' && ts.isTypeReferenceNode(node.parent))) report(node, 'OWN-03', 'I/O, native abort and scheduling belong in an admitted adapter; use Angular render hooks for rendering.');
         if (original === 'ManagedRuntime' && role !== 'composition') report(node, 'OWN-02', 'Managed runtime creation belongs at composition.');
         if (runtimes.has(original) && role !== 'composition') report(node, 'OWN-02', 'Execute Effects only at composition boundaries.');
       }
       if (ts.isElementAccessExpression(node)) {
         const member = node.argumentExpression;
         if (ts.isStringLiteralLike(member)) {
-          if (!legacy && ioNames.has(member.text) && role !== 'adapter') report(node, 'OWN-03', 'Indirect I/O must stay in an adapter.');
+          if (!legacy && ioNames.has(member.text) && role !== 'adapter') report(node, 'OWN-03', 'Indirect I/O and native scheduling must stay in an admitted adapter.');
           if (runtimes.has(member.text) && role !== 'composition') report(node, 'OWN-02', 'Indirect runtime execution is forbidden here.');
-        } else if (/^(window|globalThis|self|Effect|ManagedRuntime|Runtime)$/.test(authority(node.expression))) report(node, 'OWN-03', 'Computed authority is not reviewable.');
+        } else if (/^(window|globalThis|self|scheduler|Effect|ManagedRuntime|Runtime)$/.test(authority(node.expression))) report(node, 'OWN-03', 'Computed authority is not reviewable.');
       }
       if (ts.isImportDeclaration(node) && node.moduleSpecifier && ts.isStringLiteral(node.moduleSpecifier) &&
         /effect\/(ManagedRuntime|Runtime)$/.test(node.moduleSpecifier.text) && role !== 'composition') report(node, 'OWN-02', 'Runtime modules belong at composition boundaries.');

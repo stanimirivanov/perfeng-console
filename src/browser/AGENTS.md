@@ -20,3 +20,9 @@ permits specific production paths, not component-owned runtimes generally.
 `main.ts` still mixes components with composition authority; do not copy that
 pattern. Shared-session coordination and the frozen Verification adapter migration
 remain pending in the [enforcement index](../../docs/development/harness-rules.md#remaining-hardening).
+
+Use reviewed `.ts` source; alternate executable JS/TS formats are rejected even
+under nested or spec-like paths. Native microtask/immediate/frame/idle/task APIs
+are scheduling authority, not a component rendering shortcut. Prefer Angular
+render hooks; keep direct schedulers in reviewed adapters with teardown proof.
+See [native scheduling scope](../../docs/development/harness-rules.md#native-scheduling-scope).
