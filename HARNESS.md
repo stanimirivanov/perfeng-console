@@ -96,6 +96,10 @@ and integration tests live under `tests/`. Follow the
 | Pre-commit | `make hooks` once per checkout | Verifies the staged snapshot with the installed modules. Unstaged edits cannot mask a bad staged source |
 | Hosted CI | `quality.yml` jobs `verify`, `browser`, `supply-chain` | Frozen bootstrap; aggregate, browser/installation/stack/self-test and audit respectively; read-only contents permission and ten-minute job limits |
 
+When a release-build harness module gains a local import, update the explicit input
+manifest in scripts/check-console-isolation.ts and run this installation gate.
+A normal workspace build cannot prove that the isolated source closure is complete.
+
 `make verify` does not run browser, installation, stack-admission, guide or
 harness-self-test targets. Quality CI runs browser, installation, stack-admission and self-test separately; the
 [user-guide workflow](.github/workflows/user-guide.yml) publishes passing tagged journeys.
