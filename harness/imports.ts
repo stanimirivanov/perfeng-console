@@ -12,6 +12,7 @@ export const publicImports: Readonly<Record<string, string>> = {
   "#perfeng/contracts": "src/shared/contracts/public-api.ts",
   "#perfeng/bff": "src/bff/public-api.ts",
   "#perfeng/bff-config": "src/bff/config-public-api.ts",
+  "#perfeng/bff-login-protocol": "src/bff/login/protocol.ts",
   "#perfeng/bff-login": "src/bff/login/transactions.ts",
   "#perfeng/bff-session": "src/bff/session.ts",
   "#perfeng/bff-csp": "src/bff/csp.ts",

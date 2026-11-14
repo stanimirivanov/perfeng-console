@@ -90,3 +90,8 @@ an Effect operation in this slice.
 Rollback removes this unused-by-serving owner, its alias and tests. No session,
 provider credential, contract, generated output, local pairing behavior or public
 route migration is required.
+
+The [PR52b protocol adapter](login-protocol.md) now consumes this owner to build
+fixed authorization requests and admit bound callbacks. It supplies cookie
+instructions only; incoming HTTP integration, exchange and browser receipts
+remain pending.
