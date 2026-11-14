@@ -14,3 +14,10 @@ qualified lazy Effect reader; [transport.ts](transport.ts) owns execution and pu
 failure projection. Keep the Node adapter imports local to the reader. No native HTTP
 dispatch or transport legacy allowance remains. Preserve the real TLS, raw-header,
 byte/deadline, identity and lifecycle tests in tests/integration/transport.test.ts.
+
+Pending shared-user login transactions live in `login/transactions.ts`; see
+[their contract and remaining gates](../../docs/development/login-transactions.md).
+Keep them separate from local pairing and authenticated sessions. The begin
+result's browser binding is server/cookie-only; never JSON-serialize the whole
+result. Consume once before exchange I/O. A handoff is not authentication success.
+No login/callback route or shared-user activation is admitted by this helper.

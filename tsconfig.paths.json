@@ -60,6 +60,9 @@
       ],
       "#perfeng/run-transitions": [
         "./src/generated/transitions.ts"
+      ],
+      "#perfeng/bff-login": [
+        "./src/bff/login/transactions.ts"
       ]
     }
   }

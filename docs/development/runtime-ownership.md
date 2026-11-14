@@ -169,3 +169,12 @@ topology. The browser consumes it as DTO data, without fetching schemas or
 importing a provider runtime. Artifact-list reads share the qualified Node reader
 and never confer artifact-body access. The standalone release inventory includes
 the generated transition entry.
+
+## Pending login ownership — PR52a
+
+The BFF's [login transaction adapter](login-transactions.md) owns bounded
+process-local pending state and synchronous Node crypto. It performs no I/O,
+timers or asynchronous work, and needs no Effect runtime. Composition must stop
+it on shutdown/configuration replacement; future scoped exchange operations own
+the server-only handoff, cancellation and late-result refusal. This does not
+admit a shared-user HTTP route, browser session or provider exchange adapter.

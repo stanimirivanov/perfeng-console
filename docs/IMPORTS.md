@@ -37,6 +37,7 @@ parenthesized note may follow the target. Code review still governs permission c
 | `#perfeng/contracts` | `./src/shared/contracts/public-api.ts` |
 | `#perfeng/bff` | `./src/bff/public-api.ts` |
 | `#perfeng/bff-config` | `./src/bff/config-public-api.ts` |
+| `#perfeng/bff-login` | `./src/bff/login/transactions.ts` |
 | `#perfeng/bff-session` | `./src/bff/session.ts` |
 | `#perfeng/bff-csp` | `./src/bff/csp.ts` |
 | `#perfeng/bff-runs` | `./src/bff/runs.ts` |
