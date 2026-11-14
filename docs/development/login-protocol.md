@@ -97,3 +97,8 @@ import and ownership maps include this adapter; no dependency or contract change
 
 Rollback removes this unmounted adapter, its alias and tests. The transaction
 owner, local pairing, existing routes and all provider state remain intact.
+
+[PR52c client assertions](client-assertions.md) now supply a separate bounded
+confidential-client signing capability for later code/exchange operations. This
+is synthetic signing conformance only; no token POST, provider admission or
+browser session is added.

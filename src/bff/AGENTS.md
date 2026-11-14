@@ -28,3 +28,9 @@ Future incoming adapters must pass raw targets and every Cookie header, enforce
 Host/method/initiation CSRF, and keep successful handoffs server-only. Its cookie
 instructions do not mount routes or qualify a browser flow. Do not infer login
 success from callback admission; exchange and signed nonce/token validation follow.
+
+`login/client-assertion.ts` owns the fixed server-only private_key_jwt signer;
+read [its custody and qualification limits](../../docs/development/client-assertions.md).
+Use separate configured owners/keys for login and delegation. Form fields are
+credentials, not response DTOs. Fresh jti values do not authorize retries of an
+uncertain code exchange. No token endpoint transport is admitted by this signer.
