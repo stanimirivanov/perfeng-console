@@ -63,6 +63,9 @@
       ],
       "#perfeng/bff-login": [
         "./src/bff/login/transactions.ts"
+      ],
+      "#perfeng/bff-login-protocol": [
+        "./src/bff/login/protocol.ts"
       ]
     }
   }

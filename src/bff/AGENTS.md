@@ -21,3 +21,10 @@ Keep them separate from local pairing and authenticated sessions. The begin
 result's browser binding is server/cookie-only; never JSON-serialize the whole
 result. Consume once before exchange I/O. A handoff is not authentication success.
 No login/callback route or shared-user activation is admitted by this helper.
+
+`login/protocol.ts` owns the fixed authorization profile and strict raw callback
+admission; see [the protocol boundary](../../docs/development/login-protocol.md).
+Future incoming adapters must pass raw targets and every Cookie header, enforce
+Host/method/initiation CSRF, and keep successful handoffs server-only. Its cookie
+instructions do not mount routes or qualify a browser flow. Do not infer login
+success from callback admission; exchange and signed nonce/token validation follow.

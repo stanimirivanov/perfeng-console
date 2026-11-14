@@ -82,6 +82,7 @@
       "default": "./harness/import-lint.mjs"
     },
     "#perfeng/run-transitions": "./src/generated/transitions.ts",
-    "#perfeng/bff-login": "./src/bff/login/transactions.ts"
+    "#perfeng/bff-login": "./src/bff/login/transactions.ts",
+    "#perfeng/bff-login-protocol": "./src/bff/login/protocol.ts"
   }
 }
