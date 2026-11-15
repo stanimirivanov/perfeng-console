@@ -95,3 +95,8 @@ remain pending. Named serving stays gated and local pairing is unchanged.
 Rollback removes this unmounted adapter and its exact SDK/constant permissions,
 alias and tests. No dependency, generated schema, provider state, existing route
 or persistence migration changes.
+
+The [PR52e envelope decoders](token-response-admission.md) now reject ambiguous
+response JSON and separate unverified code/delegated token candidates. They do
+not compose a grant or verify a JWT; token/session/provider/browser admission
+remains pending.

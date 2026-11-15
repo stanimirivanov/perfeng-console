@@ -42,6 +42,7 @@ export const roles: Readonly<Record<string, Role>> = {
   'src/bff/login/protocol.ts': 'adapter',
   'src/bff/login/client-assertion.ts': 'adapter',
   'src/bff/login/token-post.ts': 'adapter',
+  'src/bff/login/token-response.ts': 'adapter',
   'apps/console/src/runs/detail/run-detail.ts': 'component',
   'apps/console/src/runs/run.store.ts': 'store',
   'apps/console/src/runs/run-client.ts': 'adapter',

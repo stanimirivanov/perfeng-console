@@ -41,3 +41,9 @@ tokens or login success. Keep its response text and submitted form server-only.
 Its native HTTP permission is solely the named effective header-size constant;
 no request/get, namespace or copied adapter authority is admitted. Repeat TLS,
 raw-header, deadline and peer-closure tests before extending transport use.
+
+`login/token-response.ts` admits only private unverified credential envelopes;
+see [the phase and authority limits](../../docs/development/token-response-admission.md).
+Never treat its success as signed identity or serialize candidates to the browser.
+JWT type/signature/issuer/audience/nonce/time checks and current policy are later
+obligations. Keep native JSON grammar validation and decoded-name duplicate checks.

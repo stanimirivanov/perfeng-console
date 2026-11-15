@@ -72,6 +72,9 @@
       ],
       "#perfeng/bff-token-post": [
         "./src/bff/login/token-post.ts"
+      ],
+      "#perfeng/bff-token-response": [
+        "./src/bff/login/token-response.ts"
       ]
     }
   }
