@@ -107,3 +107,11 @@ test('aliases preserve layer authority and type-only DTO admission', () => {
   assert.match(diagnostics({ 'src/browser/view.ts': "import '#perfeng/bff';" }), /layer/);
   assert.match(diagnostics({ 'src/browser/view.ts': "import '#perfeng/contracts';" }), /shared-contract/);
 });
+
+test('token POST platform admission belongs only to its concrete BFF adapter', () => {
+  const code = "import * as NodeHttpClient from '@effect/platform-node/NodeHttpClient'; import * as Request from 'effect/http/HttpClientRequest';";
+  assert.equal(diagnostics({ 'src/bff/login/token-post.ts': code }), '');
+  assert.match(diagnostics({ 'src/bff/login/copied-post.ts': code }), /package/);
+  assert.match(diagnostics({ 'src/browser/token-post.ts': code }), /package/);
+  assert.match(diagnostics({ 'src/bff/login/token-post.ts': "import { request } from 'node:https';" }), /package/);
+});

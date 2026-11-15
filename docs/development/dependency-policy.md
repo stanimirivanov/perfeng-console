@@ -42,7 +42,8 @@ CSP exceptions follow ADR 0002 and explicit owner authorization.
 
 ## Node adapter admission — issue #33
 
-@effect/platform-node 4.1.2 is admitted for the BFF Run reader only, paired with
+@effect/platform-node 4.1.2 is admitted for the BFF Run reader and the narrowly
+qualified [token POST adapter](token-post-transport.md), paired with
 Effect 4.1.2. MIT; Node >=22.19.0; current Node pin is 26.13.0. The exact registry
 metadata, resolved fixture licenses and qualification history are recorded under
 tools/qualification/effect-node. The root lock now pins the actual production graph.

@@ -80,8 +80,9 @@ key/config rejection, lifetime, stop and invalid/failing clocks. These are
 synthetic cryptographic checks, not actual Keycloak client authentication or
 capacity/latency measurements.
 
-Fixed-origin token POST/TLS transport still needs scoped admission: the current
-Node HTTP adapter is qualified for the Run reader only. Code exchange, signed
+The [PR52d token POST adapter](token-post-transport.md) separately qualifies
+fixed-endpoint TLS/streaming behavior; it does not compose these assertions or
+qualify actual OAuth client authentication. Code exchange, signed
 ID-token/nonce validation, audience-restricted delegation, authenticated sessions,
 real-browser/provider and shared-pilot receipts remain pending. Neither this
 signer nor a callback handoff grants a session or service access. Existing local

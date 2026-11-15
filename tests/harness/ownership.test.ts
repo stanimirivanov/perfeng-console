@@ -308,3 +308,14 @@ test('tool native loaders cannot hide behind computed names or assigned process 
     'const p = process; p[method]("https");'])
     assert.match(inspect({ 'tools/console-server.ts': code }), /OWN-03|OWN-13/, code);
 });
+
+test('token POST may read the effective header limit without acquiring native dispatch', () => {
+  const file = 'src/bff/login/token-post.ts';
+  assert.equal(inspect({ [file]: "import { maxHeaderSize } from 'node:http'; void maxHeaderSize;" }), '');
+  for (const source of [
+    "import { request } from 'node:http';", "import * as http from 'node:http';",
+    "import http from 'node:http';", "import { maxHeaderSize, get } from 'node:http';",
+    "export { maxHeaderSize } from 'node:http';",
+  ]) assert.match(inspect({ [file]: source }), /Native dispatch/);
+  assert.match(inspect({ 'src/bff/run-reader.ts': "import { maxHeaderSize } from 'node:http';" }), /Native dispatch/);
+});
