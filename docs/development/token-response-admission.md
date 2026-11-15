@@ -102,3 +102,8 @@ profile are conservative admission choices, not measured provider capacities.
 No initial refresh lifetime or refresh implementation is selected here. Rollback
 removes the decoders, public alias and tests without altering transport, local
 pairing, cookies, provider state, routes or persistence.
+
+The [PR52f private code exchange](code-exchange.md) now composes callback, signing,
+wire and code-envelope admission. Shared feature types live in login-contracts.ts
+with existing public exports preserved. Its output remains unverified; JWT,
+session, actual-provider and browser gates are still pending.

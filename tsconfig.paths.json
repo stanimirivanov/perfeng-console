@@ -78,6 +78,9 @@
       ],
       "#perfeng/bff-token-envelope": [
         "./src/bff/login/token-envelope.ts"
+      ],
+      "#perfeng/bff-code-exchange": [
+        "./src/bff/login/code-exchange.ts"
       ]
     }
   }

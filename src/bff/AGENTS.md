@@ -50,3 +50,10 @@ obligations. `token-envelope.ts` owns common native JSON/decoded-name duplicate
 checks; keep its flat, syntax-validated scan precondition and standalone tests.
 Public decoder results/candidates use named readonly types; readonly does not
 replace server-side custody or JWT verification.
+
+`login/code-exchange.ts` wires the private single-use code operation; see
+[its sequence and lifetime limits](../../docs/development/code-exchange.md).
+The operation depends on feature-owned contracts/capabilities, not adapters.
+Execute its Effect only at composition; interruption owns network cancellation.
+Owner retirement fences late results but does not itself interrupt request fibers.
+A returned expected nonce/candidate is not verified identity or a session.
