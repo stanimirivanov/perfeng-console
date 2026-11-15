@@ -1,4 +1,4 @@
-# ID/initial-access JWT qualification — PR52g
+# ID/initial-access JWT qualification — PR52g and PR52h
 
 Issue: https://github.com/stanimirivanov/perfeng-console/issues/81
 Qualification date: 2026-11-15. Base production main: 52d3df1.
@@ -58,9 +58,9 @@ before asynchronous work. Both config and token contain only synthetic fixture d
 
 Header/body preflight happens before signature verification but confers no trust.
 The only successful projection follows library signature/claim verification. Outcomes
-are generic invalid_token or unavailable with no partial subject. This is a per-token
-proof: code-pair subject equality and binding to the live callback/operation are **not**
-qualified by two independent successes.
+are generic invalid_token or unavailable with no partial subject. This API remains a per-token proof: two independent successes alone do not
+qualify code-pair subject equality or live callback/operation binding. The isolated
+PR52h extension below qualifies explicit pair checks at a captured instant.
 
 ## Refutations and remaining admission gates
 
@@ -77,7 +77,7 @@ and generate keys only in test memory. No real Keycloak receipt is claimed.
 
 Before production adoption: review the wrapper/API/runtime ownership and dependency ADR;
 qualify fixed-origin key fetching, a bounded shared fresh-key cache and actual rotation/
-outage; bind ID/access subjects and conservative validity to the consumed code flow;
+outage; integrate the isolated pair checks with the actual consumed code flow;
 validate current enrollment/caller/service policy at its owning provider; preserve
 server credential custody, session fixation/CSRF/logout, cancellation/late-result fencing;
 obtain actual Keycloak/BFF/browser and shared-pilot receipts. No session is granted here.
@@ -103,3 +103,80 @@ Production behavior/lockfiles, identity provider, credentials and persisted stat
 
 The boundary/maintenance decision is recorded in
 [proposed ADR 0004](../../../docs/decisions/0004-qualify-jwt-verification-before-runtime-adoption.md).
+
+## PR52h code-response pair qualification — issue #95
+
+[Console issue #95](https://github.com/stanimirivanov/perfeng-console/issues/95)
+adds an isolated pair candidate on merged production baseline `ce138b9`.
+This extends the original PR52g qualification; it does not change that historical
+baseline/receipt or admit jose/jsonc-parser into the root production graph.
+
+`pair-candidate.ts` owns a readonly structural input matching the relevant private
+code-exchange observation: `issuer`, `nonce`, `requestStartedAtMs`, `nowMs`, explicit
+trusted key `snapshot`, and unverified-code `idToken`, `accessToken`, `expiresIn`.
+It has no production imports. Its caller must supply the nonce/context from the
+trusted consumed handoff; the fixture neither consumes that handoff nor proves
+live callback integrity. `requestStartedAtMs` is the token POST start, **not** the
+browser authorization start. No auth_time claim or refresh-token trust is invented.
+
+The entire input is cloned before the first await. Both credentials use the same
+reviewed per-token verifier; a fixture-internal verified projection retains only
+signed issuance/expiry/not-before timestamps alongside issuer/subject/profile.
+It performs no independent cryptography or unverified second decoding. The public
+`verifyCandidate` projection remains unchanged and still omits times and raw claims.
+The pair candidate does not accept two unrelated per-token successes as sufficient:
+
+1. Check finite, nonnegative safe-integer millisecond observations with a valid Date
+   and `requestStartedAtMs <= nowMs`; require an unverified-code stage and integral
+   `expiresIn` from 1 through 300. Refuse malformed runtime objects, not just TS types.
+2. Verify both signatures and the exact existing profiles using the captured
+   issuer/key snapshot. ID nonce matches the captured expected nonce; both verified
+   subjects and issuers must match. Per-token refusal becomes generic invalid_pair
+   or unavailable, without either subject, credential, signed time or backend error.
+3. Apply a **conservative proposed code-response profile**, not a universal OIDC
+   requirement: each signed `iat * 1000 >= requestStartedAtMs - 30000`. The accepted
+   ADR permits at most 30 seconds of clock tolerance. NumericDate seconds are compared
+   as exact milliseconds; fractional request starts can tighten that window, never
+   expand it. This helps reject older same-subject credentials without pretending
+   POST time is authentication time. The original upper issuance-age/skew checks
+   remain in the shared verifier.
+4. A signed nbf, if present, must be at or before nowMs. The pair refuses future nbf
+   even if per-token clock tolerance alone would allow it. All converted times and
+   computed duration endpoints must be safe integers.
+5. The usable observation horizon is exactly
+   `min(ID exp * 1000, access exp * 1000, requestStartedAtMs + expiresIn * 1000)`.
+   Require it strictly after nowMs. Equality is expired; signature-verifier grace
+   never extends credential usability. Measuring expires_in from POST start is
+   conservative relative to receipt time and charges dispatch/response delay.
+6. Return only `{ok: true, issuer, subject, validUntilMs}` or a generic refusal.
+   This is an observation at the captured instant: it creates no session, HUMAN/CI
+   enrollment, service grant, approved caller or entitlement to ignore later trust
+   freshness/revocation. It is not a wall-clock monitor or cancellation boundary.
+
+Seventeen tests across the combined fixture gate include the original eight profile
+checks and nine pair checks: mismatched independently valid subjects, signed issuer/
+nonce/client/audience/type substitution, invalid signature, conservative expiration/
+response duration, exact/fractional issuance windows and nbf, unsafe clocks/context,
+stale trust, no partial projection and caller mutation during crypto awaits. Test
+keys and credentials are synthetic and stay in memory; no real Keycloak run occurs.
+
+**Strongest limitation:** equal issuer/subject and bounded issuance are not proof
+that two tokens were signed in the exact same response. A recently issued access
+token for the same person can pass; a test explicitly records that limitation.
+Optional at_hash/common-response binding is not qualified here. Actual OIDC/provider
+conformance must settle any such requirements before runtime admission rather than
+claiming this candidate alone is a complete OIDC relying party.
+
+**Production remains NOT_ADMITTED.** Remaining gates include dependency/API/runtime
+ownership review, fixed-origin key fetching and bounded shared freshness/rotation/
+outage behavior, integration with the actual single-use code operation, live clock
+and cancellation/late-result fencing, server token/session lifecycle and real
+Keycloak/BFF/browser/shared-pilot receipts. The captured nowMs is not re-read after
+crypto; a production adapter must decide and qualify when to re-evaluate time/trust
+before releasing authority. Signing-key freshness is verified at this observation,
+not promised throughout validUntilMs. Control-plane issue #356 remains open.
+
+Reproduce with the existing `make identity-jwt-qualification` gate, which now
+explicitly runs both test files and compiles both candidates. Roll back the pair
+candidate, its tests and gate additions together; preserve the original per-token
+projection and do not activate production as a fallback for an unqualified fixture.

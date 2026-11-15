@@ -23,8 +23,14 @@ type Result = {
     readonly ok: false;
     readonly reason: 'invalid_token' | 'unavailable';
   };
-const invalid = (): Result => ({ ok: false, reason: 'invalid_token' });
-const unavailable = (): Result => ({ ok: false, reason: 'unavailable' });
+type Refusal = Extract<Result, { ok: false; }>;
+type VerifiedProfile = Refusal | (Extract<Result, { ok: true; }> & {
+  readonly issuedAtMs: number;
+  readonly expiresAtMs: number;
+  readonly notBeforeMs: number | undefined;
+});
+const invalid = (): Refusal => ({ ok: false, reason: 'invalid_token' });
+const unavailable = (): Refusal => ({ ok: false, reason: 'unavailable' });
 
 function objectSegment(segment: string): Record<string, unknown> {
   if (!/^[A-Za-z0-9_-]+$/.test(segment)) throw new Error('Noncanonical segment');
@@ -56,7 +62,7 @@ function objectSegment(segment: string): Record<string, unknown> {
 /** Isolated qualification only: explicit trusted snapshots, never remote discovery.
  * No session, service grant or enrolled HUMAN/CI kind is inferred from claims.
  */
-export async function verifyCandidate(token: unknown, input: QualificationInput): Promise<Result> {
+export async function verifyTokenProfile(token: unknown, input: QualificationInput): Promise<VerifiedProfile> {
   try {
     const { issuer, profile, nonce, nowMs } = input;
     const snapshot = structuredClone(input.snapshot);
@@ -93,6 +99,12 @@ export async function verifyCandidate(token: unknown, input: QualificationInput)
         (profile === 'id' && (typeof nonce !== 'string' || !nonce || nonce.length > 256 || claims.nonce !== nonce))) return invalid();
     const cryptoKey = await importJWK({ kty: 'RSA', n: key.n, e: key.e, alg: 'RS256', use: 'sig' }, 'RS256');
     await jwtVerify(token, cryptoKey, { algorithms: ['RS256'], typ: 'JWT', issuer, audience,requiredClaims: ['iss', 'sub', 'aud', 'iat', 'exp'], maxTokenAge: 300, clockTolerance: 30, currentDate: new Date(nowMs) });
-    return { ok: true, issuer, subject: claims.sub, profile };
+    return { ok: true, issuer, subject: claims.sub, profile, issuedAtMs: claims.iat * 1000, expiresAtMs: claims.exp * 1000, notBeforeMs: claims.nbf === undefined ? undefined : claims.nbf * 1000 };
   } catch { return invalid(); }
+}
+
+/** Retain the per-token public projection; signed time fields stay fixture-internal. */
+export async function verifyCandidate(token: unknown, input: QualificationInput): Promise<Result> {
+  const verified = await verifyTokenProfile(token, input);
+  return verified.ok ? { ok: true, issuer: verified.issuer, subject: verified.subject, profile: verified.profile } : verified;
 }
