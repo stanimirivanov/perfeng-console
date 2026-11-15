@@ -15,6 +15,8 @@ export const publicImports: Readonly<Record<string, string>> = {
   "#perfeng/bff-login-protocol": "src/bff/login/protocol.ts",
   "#perfeng/bff-client-assertion": "src/bff/login/client-assertion.ts",
   "#perfeng/bff-token-post": "src/bff/login/token-post.ts",
+  "#perfeng/bff-token-envelope": "src/bff/login/token-envelope.ts",
+  "#perfeng/bff-token-response": "src/bff/login/token-response.ts",
   "#perfeng/bff-login": "src/bff/login/transactions.ts",
   "#perfeng/bff-session": "src/bff/session.ts",
   "#perfeng/bff-csp": "src/bff/csp.ts",
