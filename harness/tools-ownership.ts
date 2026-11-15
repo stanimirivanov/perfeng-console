@@ -3,6 +3,10 @@ import ts from 'typescript';
 // Issue #61: incoming listeners are distinct from the qualified upstream transport.
 export const toolRoles = {
   'tools/console-server.ts': 'adapter',
+  'tools/server/request-policy.ts': 'adapter',
+  'tools/server/session-routes.ts': 'adapter',
+  'tools/server/run-routes.ts': 'adapter',
+  'tools/server/static-route.ts': 'adapter',
   'tools/serve-console.ts': 'composition',
   'tools/preview.mjs': 'adapter',
   'tools/public-api.ts': 'entry',
@@ -10,10 +14,25 @@ export const toolRoles = {
 
 const imports: Readonly<Record<string, Readonly<Record<string, readonly string[]>>>> = {
   'tools/console-server.ts': {
-    'node:https': ['createServer'], 'node:fs/promises': ['readFile'],
-    'node:path': ['resolve'], 'node:url': ['fileURLToPath'], 'node:events': ['once'],
-    '#perfeng/bff-runs': ['artifactObservation', 'runObservation'], '#perfeng/bff': ['createRunTransport'],
-    '#perfeng/bff-session': ['createSession'], '#perfeng/bff-csp': ['renderConsoleHtml'],
+    'node:https': ['createServer', 'Server'], 'node:url': ['fileURLToPath'], 'node:events': ['once'],
+    '#perfeng/bff-session': ['createSession'],
+    './server/request-policy.ts': ['requestAllowed', 'sessionId', 'SESSION_PATH'],
+    './server/session-routes.ts': ['handleSession'], './server/run-routes.ts': ['handleRun', 'matchesRun', 'RunReader'],
+    './server/static-route.ts': ['handleStatic'],
+  },
+  'tools/server/request-policy.ts': { 'node:http': ['IncomingMessage'] },
+  'tools/server/session-routes.ts': {
+    'node:http': ['IncomingMessage', 'ServerResponse'], '#perfeng/bff-session': ['createSession'],
+    './request-policy.ts': ['SESSION_COOKIE', 'COOKIE_ATTRIBUTES', 'SESSION_PATH', 'readAllowed'],
+  },
+  'tools/server/run-routes.ts': {
+    './request-policy.ts': ['readAllowed'],
+    'node:http': ['IncomingMessage', 'ServerResponse'], '#perfeng/bff-session': ['createSession'],
+    '#perfeng/bff-runs': ['artifactObservation', 'runObservation', 'RunResult', 'ArtifactResult'],
+  },
+  'tools/server/static-route.ts': {
+    'node:http': ['IncomingMessage', 'ServerResponse'], 'node:fs/promises': ['readFile'],
+    'node:path': ['resolve'], '#perfeng/bff-csp': ['renderConsoleHtml'],
   },
   'tools/serve-console.ts': {
     'node:fs/promises': ['readFile'], './console-server.ts': ['startConsole'], '#perfeng/bff': ['createRunTransport'],
@@ -29,9 +48,9 @@ const imports: Readonly<Record<string, Readonly<Record<string, readonly string[]
 export function toolImportError(file: string, node: ts.Node, specifier: string): string | undefined {
   const members = imports[file]?.[specifier];
   if (!members) return 'Review this exact tool import and its members; file roles grant no platform imports.';
-  if (file === 'tools/console-server.ts' && specifier === '#perfeng/bff' &&
+  if (((specifier === 'node:http' && file !== 'tools/preview.mjs') || (file === 'tools/server/session-routes.ts' && specifier === '#perfeng/bff-session')) &&
       !(ts.isImportDeclaration(node) && node.importClause?.isTypeOnly))
-    return 'The incoming server consumes the upstream factory through declaration-level import type only.';
+    return 'Consume these declarations through declaration-level import type only.';
   if (ts.isImportDeclaration(node)) {
     const clause = node.importClause;
     if (clause && !clause.name && clause.namedBindings && ts.isNamedImports(clause.namedBindings) &&
@@ -48,7 +67,7 @@ export function separateToolOwner(path: string): boolean {
   return path === 'tools/qualification' || path === 'tools/user-guide';
 }
 export function toolGlobalAllowed(file: string, member: string): boolean {
-  return file === 'tools/console-server.ts' && member === 'AbortController';
+  return file === 'tools/server/run-routes.ts' && member === 'AbortController';
 }
 
 /** The existing listener deadline is not permission to start an arbitrary global timer. */

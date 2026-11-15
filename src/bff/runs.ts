@@ -27,3 +27,5 @@ export function artifactObservation(result: ArtifactResult): { status: number; b
     ({ id, runId, kind, sha256, sizeBytes, mediaType, format }));
   return { status: 200, body: { value: { artifacts }, validForMs: 10_000 } };
 }
+
+export type { RunResult, ArtifactResult } from './transport-result.ts';

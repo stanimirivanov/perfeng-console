@@ -31,6 +31,9 @@ test('actual HTTPS listener contains reader, pairing and response defects withou
     child.send('fail-clock'); await once(child, 'message');
     assert.deepEqual(await call('/console/api/session/pair', JSON.stringify({ code })), { status: 500, body: '' });
     child.send('restore-clock'); await once(child, 'message');
+    assert.equal((await call('/console/api/session/pair')).status, 404);
+    assert.equal((await call('/console/api/session/logout')).status, 404);
+    assert.equal((await call('/console/api/session', '{}')).status, 404);
     const paired = await call('/console/api/session/pair', JSON.stringify({ code }));
     assert.equal(paired.status, 200);
     for (const suffix of ['', '/artifacts']) {

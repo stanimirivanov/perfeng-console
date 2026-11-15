@@ -1,8 +1,12 @@
 # Console server and tooling
 
 `serve-console.ts` composes CLI settings, certificate reads, the qualified BFF
-transport and incoming listener. `console-server.ts` owns loopback HTTPS, static
-serving, pairing/session boundaries and request-disconnect cancellation.
+transport and incoming listener. `console-server.ts` owns loopback HTTPS lifecycle, closed dispatch and terminal
+error containment. `server/request-policy.ts` owns pure Host/Origin/CSRF/cookie
+admission; `server/session-routes.ts` owns pairing/session wire handling;
+`server/run-routes.ts` owns the narrow read port, disconnect cancellation and
+post-await authorization; `server/static-route.ts` owns closed asset/CSP serving.
+BFF modules retain session state and upstream execution. Keep preview separate.
 `preview.mjs` is a local browser-test/development listener with no pairing or
 upstream authority; never make it a production entry. `public-api.ts` exports only
 startConsole from its owning server.

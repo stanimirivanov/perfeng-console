@@ -73,3 +73,16 @@ test('release rejects a native alias redirected to another admitted server file'
     await assert.rejects(bundleServer(root), /imports/);
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
+
+ test('server helper HTTP declarations never admit runtime HTTP dispatch', async () => {
+  const root = releaseFixture();
+  try {
+    mkdirSync(join(root, 'tools/server'), { recursive: true });
+    writeFileSync(join(root, 'tools/serve-console.ts'), "import './server/run-routes.ts';");
+    const helper = join(root, 'tools/server/run-routes.ts');
+    writeFileSync(helper, "import type { IncomingMessage } from 'node:http'; console.log('safe');");
+    assert.match(await bundleServer(root), /safe/);
+    writeFileSync(helper, "import { request } from 'node:http'; request('/');");
+    await assert.rejects(bundleServer(root), /Forbidden product input: node:http/);
+  } finally { rmSync(root, { recursive: true, force: true }); }
+ });

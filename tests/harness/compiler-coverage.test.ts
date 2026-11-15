@@ -12,7 +12,7 @@ test('production tools compile under their own strict Node program without test 
   const parsed = ts.parseJsonConfigFileContent(loaded.config, ts.sys, resolve('tools'));
   assert.deepEqual(parsed.errors, []);
   assert.deepEqual(parsed.fileNames.sort(),
-    ['console-server.ts', 'public-api.ts', 'serve-console.ts'].map(file => resolve('tools', file)).sort());
+    ['console-server.ts', 'public-api.ts', 'serve-console.ts', 'server/request-policy.ts', 'server/session-routes.ts', 'server/run-routes.ts', 'server/static-route.ts'].map(file => resolve('tools', file)).sort());
   const { strict, noUncheckedIndexedAccess, exactOptionalPropertyTypes, verbatimModuleSyntax, noEmit, module } = parsed.options;
   assert.deepEqual({ strict, noUncheckedIndexedAccess, exactOptionalPropertyTypes, verbatimModuleSyntax, noEmit, module },
     { strict: true, noUncheckedIndexedAccess: true, exactOptionalPropertyTypes: true, verbatimModuleSyntax: true, noEmit: true, module: ts.ModuleKind.NodeNext });

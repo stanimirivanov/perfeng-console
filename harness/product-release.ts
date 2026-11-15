@@ -16,7 +16,7 @@ const lockedRuntimeDirectories = new Set([
 
 const serverSources = new Set([
   'tools/serve-console.ts',
-  'tools/console-server.ts',
+  'tools/console-server.ts', 'tools/server/request-policy.ts', 'tools/server/session-routes.ts', 'tools/server/run-routes.ts', 'tools/server/static-route.ts',
   'src/bff/public-api.ts',
   'src/bff/config-public-api.ts',
   'tools/public-api.ts',
@@ -50,6 +50,9 @@ export async function bundleServer(root: string) {
     inspectImports(source, (node, specifier) => {
       if (!specifier || !ts.isStringLiteralLike(specifier)) throw new Error('Computed product import: ' + file);
       const name = specifier.text;
+      if (name === 'node:http' && ['tools/server/request-policy.ts', 'tools/server/session-routes.ts', 'tools/server/run-routes.ts', 'tools/server/static-route.ts'].includes(file) &&
+          ts.isImportDeclaration(node) && node.importClause?.isTypeOnly && !node.importClause.name && node.importClause.namedBindings &&
+          ts.isNamedImports(node.importClause.namedBindings) && node.importClause.namedBindings.elements.length > 0 && node.importClause.namedBindings.elements.every(member => ['IncomingMessage', 'ServerResponse'].includes((member.propertyName ?? member.name).text))) return;
       if (serverBuiltins.has(name) || (file === 'src/bff/config.ts' && name === 'node:fs') || (file.startsWith('src/bff/') && runtimePackages.has(name))) return;
       const target = publicImports[name] ?? (name.startsWith('.') ? relative(root, resolve(root, dirname(file), name)) : name);
       if (target.startsWith('src/shared/contracts/') &&

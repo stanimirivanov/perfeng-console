@@ -267,7 +267,7 @@ test('tools scan rejects unregistered deep/spec-like modules, alternate formats 
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
 test('incoming listeners and CLI filesystem access use exact named platform imports', () => {
-  assert.equal(inspect({ 'tools/console-server.ts': "import { createServer as listen } from 'node:https'; new AbortController(); const server = listen({}); server.setTimeout(5000, () => {});" }), '');
+  assert.equal(inspect({ 'tools/console-server.ts': "import { createServer as listen } from 'node:https'; const server = listen({}); server.setTimeout(5000, () => {});" }), '');
   assert.equal(inspect({ 'tools/serve-console.ts': "import { readFile as load } from 'node:fs/promises'; load('cert');" }), '');
   assert.equal(inspect({ 'tools/preview.mjs': "import { createServer } from 'node:http'; createServer(() => {});" }), '');
   for (const code of ["import { request as send } from 'node:https';", "import { get } from 'node:https';",
@@ -285,7 +285,7 @@ test('tools cannot acquire undeclared helper edges or leak a native namespace th
   assert.match(inspect({ 'tools/console-server.ts': "import './helper.ts';", 'tools/helper.ts': 'export {};' },
     { ...productionRoles, 'tools/helper.ts': 'adapter' }), /OWN-13/);
   assert.match(inspect({ 'tools/public-api.ts': "export { createServer } from 'node:https';" }), /OWN-01|OWN-13/);
-  assert.match(inspect({ 'tools/console-server.ts': "import { createRunTransport } from '#perfeng/bff';" }), /OWN-13.*type/);
+  assert.match(inspect({ 'tools/console-server.ts': "import { createRunTransport } from '#perfeng/bff';" }), /OWN-13/);
   assert.equal(inspect({ 'tools/public-api.ts': "export { startConsole } from './console-server.ts';",
     'tools/console-server.ts': 'export function startConsole() {}' }), '');
 });
@@ -319,3 +319,13 @@ test('token POST may read the effective header limit without acquiring native di
   ]) assert.match(inspect({ [file]: source }), /Native dispatch/);
   assert.match(inspect({ 'src/bff/run-reader.ts': "import { maxHeaderSize } from 'node:http';" }), /Native dispatch/);
 });
+
+ test('extracted server handlers retain exact capabilities', () => {
+  assert.equal(inspect({ 'tools/server/run-routes.ts': 'new AbortController();' }), '');
+  for (const file of ['tools/server/request-policy.ts', 'tools/server/session-routes.ts', 'tools/server/static-route.ts']) {
+    assert.match(inspect({ [file]: 'new AbortController();' }), /OWN-03/);
+    assert.match(inspect({ [file]: "import { request } from 'node:https';" }), /OWN-03|OWN-13/);
+  }
+  assert.match(inspect({ 'tools/server/run-routes.ts': "import { createRunTransport } from '#perfeng/bff';" }), /OWN-13/);
+  assert.match(inspect({ 'tools/server/request-policy.ts': "import { IncomingMessage } from 'node:http';" }), /OWN-13.*type/);
+ });
