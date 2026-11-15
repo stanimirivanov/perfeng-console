@@ -9,10 +9,15 @@ export function renderConsoleHtml(template: string) {
     html: template.replace("<app-root>", '<app-root ngCspNonce="' + nonce + '">'),
     headers: {
       "Content-Security-Policy": [
-        "default-src 'none'", "script-src 'self'",
+        "default-src 'none'",
+        "script-src 'self'",
         "style-src 'self' 'nonce-" + nonce + "'",
-        "connect-src 'self'", "img-src 'self'", "font-src 'self'",
-        "base-uri 'self'", "frame-ancestors 'none'", "form-action 'self'",
+        "connect-src 'self'",
+        "img-src 'self'",
+        "font-src 'self'",
+        "base-uri 'self'",
+        "frame-ancestors 'none'",
+        "form-action 'self'",
       ].join("; "),
       "Cache-Control": "no-store",
     },

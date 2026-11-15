@@ -75,9 +75,7 @@ const edges: Record<Role, readonly Role[]> = {
 };
 // Issue #53: native scheduling is platform authority, including rendering callbacks.
 // Angular render hooks remain framework-owned; these reserved names cannot create a second scheduler.
-const ioNames = new Set(['fetch', 'XMLHttpRequest', 'WebSocket', 'EventSource', 'AbortController', 'AbortSignal',
-  'setTimeout', 'setInterval', 'queueMicrotask', 'setImmediate', 'requestAnimationFrame', 'requestIdleCallback',
-  'scheduler', 'postTask']);
+const ioNames = new Set(['fetch', 'XMLHttpRequest', 'WebSocket', 'EventSource', 'AbortController', 'AbortSignal','setTimeout', 'setInterval', 'queueMicrotask', 'setImmediate', 'requestAnimationFrame', 'requestIdleCallback','scheduler', 'postTask']);
 const runtimes = new Set(['runPromise', 'runPromiseExit', 'runFork', 'runSync', 'runSyncExit', 'runCallback', 'runForkWith', 'runPromiseWith']);
 const toolLoaders = new Set(['getBuiltinModule', 'binding', '_linkedBinding', 'dlopen']);
 

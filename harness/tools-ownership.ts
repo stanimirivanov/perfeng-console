@@ -14,32 +14,43 @@ export const toolRoles = {
 
 const imports: Readonly<Record<string, Readonly<Record<string, readonly string[]>>>> = {
   'tools/console-server.ts': {
-    'node:https': ['createServer', 'Server'], 'node:url': ['fileURLToPath'], 'node:events': ['once'],
+    'node:https': ['createServer', 'Server'],
+    'node:url': ['fileURLToPath'],
+    'node:events': ['once'],
     '#perfeng/bff-session': ['createSession'],
     './server/request-policy.ts': ['requestAllowed', 'sessionId', 'SESSION_PATH'],
-    './server/session-routes.ts': ['handleSession'], './server/run-routes.ts': ['handleRun', 'matchesRun', 'RunReader'],
+    './server/session-routes.ts': ['handleSession'],
+    './server/run-routes.ts': ['handleRun', 'matchesRun', 'RunReader'],
     './server/static-route.ts': ['handleStatic'],
   },
   'tools/server/request-policy.ts': { 'node:http': ['IncomingMessage'] },
   'tools/server/session-routes.ts': {
-    'node:http': ['IncomingMessage', 'ServerResponse'], '#perfeng/bff-session': ['createSession'],
+    'node:http': ['IncomingMessage', 'ServerResponse'],
+    '#perfeng/bff-session': ['createSession'],
     './request-policy.ts': ['SESSION_COOKIE', 'COOKIE_ATTRIBUTES', 'SESSION_PATH', 'readAllowed'],
   },
   'tools/server/run-routes.ts': {
     './request-policy.ts': ['readAllowed'],
-    'node:http': ['IncomingMessage', 'ServerResponse'], '#perfeng/bff-session': ['createSession'],
+    'node:http': ['IncomingMessage', 'ServerResponse'],
+    '#perfeng/bff-session': ['createSession'],
     '#perfeng/bff-runs': ['artifactObservation', 'runObservation', 'RunResult', 'ArtifactResult'],
   },
   'tools/server/static-route.ts': {
-    'node:http': ['IncomingMessage', 'ServerResponse'], 'node:fs/promises': ['readFile'],
-    'node:path': ['resolve'], '#perfeng/bff-csp': ['renderConsoleHtml'],
+    'node:http': ['IncomingMessage', 'ServerResponse'],
+    'node:fs/promises': ['readFile'],
+    'node:path': ['resolve'],
+    '#perfeng/bff-csp': ['renderConsoleHtml'],
   },
   'tools/serve-console.ts': {
-    'node:fs/promises': ['readFile'], './console-server.ts': ['startConsole'], '#perfeng/bff': ['createRunTransport'],
+    'node:fs/promises': ['readFile'],
+    './console-server.ts': ['startConsole'],
+    '#perfeng/bff': ['createRunTransport'],
   },
   'tools/preview.mjs': {
-    'node:http': ['createServer'], 'node:fs/promises': ['readFile'],
-    'node:path': ['resolve', 'extname'], '#perfeng/bff-csp': ['renderConsoleHtml'],
+    'node:http': ['createServer'],
+    'node:fs/promises': ['readFile'],
+    'node:path': ['resolve', 'extname'],
+    '#perfeng/bff-csp': ['renderConsoleHtml'],
   },
   'tools/public-api.ts': { './console-server.ts': ['startConsole'] },
 };

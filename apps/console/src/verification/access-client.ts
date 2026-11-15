@@ -5,7 +5,10 @@ import type { AccessReply } from './access-reader.port';
 export function readAccess() {
   return Effect.tryPromise(async (signal): Promise<AccessReply> => {
     const response = await fetch('/console/api/verification/access', {
-      signal, credentials: 'same-origin', cache: 'no-store', redirect: 'error',
+      signal,
+      credentials: 'same-origin',
+      cache: 'no-store',
+      redirect: 'error',
     });
     // This optional probe has no local-session denial contract; never infer global logout.
     return response.status === 204 ? 'granted' : 'denied';

@@ -60,7 +60,8 @@ export function checkImportMaps(root: string, checkConsumers = true): string[] {
     Object.keys(actual).length === Object.keys(wanted).length &&
     Object.entries(wanted).every(([key, value]) => JSON.stringify((actual as Record<string, unknown>)[key]) === JSON.stringify(value));
   const configs: Record<string, string> = {
-    'tsconfig.json': './tsconfig.paths.json', 'tsconfig.base.json': './tsconfig.paths.json',
+    'tsconfig.json': './tsconfig.paths.json',
+    'tsconfig.base.json': './tsconfig.paths.json',
     'tools/tsconfig.json': '../tsconfig.json',
     'apps/console/tsconfig.app.json': '../../tsconfig.base.json',
     'apps/console/tsconfig.spec.json': '../../tsconfig.base.json',

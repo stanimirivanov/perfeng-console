@@ -58,7 +58,10 @@ export function verifySnapshot(root: string) {
 type Family = {
   sourceRevision: string;
   manifestSha256: string;
-  members: Record<string, { destination: string; sha256: string }>;
+  members: Record<string, {
+    destination: string;
+    sha256: string;
+  }>;
 };
 type Receipt = {
   status: string;
@@ -68,7 +71,10 @@ type Receipt = {
   toolRelease: string;
   families: Record<string, Family>;
 };
-type ReceiptPin = { commit: string; receiptSha256: string };
+type ReceiptPin = {
+  commit: string;
+  receiptSha256: string;
+};
 type DistributionLock = {
   controlPlane: ReceiptPin;
   rollbackProvenanceSha256: string;
@@ -120,7 +126,7 @@ export function compareDistribution(
 }
 
 export function stageSnapshot(target: string, provenance: Buffer, files: Map<string, Buffer>) {
-  const expected = (JSON.parse(provenance.toString()) as { sha256: Record<string, string> }).sha256;
+  const expected = (JSON.parse(provenance.toString()) as { sha256: Record<string, string>; }).sha256;
   if (files.size !== Object.keys(expected).length) throw Error("Candidate inventory mismatch");
   for (const [path, bytes] of files) {
     if (!/^[A-Za-z0-9_./-]+$/.test(path) || path.split("/").some(part => !part || part === "." || part === "..") ||
@@ -147,15 +153,23 @@ export function verifyRollback(root: string, expected: Record<string, string>, p
   if (!/^[a-f0-9]{64}$/.test(provenancePin) || sha256(bytes) !== provenancePin)
     throw Error("Retained provenance differs from the reviewed rollback pin");
   verifySnapshot(root);
-  const prior = (JSON.parse(bytes.toString()) as { sha256: Record<string, string> }).sha256;
+  const prior = (JSON.parse(bytes.toString()) as { sha256: Record<string, string>; }).sha256;
   if (Object.keys(prior).length !== Object.keys(expected).length ||
       Object.entries(expected).some(([path, digest]) => prior[path] !== digest))
     throw Error("Retained snapshot differs from the selected provider bytes");
 }
 
 function projectFamily(
-  family: Family, lock: DistributionLock, history: string, scratch: string, tool: string,
-  verified: Map<string, string>, selected: Record<string, { destination: string; sha256: string }>,
+  family: Family,
+  lock: DistributionLock,
+  history: string,
+  scratch: string,
+  tool: string,
+  verified: Map<string, string>,
+  selected: Record<string, {
+    destination: string;
+    sha256: string;
+  }>,
 ) {
   const area = mkdtempSync(join(scratch, "projection-"));
   const policy = join(area, "policy.json");
@@ -170,9 +184,21 @@ function projectFamily(
   mkdirSync(store, { mode: 0o700 });
   const profile = join(history, family.sourceRevision);
   const output = run(join(tool, "runtime/bin/python3.12"), [
-    "-IB", join(tool, "materialize.py"), "--manifest", profile + ".manifest.json",
-    "--archive", profile + ".tar.gz", "--bundle", join(history, "manifest.sigstore.jsonl"),
-    "--policy", policy, "--selection", selection, "--target", store, "--execute",
+    "-IB",
+    join(tool, "materialize.py"),
+    "--manifest",
+    profile + ".manifest.json",
+    "--archive",
+    profile + ".tar.gz",
+    "--bundle",
+    join(history, "manifest.sigstore.jsonl"),
+    "--policy",
+    policy,
+    "--selection",
+    selection,
+    "--target",
+    store,
+    "--execute",
   ], area, {});
   const pointer = readFileSync(join(store, "current"), "ascii");
   if (!/^[a-f0-9]{64}\n$/.test(pointer) || output !== join(store, pointer.trim()) + "\n")
@@ -187,7 +213,11 @@ function projectFamily(
 
 function run(file: string, args: string[], cwd: string, env?: NodeJS.ProcessEnv) {
   return execFileSync(file, args, {
-    cwd, env, encoding: "utf8", timeout: 120_000, maxBuffer: 4 * 1024 * 1024,
+    cwd,
+    env,
+    encoding: "utf8",
+    timeout: 120_000,
+    maxBuffer: 4 * 1024 * 1024,
     stdio: ["ignore", "pipe", "inherit"],
   });
 }
@@ -215,10 +245,20 @@ function verifyFamily(
   const inspect = "import sys\nsys.path.insert(0, sys.argv.pop(1))\n" +
     "from scripts.contracts_inspect import main\nraise SystemExit(main())";
   const result = run(join(tool, "runtime/bin/python3.12"), [
-    "-IB", "-c", inspect, tool, "--manifest", manifestPath,
-    "--archive", join(history, sourceRevision + ".tar.gz"),
-    "--bundle", join(history, "manifest.sigstore.jsonl"),
-    "--policy", policy, "--verifier", join(tool, "bin/gh"),
+    "-IB",
+    "-c",
+    inspect,
+    tool,
+    "--manifest",
+    manifestPath,
+    "--archive",
+    join(history, sourceRevision + ".tar.gz"),
+    "--bundle",
+    join(history, "manifest.sigstore.jsonl"),
+    "--policy",
+    policy,
+    "--verifier",
+    join(tool, "bin/gh"),
   ], scratch, {});
   return new Map(Object.entries(JSON.parse(result) as Record<string, string>));
 }
@@ -248,10 +288,7 @@ function shadow(assets: string, bootstrap: string, verifier: string, receiptPath
     const pins = join(scratch, "tool.json");
     const tool = join(scratch, "tool");
     writeFileSync(pins, JSON.stringify(lock.tool), { mode: 0o600 });
-    run("uv", ["run", "--locked", "--offline", "--no-sync", "python",
-      "-m", "scripts.contracts_tool_release", "restore", "--archive", join(assets, "tool/materializer.tar.gz"),
-      "--bundle", join(assets, "tool/materializer.sigstore.jsonl"),
-      "--verifier", verifier, "--pins", pins, "--target", tool], bootstrap);
+    run("uv", ["run", "--locked", "--offline", "--no-sync", "python","-m", "scripts.contracts_tool_release", "restore", "--archive", join(assets, "tool/materializer.tar.gz"),"--bundle", join(assets, "tool/materializer.sigstore.jsonl"),"--verifier", verifier, "--pins", pins, "--target", tool], bootstrap);
     const verified = new Map(Object.entries(receipt.families).map(([name, family]) =>
       [name, verifyFamily(family, lock, join(assets, "history"), scratch, tool)]));
     const matchedFiles = compareDistribution(receipt, provenance.sha256, supplemental.files, verified);
@@ -277,9 +314,13 @@ function shadow(assets: string, bootstrap: string, verifier: string, receiptPath
       stageSnapshot(target, readFileSync(join(root, "provenance.json")), projected);
     }
     return {
-      status: target ? "prepared" : "passed", ...(rollback ? { rollbackScope: "distribution-path; same family revisions" } : {}), controlPlaneCommit: receipt.consumerCommit,
+      status: target ? "prepared" : "passed",
+      ...(rollback ? { rollbackScope: "distribution-path; same family revisions" } : {}),
+      controlPlaneCommit: receipt.consumerCommit,
       controlPlaneReceiptSha256: lock.controlPlane.receiptSha256,
-      historyRelease: lock.historyRelease, toolRelease: lock.toolRelease, matchedFiles,
+      historyRelease: lock.historyRelease,
+      toolRelease: lock.toolRelease,
+      matchedFiles,
     };
   } finally {
     rmSync(scratch, { recursive: true, force: true });

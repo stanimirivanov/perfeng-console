@@ -66,9 +66,7 @@ test('token POST qualifies fixed endpoint, TLS, headers, payload and scoped clea
   const lazy = transport.post(form); assert.equal(hits, 0);
   assert.deepEqual(await Effect.runPromise(lazy), { ok: true, body: '{"access_token":"fixture-response-secret"}' });
   assert.equal(hits, 1);
-  for (const [value, reason] of [['redirect', 'invalid_response'], ['denied', 'denied'], ['unavailable', 'unavailable'],
-    ['duplicate', 'invalid_response'], ['media', 'invalid_response'], ['cache-duplicate', 'invalid_response'], ['pragma', 'invalid_response'], ['chunked-large', 'invalid_response'], ['empty', 'invalid_response'], ['cache', 'invalid_response'], ['encoding', 'invalid_response'], ['utf8', 'invalid_response'],
-    ['large', 'invalid_response'], ['many-headers', 'invalid_response'], ['headers', 'unavailable']] as const) {
+  for (const [value, reason] of [['redirect', 'invalid_response'], ['denied', 'denied'], ['unavailable', 'unavailable'],['duplicate', 'invalid_response'], ['media', 'invalid_response'], ['cache-duplicate', 'invalid_response'], ['pragma', 'invalid_response'], ['chunked-large', 'invalid_response'], ['empty', 'invalid_response'], ['cache', 'invalid_response'], ['encoding', 'invalid_response'], ['utf8', 'invalid_response'],['large', 'invalid_response'], ['many-headers', 'invalid_response'], ['headers', 'unavailable']] as const) {
     mode = value; const priorHits: number = hits;
     const result = await Effect.runPromise(transport.post(form));
     assert.deepEqual(result, { ok: false, reason }); assert.equal(hits, priorHits + 1);

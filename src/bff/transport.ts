@@ -8,7 +8,10 @@ import type { RunResult, ArtifactResult } from './transport-result.ts';
 /** Compose protected config and the qualified adapter; expose safe public results. */
 export function createRunTransport(config: UpstreamConfig) {
   const read = createRunReader(loadUpstreamConfig(config));
-  async function execute<Result, Error>(runId: string, operation: (id: string) => Effect.Effect<Result, Error>, signal?: AbortSignal): Promise<Result | { ok: false; reason: 'invalid_input' | 'aborted' | 'unavailable' }> {
+  async function execute<Result, Error>(runId: string, operation: (id: string) => Effect.Effect<Result, Error>, signal?: AbortSignal): Promise<Result | {
+    ok: false;
+    reason: 'invalid_input' | 'aborted' | 'unavailable';
+  }> {
     if (!run_RunId(runId)) return { ok: false, reason: 'invalid_input' };
     if (signal?.aborted) return { ok: false, reason: 'aborted' };
     try { return await Effect.runPromise(operation(runId), { signal }); }

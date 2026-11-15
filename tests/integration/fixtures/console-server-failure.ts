@@ -3,7 +3,9 @@ import { startConsole } from '#perfeng/server';
 
 let failClock = false;
 const local = await startConsole({
-  cert: readFileSync(process.argv[2]!), key: readFileSync(process.argv[3]!), port: 0,
+  cert: readFileSync(process.argv[2]!),
+  key: readFileSync(process.argv[3]!),
+  port: 0,
   now: () => { if (failClock) throw new Error('private-clock-canary'); return 0; },
   runs: {
     getRun: async () => { throw new Error('private-reader-canary'); },

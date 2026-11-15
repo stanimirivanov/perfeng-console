@@ -47,10 +47,8 @@ export function createLoginProtocol(config: LoginProtocolConfig, now?: () => num
       const pending = transactions.begin(intent);
       if (!pending) return;
       const { state, nonce, codeChallenge, codeChallengeMethod } = pending.authorization;
-      const query = new URLSearchParams({ client_id: 'perfeng-console-login', redirect_uri: profile.redirectUri,
-        response_type: 'code', scope: 'openid', state, nonce, code_challenge: codeChallenge, code_challenge_method: codeChallengeMethod });
-      return { authorizationUrl: profile.authorizationEndpoint + '?' + query,
-        setCookie: cookieName + '=' + pending.browserBinding + cookieAttributes + '300' };
+      const query = new URLSearchParams({ client_id: 'perfeng-console-login', redirect_uri: profile.redirectUri,response_type: 'code', scope: 'openid', state, nonce, code_challenge: codeChallenge, code_challenge_method: codeChallengeMethod });
+      return { authorizationUrl: profile.authorizationEndpoint + '?' + query,setCookie: cookieName + '=' + pending.browserBinding + cookieAttributes + '300' };
     },
     callback(rawTarget: string, cookieHeaders: readonly string[]) {
       const invalid = () => ({ ok: false as const, reason: 'invalid_callback' as const });

@@ -18,14 +18,21 @@ for (const suffix of ['', '/artifacts']) {
       let started!: () => void; const pending = new Promise<void>(resolve => { started = resolve; });
       let release!: () => void; const ready = new Promise<void>(resolve => { release = resolve; });
       let aborted!: () => void; const abort = new Promise<void>(resolve => { aborted = resolve; });
-      async function read(_id: string, signal?: AbortSignal): Promise<{ ok: false; reason: 'unavailable' }> {
+      async function read(_id: string, signal?: AbortSignal): Promise<{
+        ok: false;
+        reason: 'unavailable';
+      }> {
         signal?.addEventListener('abort', aborted, { once: true }); started(); await ready;
         return { ok: false, reason: 'unavailable' };
       }
       const local = await startConsole({ cert: readFileSync(cert), key: readFileSync(key), port: 0, now: () => now, runs: { getRun: read, listArtifacts: read } });
       function call(path: string, method = 'GET', body?: string, cookie?: string, csrf = 'read') {
         const req = request(local.origin + path, { rejectUnauthorized: false, method, headers: { Origin: local.origin, 'Content-Type': 'application/json', 'X-Perfeng-CSRF': csrf, ...(cookie ? { Cookie: cookie } : {}) } });
-        const response = new Promise<{ status: number; body: string; cookie: string }>((resolve, reject) => {
+        const response = new Promise<{
+          status: number;
+          body: string;
+          cookie: string;
+        }>((resolve, reject) => {
           req.on('error', reject); req.on('response', res => {
             let text = ''; res.on('data', data => { text += data; }); res.on('error', reject);
             res.on('end', () => resolve({ status: res.statusCode!, body: text, cookie: res.headers['set-cookie']?.[0]?.split(';')[0] ?? '' }));
@@ -42,7 +49,7 @@ for (const suffix of ['', '/artifacts']) {
         if (interruption === 'disconnect') { job.req.destroy(); await abort; release(); assert.equal(await observed, undefined); }
         else {
           if (interruption === 'expiry') now = 900_000;
-          else assert.equal((await call('/console/api/session/logout', 'POST', '', pair.cookie, (JSON.parse(pair.body) as { csrf: string }).csrf).response).status, 200);
+          else assert.equal((await call('/console/api/session/logout', 'POST', '', pair.cookie, (JSON.parse(pair.body) as { csrf: string; }).csrf).response).status, 200);
           release(); const result = await observed;
           assert.equal(result?.status, 401); assert.equal(result.body, '');
         }

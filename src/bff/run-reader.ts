@@ -6,7 +6,7 @@ import type { loadUpstreamConfig } from './config.ts';
 import type { Run, Failure, RunResult, ArtifactResult, Artifacts } from './transport-result.ts';
 import { run_Run, run_ArtifactCollection } from '#perfeng/validators';
 
-class TransportFailure extends Data.TaggedError('TransportFailure')<{ readonly reason: Failure }> {}
+class TransportFailure extends Data.TaggedError('TransportFailure')<{ readonly reason: Failure; }> {}
 function isRun(value: unknown): value is Run { return run_Run(value); }
 const fail = (reason: Failure) => Effect.fail(new TransportFailure({ reason }));
 
@@ -63,7 +63,7 @@ export function createRunReader(config: ReturnType<typeof loadUpstreamConfig>) {
       ? { ok: true, run: value } : { ok: false, reason: 'invalid_response' }),
     listArtifacts: (id: string) => read<ArtifactResult>(id, '/artifacts', value => {
       if (!run_ArtifactCollection(value)) return { ok: false, reason: 'invalid_response' };
-      const { artifacts } = value as { artifacts: Artifacts };
+      const { artifacts } = value as { artifacts: Artifacts; };
       return artifacts.every(artifact => artifact.runId === id)
         ? { ok: true, artifacts } : { ok: false, reason: 'invalid_response' };
     }),

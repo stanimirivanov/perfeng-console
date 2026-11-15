@@ -6,8 +6,7 @@ import { SESSION_UI } from './session-ui';
 import { VERIFICATION_ACCESS } from '../verification/access.port';
 
 const refresh = vi.fn(async () => false);
-@Component({ template: '', providers: [...provideSession(),
-  { provide: VERIFICATION_ACCESS, useValue: { granted: signal(false), refresh } }] })
+@Component({ template: '', providers: [...provideSession(),{ provide: VERIFICATION_ACCESS, useValue: { granted: signal(false), refresh } }] })
 class Host { readonly ui = inject(SESSION_UI); }
 beforeEach(() => TestBed.configureTestingModule({ providers: [provideSessionBoundary()] }));
 afterEach(() => { TestBed.resetTestingModule(); vi.unstubAllGlobals(); vi.clearAllMocks(); });

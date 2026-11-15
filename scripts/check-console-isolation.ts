@@ -10,14 +10,46 @@ const source = join(temporary, 'source');
 const installed = join(temporary, 'installed');
 // Keep build-time transitive imports explicit too; do not copy the verifier to hide a missing input.
 const inputs = [
-  '.node-version', 'LICENSE', 'package.json', 'pnpm-lock.yaml', 'pnpm-workspace.yaml',
-  'tsconfig.paths.json', 'angular.json', 'nx.json', 'tsconfig.base.json', 'Makefile', 'apps/console',
-  'harness/imports.ts', 'harness/diagnostics.ts', 'harness/assets.ts', 'harness/workspace.ts', 'harness/angular-features.ts', 'harness/boundaries.ts', 'harness/product-release.ts',
-  'scripts/package-console.ts', 'tools/serve-console.ts', 'tools/console-server.ts', 'tools/server/request-policy.ts', 'tools/server/session-routes.ts', 'tools/server/run-routes.ts', 'tools/server/static-route.ts',
-  'src/shared/contracts/public-api.ts', 'src/bff/public-api.ts', 'src/bff/config-public-api.ts',
-  'tools/public-api.ts', 'src/bff/session.ts', 'src/bff/csp.ts', 'src/bff/runs.ts', 'src/bff/config.ts',
-  'src/bff/transport.ts', 'src/bff/run-reader.ts', 'src/bff/transport-result.ts',
-  'src/generated/transitions.ts', 'src/generated/run.ts', 'src/generated/validators.mjs', 'src/shared/contracts/observation.ts',
+  '.node-version',
+  'LICENSE',
+  'package.json',
+  'pnpm-lock.yaml',
+  'pnpm-workspace.yaml',
+  'tsconfig.paths.json',
+  'angular.json',
+  'nx.json',
+  'tsconfig.base.json',
+  'Makefile',
+  'apps/console',
+  'harness/imports.ts',
+  'harness/diagnostics.ts',
+  'harness/assets.ts',
+  'harness/workspace.ts',
+  'harness/angular-features.ts',
+  'harness/boundaries.ts',
+  'harness/product-release.ts',
+  'scripts/package-console.ts',
+  'tools/serve-console.ts',
+  'tools/console-server.ts',
+  'tools/server/request-policy.ts',
+  'tools/server/session-routes.ts',
+  'tools/server/run-routes.ts',
+  'tools/server/static-route.ts',
+  'src/shared/contracts/public-api.ts',
+  'src/bff/public-api.ts',
+  'src/bff/config-public-api.ts',
+  'tools/public-api.ts',
+  'src/bff/session.ts',
+  'src/bff/csp.ts',
+  'src/bff/runs.ts',
+  'src/bff/config.ts',
+  'src/bff/transport.ts',
+  'src/bff/run-reader.ts',
+  'src/bff/transport-result.ts',
+  'src/generated/transitions.ts',
+  'src/generated/run.ts',
+  'src/generated/validators.mjs',
+  'src/shared/contracts/observation.ts',
 ];
 
 try {
@@ -35,16 +67,19 @@ try {
 
   const cert = join(temporary, 'certificate.pem');
   const key = join(temporary, 'key.pem');
-  execFileSync('openssl', ['req', '-x509', '-newkey', 'rsa:2048', '-nodes', '-days', '1',
-    '-subj', '/CN=loopback-test', '-addext', 'subjectAltName=IP:127.0.0.1', '-out', cert, '-keyout', key],
-  { stdio: 'ignore' });
+  execFileSync('openssl', ['req', '-x509', '-newkey', 'rsa:2048', '-nodes', '-days', '1','-subj', '/CN=loopback-test', '-addext', 'subjectAltName=IP:127.0.0.1', '-out', cert, '-keyout', key],{ stdio: 'ignore' });
   // Use a separate working directory and an empty environment to expose ambient runtime dependencies.
   const child = spawn(process.execPath, [join(installed, release.entry), cert, key, '0'], {
-    cwd: temporary, env: {}, stdio: ['ignore', 'ignore', 'pipe'],
+    cwd: temporary,
+    env: {},
+    stdio: ['ignore', 'ignore', 'pipe'],
   });
   const exited = once(child, 'exit');
   try {
-    const ready = await new Promise<{ origin: string; code: string }>((resolve, reject) => {
+    const ready = await new Promise<{
+      origin: string;
+      code: string;
+    }>((resolve, reject) => {
       const timer = setTimeout(() => reject(new Error('Installed console did not start')), 5000);
       child.once('exit', () => { clearTimeout(timer); reject(new Error('Installed console exited before startup')); });
       child.once('error', error => { clearTimeout(timer); reject(error); });

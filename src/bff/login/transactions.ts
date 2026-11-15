@@ -21,7 +21,13 @@ const opaque = (value: unknown): value is string => typeof value === 'string' &&
  * send only authorization fields to the fixed issuer. No verifier leaves begin.
  */
 export function createLoginTransactions(now = () => performance.now()) {
-  const pending = new Map<string, { browserBinding: string; nonce: string; codeVerifier: string; expires: number; returnIntent: LoginReturnIntent }>();
+  const pending = new Map<string, {
+    browserBinding: string;
+    nonce: string;
+    codeVerifier: string;
+    expires: number;
+    returnIntent: LoginReturnIntent;
+  }>();
   let stopped = false;
   let lastTime = 0;
   const stop = () => { stopped = true; pending.clear(); };

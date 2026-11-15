@@ -55,16 +55,14 @@ test('standalone import command rejects a resolvable native alias remap before g
   const { resolve } = await import('node:path');
   const root = mkdtempSync(join(tmpdir(), 'import-cli-'));
   try {
-    for (const file of ['package.json', 'tsconfig.paths.json', 'tsconfig.json', 'tsconfig.base.json', 'tools/tsconfig.json',
-      'apps/console/tsconfig.app.json', 'apps/console/tsconfig.spec.json', 'apps/web-e2e/tsconfig.json']) {
+    for (const file of ['package.json', 'tsconfig.paths.json', 'tsconfig.json', 'tsconfig.base.json', 'tools/tsconfig.json','apps/console/tsconfig.app.json', 'apps/console/tsconfig.spec.json', 'apps/web-e2e/tsconfig.json']) {
       mkdirSync(dirname(join(root, file)), { recursive: true });
       cpSync(file, join(root, file));
     }
     const pkg = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8'));
     pkg.imports['#perfeng/contracts'] = './src/bff/config.ts';
     writeFileSync(join(root, 'package.json'), JSON.stringify(pkg));
-    assert.throws(() => execFileSync(process.execPath, [resolve('harness/check-imports.ts')], { cwd: root, stdio: ['ignore', 'pipe', 'pipe'] }),
-      error => String((error as { stderr?: string }).stderr).includes('[imports]'));
+    assert.throws(() => execFileSync(process.execPath, [resolve('harness/check-imports.ts')], { cwd: root, stdio: ['ignore', 'pipe', 'pipe'] }),error => String((error as { stderr?: string; }).stderr).includes('[imports]'));
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
 
@@ -78,11 +76,7 @@ test('reviewed alias documentation rejects semantic drift and malformed inventor
     const file = join(root, 'docs/IMPORTS.md');
     writeFileSync(file, header + rows.join('\n') + '\n');
     assert.deepEqual(checkAliasDocumentation(root), []);
-    for (const text of [header + rows.slice(1).join('\n'), header + [...rows, rows[0]].join('\n'),
-      header + rows.join('\n') + '\n| `#perfeng/extra` | `./extra.ts` |',
-      header + rows.join('\n').replace('src/shared/contracts/public-api.ts', 'src/bff/config.ts'),
-      header + rows.join('\n').replace('| `#perfeng/contracts`', '| #perfeng/contracts'),
-      '# Missing alias inventory', header + rows.join('\n') + '\n' + header + rows.join('\n')]) {
+    for (const text of [header + rows.slice(1).join('\n'), header + [...rows, rows[0]].join('\n'),header + rows.join('\n') + '\n| `#perfeng/extra` | `./extra.ts` |',header + rows.join('\n').replace('src/shared/contracts/public-api.ts', 'src/bff/config.ts'),header + rows.join('\n').replace('| `#perfeng/contracts`', '| #perfeng/contracts'),'# Missing alias inventory', header + rows.join('\n') + '\n' + header + rows.join('\n')]) {
       writeFileSync(file, text);
       assert.match(checkAliasDocumentation(root).join('\n'), /docs\/IMPORTS.md:\d+ \[alias-document\].*make check-imports/);
     }
@@ -97,14 +91,13 @@ test('standalone import command rejects documentation drift before dependency gr
   const { resolve } = await import('node:path');
   const root = mkdtempSync(join(tmpdir(), 'alias-doc-cli-'));
   try {
-    for (const file of ['package.json', 'tsconfig.paths.json', 'tsconfig.json', 'tsconfig.base.json', 'tools/tsconfig.json',
-      'apps/console/tsconfig.app.json', 'apps/console/tsconfig.spec.json', 'apps/web-e2e/tsconfig.json', 'docs/IMPORTS.md']) {
+    for (const file of ['package.json', 'tsconfig.paths.json', 'tsconfig.json', 'tsconfig.base.json', 'tools/tsconfig.json','apps/console/tsconfig.app.json', 'apps/console/tsconfig.spec.json', 'apps/web-e2e/tsconfig.json', 'docs/IMPORTS.md']) {
       mkdirSync(dirname(join(root, file)), { recursive: true }); cpSync(file, join(root, file));
     }
     const doc = join(root, 'docs/IMPORTS.md');
     writeFileSync(doc, readFileSync(doc, 'utf8').replace('`./src/shared/contracts/public-api.ts`', '`./src/bff/config.ts`'));
     assert.throws(() => execFileSync(process.execPath, [resolve('harness/check-imports.ts')], { cwd: root, stdio: ['ignore', 'pipe', 'pipe'] }), error => {
-      const stderr = String((error as { stderr?: string }).stderr);
+      const stderr = String((error as { stderr?: string; }).stderr);
       assert.match(stderr, /\[alias-document\]/);
       assert.doesNotMatch(stderr, /dependency-cruiser|ERR_MODULE_NOT_FOUND/);
       return true;

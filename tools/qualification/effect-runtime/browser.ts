@@ -30,7 +30,9 @@ function operation(path: string, deadlineMs = 2000) {
     Effect.timeout(deadlineMs),
     Effect.provide(FetchHttpClient.layer),
     Effect.provideService(FetchHttpClient.RequestInit, {
-      redirect: 'error', credentials: 'same-origin', cache: 'no-store',
+      redirect: 'error',
+      credentials: 'same-origin',
+      cache: 'no-store',
     }),
   );
 }
@@ -43,5 +45,5 @@ const probe = {
   start(path: string) { active = Effect.runFork(operation(path, 10000)); },
   async stop() { if (active) await Effect.runPromise(Fiber.interrupt(active)); },
 };
-declare global { interface Window { probe: typeof probe } }
+declare global { interface Window { probe: typeof probe; } }
 window.probe = probe;

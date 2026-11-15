@@ -6,7 +6,10 @@ import type { LookupResult } from './run-reader.port';
 export function lookupRun(id: string) {
   return Effect.tryPromise(async (signal): Promise<LookupResult> => {
     const response = await fetch('/console/api/runs/' + encodeURIComponent(id), {
-      signal, credentials: 'same-origin', cache: 'no-store', redirect: 'error',
+      signal,
+      credentials: 'same-origin',
+      cache: 'no-store',
+      redirect: 'error',
       headers: { 'X-Perfeng-CSRF': 'read' },
     });
     if (response.status === 400) return { message: 'Enter a valid exact Run ID.' };
@@ -34,17 +37,24 @@ export function lookupRun(id: string) {
     const artifacts = await artifactClaims(id, signal);
     if (artifacts.sessionDenied) return { message: 'Session expired. Pair the console again.', sessionDenied: true };
     if (artifacts.denied) throw new Error('Observation scope lost');
-    return { observation: { value: { id, state: value.state, revision: value.revision, updatedAt: value.updatedAt,
-      createdAt: value.createdAt, finishedAt: value.finishedAt, failureCode: value.failureCode,
-      transitions: transitions as Record<string, string[]> }, validForMs: Math.min(body.validForMs, artifacts.validForMs) }, artifacts: artifacts.value };
+    return { observation: { value: { id, state: value.state, revision: value.revision, updatedAt: value.updatedAt,createdAt: value.createdAt, finishedAt: value.finishedAt, failureCode: value.failureCode,transitions: transitions as Record<string, string[]> }, validForMs: Math.min(body.validForMs, artifacts.validForMs) }, artifacts: artifacts.value };
   }).pipe(Effect.timeout(3000), Effect.catch(() => Effect.succeed({ message: 'Run lookup unavailable. Try again when connected.' })));
 }
 
-async function artifactClaims(id: string, signal: AbortSignal): Promise<{ value: ArtifactObservation; validForMs: number; denied?: boolean; sessionDenied?: true }> {
+async function artifactClaims(id: string, signal: AbortSignal): Promise<{
+  value: ArtifactObservation;
+  validForMs: number;
+  denied?: boolean;
+  sessionDenied?: true;
+}> {
   let denied = false;
   try {
     const response = await fetch('/console/api/runs/' + encodeURIComponent(id) + '/artifacts', {
-      signal, credentials: 'same-origin', cache: 'no-store', redirect: 'error', headers: { 'X-Perfeng-CSRF': 'read' },
+      signal,
+      credentials: 'same-origin',
+      cache: 'no-store',
+      redirect: 'error',
+      headers: { 'X-Perfeng-CSRF': 'read' },
     });
     if (response.status === 401) return { value: { status: 'unavailable' }, validForMs: 10_000, sessionDenied: true };
     denied = response.status === 403 || response.status === 404;
@@ -60,8 +70,7 @@ async function artifactClaims(id: string, signal: AbortSignal): Promise<{ value:
       if (v.runId !== id || !['id', 'kind', 'sha256', 'mediaType', 'format'].every(key => typeof v[key] === 'string') ||
           !/^[a-f0-9]{64}$/.test(String(v.sha256)) || !Number.isSafeInteger(v.sizeBytes) || Number(v.sizeBytes) < 0)
         throw new Error('Invalid artifact binding');
-      return { id: String(v.id), runId: id, kind: String(v.kind), sha256: String(v.sha256),
-        sizeBytes: Number(v.sizeBytes), mediaType: String(v.mediaType), format: String(v.format) };
+      return { id: String(v.id), runId: id, kind: String(v.kind), sha256: String(v.sha256),sizeBytes: Number(v.sizeBytes), mediaType: String(v.mediaType), format: String(v.format) };
     });
     return { value: { status: 'available', artifacts }, validForMs: body.validForMs };
   } catch { return { value: { status: 'unavailable' }, validForMs: 10_000, denied }; }

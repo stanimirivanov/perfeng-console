@@ -15,11 +15,21 @@ test('actual HTTPS listener contains reader, pairing and response defects withou
   let errors = ''; child.stderr?.on('data', value => { errors += String(value); });
   try {
     const ready = await Promise.race([once(child, 'message'), once(child, 'exit').then(() => { throw new Error(errors); })]);
-    const { origin, code } = ready[0] as { origin: string; code: string };
+    const { origin, code } = ready[0] as {
+      origin: string;
+      code: string;
+    };
     async function call(path: string, body?: string, cookie?: string) {
-      return await new Promise<{ status: number; body: string; cookie?: string }>((resolve, reject) => {
+      return await new Promise<{
+        status: number;
+        body: string;
+        cookie?: string;
+      }>((resolve, reject) => {
         const req = request(origin + path, { rejectUnauthorized: false, method: body === undefined ? 'GET' : 'POST', headers: {
-          Origin: origin, 'X-Perfeng-CSRF': body === undefined ? 'read' : 'pair', 'Content-Type': 'application/json', ...(cookie ? { Cookie: cookie } : {}),
+          Origin: origin,
+          'X-Perfeng-CSRF': body === undefined ? 'read' : 'pair',
+          'Content-Type': 'application/json',
+          ...(cookie ? { Cookie: cookie } : {}),
         } }, res => {
           let text = ''; res.on('data', value => { text += String(value); });
           res.on('error', reject);

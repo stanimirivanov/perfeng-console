@@ -1,6 +1,6 @@
 import { test as base, expect, type Locator } from "@playwright/test";
 import type { GuideNarrator, GuideStepDefinition } from "./guide-narrator";
-export const test = base.extend<{ guide: GuideNarrator }>({
+export const test = base.extend<{ guide: GuideNarrator; }>({
   guide: async ({ page }, use, info) => {
     let step = 0,
       errors = 0;

@@ -9,8 +9,14 @@ import { run_Run, run_RunId } from '../public-api.mjs';
 
 type Run = operations['getRun']['responses'][200]['content']['application/json'];
 type Failure = 'invalid_input' | 'not_found' | 'forbidden' | 'unavailable' | 'invalid_response' | 'deadline' | 'aborted';
-type RunResult = { ok: true; run: Run } | { ok: false; reason: Failure };
-class TransportFailure extends Data.TaggedError('TransportFailure')<{ readonly reason: Failure }> {}
+type RunResult = {
+  ok: true;
+  run: Run;
+} | {
+  ok: false;
+  reason: Failure;
+};
+class TransportFailure extends Data.TaggedError('TransportFailure')<{ readonly reason: Failure; }> {}
 function isRun(value: unknown): value is Run { return run_Run(value); }
 const fail = (reason: Failure) => Effect.fail(new TransportFailure({ reason }));
 

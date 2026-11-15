@@ -40,8 +40,7 @@ test('browser binding cannot be swapped between simultaneous transactions', () =
 
 test('only closed home or pinned Run-ID intents are admitted and inputs are independently owned', () => {
   const store = createLoginTransactions();
-  for (const value of [undefined, null, '/', '//evil.example', 'https://evil.example', [], {}, { kind: 'home', url: '//evil' },
-    { kind: 'run', runId: '' }, { kind: 'run', runId: 'x'.repeat(101) }, { kind: 'run', runId, extra: true }]) {
+  for (const value of [undefined, null, '/', '//evil.example', 'https://evil.example', [], {}, { kind: 'home', url: '//evil' },{ kind: 'run', runId: '' }, { kind: 'run', runId: 'x'.repeat(101) }, { kind: 'run', runId, extra: true }]) {
     assert.equal(store.begin(value), undefined);
   }
   const input = { kind: 'run', runId };

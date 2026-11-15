@@ -11,11 +11,18 @@ import { handleStatic } from './server/static-route.ts';
 
 /** Loopback TLS settings plus optional local clock/read capabilities; port 0 selects an ephemeral port. */
 export interface ConsoleServerOptions {
-  readonly cert: Buffer; readonly key: Buffer; readonly port: number;
-  readonly now?: () => number; readonly runs?: RunReader;
+  readonly cert: Buffer;
+  readonly key: Buffer;
+  readonly port: number;
+  readonly now?: () => number;
+  readonly runs?: RunReader;
 }
 /** Caller owns shutdown. The one-use code must stay in the operator terminal. */
-export interface ConsoleServerResult { readonly server: Server; readonly origin: string; readonly code: string }
+export interface ConsoleServerResult {
+  readonly server: Server;
+  readonly origin: string;
+  readonly code: string;
+}
 
 // Existing local connection/request deadline; bounded waiting, not a benchmark duration.
 const REQUEST_TIMEOUT_MS = 5_000;

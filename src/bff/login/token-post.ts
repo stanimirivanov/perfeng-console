@@ -9,7 +9,7 @@ import { NodeHttpIncomingMessage } from '@effect/platform-node/NodeHttpIncomingM
 import type { TokenPostReason, TokenPostResult } from './login-contracts.ts';
 export type { TokenPostReason, TokenPostResult } from './login-contracts.ts';
 
-class TokenPostFailure extends Data.TaggedError('TokenPostFailure')<{ readonly reason: TokenPostReason }> {}
+class TokenPostFailure extends Data.TaggedError('TokenPostFailure')<{ readonly reason: TokenPostReason; }> {}
 const fail = (reason: TokenPostFailure['reason']) => Effect.fail(new TokenPostFailure({ reason }));
 
 /** Trusted server configuration; no request can supply a destination or CA. */
@@ -73,10 +73,7 @@ export function createTokenPost(config: TokenPostConfig) {
         if (size === 0) return yield* fail('invalid_response');
         const body = yield* Effect.try({ try: () => new TextDecoder('utf-8', { fatal: true }).decode(Buffer.concat(chunks, size)), catch: () => new TokenPostFailure({ reason: 'invalid_response' }) });
         return { ok: true as const, body };
-      })).pipe(Effect.provide(layer), Effect.timeout(deadlineMs),
-        Effect.catchTag('TimeoutError', () => fail('deadline')),
-        Effect.catchTag('HttpClientError', () => fail('unavailable')),
-        Effect.catchTag('TokenPostFailure', error => Effect.succeed({ ok: false as const, reason: error.reason })));
+      })).pipe(Effect.provide(layer), Effect.timeout(deadlineMs),Effect.catchTag('TimeoutError', () => fail('deadline')),Effect.catchTag('HttpClientError', () => fail('unavailable')),Effect.catchTag('TokenPostFailure', error => Effect.succeed({ ok: false as const, reason: error.reason })));
     },
   };
 }

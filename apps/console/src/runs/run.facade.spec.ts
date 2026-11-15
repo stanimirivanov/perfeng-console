@@ -24,8 +24,7 @@ for (const phase of ['headers', 'body'] as const) {
     await vi.waitFor(() => expect(signal).toBeDefined());
     fixture.destroy();
     await vi.waitFor(() => expect(signal?.aborted).toBe(true));
-    const value = { value: { id, state: 'COMPLETED', revision: 42, createdAt: '', updatedAt: '',
-      finishedAt: null, failureCode: null, transitions: { COMPLETED: [] } }, validForMs: 10000 };
+    const value = { value: { id, state: 'COMPLETED', revision: 42, createdAt: '', updatedAt: '',finishedAt: null, failureCode: null, transitions: { COMPLETED: [] } }, validForMs: 10000 };
     finish(phase === 'headers' ? Response.json(value) : value);
     await Promise.resolve();
     expect(ui.run()).toBeUndefined();

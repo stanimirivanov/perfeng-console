@@ -182,11 +182,7 @@ test('Effect package authority follows adapters, operations and integrations, ne
   const root = mkdtempSync(join(tmpdir(), 'feature-effect-'));
   try {
     mkdirSync(join(root, 'src'));
-    for (const [name, allowed] of [['runs/run.facade.ts', true], ['session/session.facade.ts', true],
-      ['runs/run.operation.ts', true], ['shell/app.ts', false], ['runs/run-lookup.ts', false],
-      ['runs/nested/run.facade.ts', false], ['verification/access.ts', true],
-      ['verification/access-client.ts', true], ['verification/access.store.ts', false],
-      ['main.ts', false], ['other.ts', false]] as const) {
+    for (const [name, allowed] of [['runs/run.facade.ts', true], ['session/session.facade.ts', true],['runs/run.operation.ts', true], ['shell/app.ts', false], ['runs/run-lookup.ts', false],['runs/nested/run.facade.ts', false], ['verification/access.ts', true],['verification/access-client.ts', true], ['verification/access.store.ts', false],['main.ts', false], ['other.ts', false]] as const) {
       const path = join(root, 'src', name);
       mkdirSync(dirname(path), { recursive: true });
       writeFileSync(path, "import { Effect } from 'effect'; export const task = Effect.void;");

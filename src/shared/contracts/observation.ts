@@ -27,4 +27,7 @@ export interface ArtifactClaim {
   mediaType: string;
   format: string;
 }
-export type ArtifactObservation = { status: 'available'; artifacts: ArtifactClaim[] } | { status: 'unavailable' };
+export type ArtifactObservation = {
+  status: 'available';
+  artifacts: ArtifactClaim[];
+} | { status: 'unavailable'; };

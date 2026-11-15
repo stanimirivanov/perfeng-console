@@ -7,8 +7,7 @@ if (!certificate || !privateKey) throw new Error('Usage: node tools/serve-consol
 const port = Number(portArgument);
 if (!/^\d+$/.test(portArgument) || !Number.isInteger(port) || port > 65535) throw new Error('Invalid loopback port');
 const [cert, key] = await Promise.all([readFile(certificate), readFile(privateKey)]);
-const { PERFENG_UPSTREAM_ORIGIN: upstream, PERFENG_UPSTREAM_TOKEN_FILE: tokenFile,
-  PERFENG_UPSTREAM_CA_FILE: caFile } = process.env;
+const { PERFENG_UPSTREAM_ORIGIN: upstream, PERFENG_UPSTREAM_TOKEN_FILE: tokenFile,PERFENG_UPSTREAM_CA_FILE: caFile } = process.env;
 if ((upstream || tokenFile || caFile) && !(upstream && tokenFile && caFile)) {
   throw new Error('Configure all three upstream settings');
 }

@@ -24,10 +24,8 @@ test('presentation internals cannot be reached by alias or positional escape', (
 });
 
 test('qualification imports use exactly the admitted public entry links', () => {
-  assert.deepEqual(inspectProjectImports(root, root + '/tools/qualification/effect-node/candidate.ts',
-    "import { loadUpstreamConfig } from '../../../src/bff/config-public-api.ts';"), []);
-  assert.ok(inspectProjectImports(root, root + '/tools/qualification/effect-node/candidate.ts',
-    "import { loadUpstreamConfig } from '../../../src/bff/config.ts';").length);
+  assert.deepEqual(inspectProjectImports(root, root + '/tools/qualification/effect-node/candidate.ts',"import { loadUpstreamConfig } from '../../../src/bff/config-public-api.ts';"), []);
+  assert.ok(inspectProjectImports(root, root + '/tools/qualification/effect-node/candidate.ts',"import { loadUpstreamConfig } from '../../../src/bff/config.ts';").length);
 });
 
 test('the existing qualification oracle has one exact computed validator load', () => {

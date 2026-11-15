@@ -55,10 +55,7 @@ export function checkApp(root: string): string[] {
           ts.isImportDeclaration(node) && node.importClause?.isTypeOnly === true;
         const allowed = reviewedPackage || effectType || contractAlias || (internal
           ? !relative(resolve(root, "src"), resolve(dirname(file), name)).startsWith("..")
-          : ["@angular/core", "@angular/platform-browser", "@angular/router",
-             "@angular/common", "@angular/material/button",
-
-             ...(file.endsWith(".spec.ts") ? ["@angular/core/testing", "@ngrx/signals", "effect"] : [])].includes(name));
+          : ["@angular/core", "@angular/platform-browser", "@angular/router","@angular/common", "@angular/material/button",...(file.endsWith(".spec.ts") ? ["@angular/core/testing", "@ngrx/signals", "effect"] : [])].includes(name));
         if (!allowed || (!file.endsWith(".spec.ts") && name.includes(".spec")) || (/[%?\\]/u.test(name) || (name.includes("#") && name !== "#perfeng/contracts")))
           report(node, "dependency", "Forbidden browser dependency " + name);
       }, report);

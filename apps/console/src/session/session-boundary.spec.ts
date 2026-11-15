@@ -13,8 +13,7 @@ import { App } from '../shell/app';
 class RunHost { readonly ui = inject(RUN_UI); }
 afterEach(() => { TestBed.resetTestingModule(); vi.unstubAllGlobals(); });
 function setup() {
-  TestBed.configureTestingModule({ providers: [provideRouter([]), provideSessionBoundary(),
-    configureSession(true), provideVerificationAccess()] });
+  TestBed.configureTestingModule({ providers: [provideRouter([]), provideSessionBoundary(),configureSession(true), provideVerificationAccess()] });
 }
 it('a shared epoch change aborts Run reads, clears session and capability, and ignores late grants', async () => {
   const signals: AbortSignal[] = [];

@@ -74,7 +74,7 @@ test('release rejects a native alias redirected to another admitted server file'
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
 
- test('server helper HTTP declarations never admit runtime HTTP dispatch', async () => {
+test('server helper HTTP declarations never admit runtime HTTP dispatch', async () => {
   const root = releaseFixture();
   try {
     mkdirSync(join(root, 'tools/server'), { recursive: true });
@@ -85,4 +85,4 @@ test('release rejects a native alias redirected to another admitted server file'
     writeFileSync(helper, "import { request } from 'node:http'; request('/');");
     await assert.rejects(bundleServer(root), /Forbidden product input: node:http/);
   } finally { rmSync(root, { recursive: true, force: true }); }
- });
+});

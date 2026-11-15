@@ -10,13 +10,11 @@ test('CI retains all gates while invoking the import preflight only through full
   const verify = quality.split('  verify:\n')[1]!.split('\n  browser:')[0]!;
   assert.match(verify, /run: make verify/);
   assert.doesNotMatch(verify, /run: pnpm check:imports/);
-  for (const command of ['make browser-test', 'make console-isolation-check', 'make stack-admission',
-    'make harness-self-test', 'make supply-chain']) assert.ok(quality.includes('run: ' + command));
+  for (const command of ['make browser-test', 'make console-isolation-check', 'make stack-admission','make harness-self-test', 'make supply-chain']) assert.ok(quality.includes('run: ' + command));
   assert.doesNotMatch(quality, /continue-on-error:|^\s+if:|paths-ignore:/m);
   const plan = execFileSync('make', ['--dry-run', 'verify'], { encoding: 'utf8' });
   assert.equal(plan.match(/node harness\/check-imports.ts/g)?.length, 1);
-  assert.ok(plan.indexOf('node harness/check-imports.ts') < plan.indexOf('sh scripts/contracts-offline.sh'),
-    'Retain fail-fast public import validation before contract generation');
+  assert.ok(plan.indexOf('node harness/check-imports.ts') < plan.indexOf('sh scripts/contracts-offline.sh'),'Retain fail-fast public import validation before contract generation');
   for (const command of ['eslint', 'tsc', 'harness/ownership.ts', 'harness/test.sh', 'ng test', 'nx run console:build'])
     assert.ok(plan.includes(command), command);
 });

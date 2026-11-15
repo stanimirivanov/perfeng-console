@@ -39,10 +39,16 @@ test('fixed login profile emits only code/openid/S256 and protected binding cook
 
 test('invalid fixed configuration has one safe error and never admits a request-selected destination', () => {
   for (const change of [
-    { issuer: 'http://identity.example/realms/perfeng' }, { issuer: issuer + '?query' }, { issuer: issuer + '/' },
-    { issuer: 'https://user:private@identity.example/realms/perfeng' }, { issuer: 'https://identity.example/realms/../other' },
-    { issuer: issuer + '#fragment' }, { consoleOrigin: 'http://console.example' }, { consoleOrigin: consoleOrigin + '/' },
-    { consoleOrigin: consoleOrigin + '/callback' }, { consoleOrigin: 'https://user:private@console.example' },
+    { issuer: 'http://identity.example/realms/perfeng' },
+    { issuer: issuer + '?query' },
+    { issuer: issuer + '/' },
+    { issuer: 'https://user:private@identity.example/realms/perfeng' },
+    { issuer: 'https://identity.example/realms/../other' },
+    { issuer: issuer + '#fragment' },
+    { consoleOrigin: 'http://console.example' },
+    { consoleOrigin: consoleOrigin + '/' },
+    { consoleOrigin: consoleOrigin + '/callback' },
+    { consoleOrigin: 'https://user:private@console.example' },
   ]) assert.throws(() => createLoginProtocol({ ...profile(), ...change }), { message: 'Invalid login configuration' });
   assert.equal(createLoginProtocol(profile()).begin('https://evil.example'), undefined);
 });
@@ -53,9 +59,7 @@ test('only the matching browser can consume a transaction; duplicate cookies and
   const two = protocol.begin({ kind: 'home' })!;
   const state = new URL(one.authorizationUrl).searchParams.get('state')!;
   const target = callback(state);
-  for (const headers of [[], cookie(two.setCookie), [...cookie(one.setCookie), ...cookie(one.setCookie)],
-    [cookie(one.setCookie)[0] + '; ' + cookie(one.setCookie)[0]], ['__Host-perfeng_login=%00'], ['x'.repeat(4097)],
-    [cookie(one.setCookie)[0] + '\r\n'], [cookie(one.setCookie)[0] + '; ignored=é']]) {
+  for (const headers of [[], cookie(two.setCookie), [...cookie(one.setCookie), ...cookie(one.setCookie)],[cookie(one.setCookie)[0] + '; ' + cookie(one.setCookie)[0]], ['__Host-perfeng_login=%00'], ['x'.repeat(4097)],[cookie(one.setCookie)[0] + '\r\n'], [cookie(one.setCookie)[0] + '; ignored=é']]) {
     const result = protocol.callback(target, headers);
     assert.equal(result.ok, false);
     assert.equal('clearCookie' in result, false);
@@ -66,7 +70,11 @@ test('only the matching browser can consume a transaction; duplicate cookies and
 
 test('bound issuer errors, malformed parameter sets and provider refusals burn the transaction without diagnostics', () => {
   for (const change of [
-    '&iss=duplicate', '&unknown=value', '&code=duplicate', '&%63ode=duplicate', '&error=access_denied',
+    '&iss=duplicate',
+    '&unknown=value',
+    '&code=duplicate',
+    '&%63ode=duplicate',
+    '&error=access_denied',
     '&code=' + 'a'.repeat(4097),
   ]) {
     const protocol = createLoginProtocol(profile());
@@ -75,10 +83,7 @@ test('bound issuer errors, malformed parameter sets and provider refusals burn t
     assert.equal(protocol.callback(callback(state) + change, cookie(begun.setCookie)).ok, false);
     assert.equal(protocol.callback(callback(state), cookie(begun.setCookie)).ok, false);
   }
-  for (const extra of [ { code: 'code', iss: 'https://evil.example' }, { code: 'code' },
-    { code: 'a'.repeat(4097), iss: issuer }, { code: 'control\ncode', iss: issuer },
-    { code: 'code', iss: issuer, session_state: 'x'.repeat(257) }, { error: '', iss: issuer },
-    { error: 'access_denied', error_description: 'private-provider-detail', error_uri: 'https://private.example', iss: issuer } ]) {
+  for (const extra of [{ code: 'code', iss: 'https://evil.example' }, { code: 'code' },{ code: 'a'.repeat(4097), iss: issuer }, { code: 'control\ncode', iss: issuer },{ code: 'code', iss: issuer, session_state: 'x'.repeat(257) }, { error: '', iss: issuer },{ error: 'access_denied', error_description: 'private-provider-detail', error_uri: 'https://private.example', iss: issuer }]) {
     const protocol = createLoginProtocol(profile());
     const begun = protocol.begin({ kind: 'home' })!;
     const state = new URL(begun.authorizationUrl).searchParams.get('state')!;
@@ -98,8 +103,7 @@ test('raw callback bounds reject absolute/normalized paths, fragments and malfor
   const begun = protocol.begin({ kind: 'home' })!;
   const state = new URL(begun.authorizationUrl).searchParams.get('state')!;
   const target = callback(state);
-  for (const value of [consoleOrigin + target, target.replace('/auth/', '/x/../auth/'), target + '#fragment', target + '&x=%ZZ',
-    target + '&x=%', target + '&x=' + 'a'.repeat(8192), target + '\r\n', target.replace('code=', 'code=%00')]) {
+  for (const value of [consoleOrigin + target, target.replace('/auth/', '/x/../auth/'), target + '#fragment', target + '&x=%ZZ',target + '&x=%', target + '&x=' + 'a'.repeat(8192), target + '\r\n', target.replace('code=', 'code=%00')]) {
     assert.equal(protocol.callback(value, cookie(begun.setCookie)).ok, false);
   }
   const expiring = protocol.begin({ kind: 'home' })!;

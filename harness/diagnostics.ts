@@ -13,11 +13,9 @@ const corrections: Readonly<Record<string, string>> = {
   'alias-document': 'Reconcile the reviewed alias table with publicImports; permission changes still require code review.',
 };
 // Source filenames/specifiers are untrusted text, not terminal or CI control lines.
-const singleLine = (text: string) => text.replace(/[\u0000-\u001f\u007f-\u009f\u2028\u2029]/gu,
-  char => '\\u' + char.charCodeAt(0).toString(16).padStart(4, '0'));
+const singleLine = (text: string) => text.replace(/[\u0000-\u001f\u007f-\u009f\u2028\u2029]/gu,char => '\\u' + char.charCodeAt(0).toString(16).padStart(4, '0'));
 
-export function diagnostic(file: string, line: number, rule: string, reason: string,
-  gate: 'architecture' | 'imports' | 'distribution' = 'architecture'): string {
+export function diagnostic(file: string, line: number, rule: string, reason: string,gate: 'architecture' | 'imports' | 'distribution' = 'architecture'): string {
   const correction = corrections[rule] ?? 'Correct the source boundary using its owner guidance; admission changes require review.';
   const command = gate === 'imports' ? 'make check-imports' : gate === 'distribution' ? 'make build' : 'make architecture';
   const guide = gate === 'imports' ? 'docs/IMPORTS.md' : 'docs/development/harness-rules.md';

@@ -64,8 +64,7 @@ test('single-use code exchange composes PKCE, client signature, TLS and unverifi
     const begun = owner.begin({ kind: 'home' })!;
     const url = new URL(begun.authorizationUrl); const code = 'synthetic-' + sequence++;
     pending.set(code, url.searchParams.get('code_challenge')!);
-    return { target: '/console/auth/callback?' + new URLSearchParams({ state: url.searchParams.get('state')!, iss: issuer, code }),
-      cookies: [begun.setCookie.split(';')[0]!], nonce: url.searchParams.get('nonce')! };
+    return { target: '/console/auth/callback?' + new URLSearchParams({ state: url.searchParams.get('state')!, iss: issuer, code }),cookies: [begun.setCookie.split(';')[0]!], nonce: url.searchParams.get('nonce')! };
   }
   const first = begin();
   assert.equal((await Effect.runPromise(owner.complete(first.target, []))).ok, false); assert.equal(hits, 0);

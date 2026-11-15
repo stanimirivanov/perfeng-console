@@ -22,7 +22,10 @@ try {
   writeFileSync(join(stage, 'tools/serve-console.mjs'), server);
   cpSync('LICENSE', join(stage, 'LICENSE'));
   writeFileSync(join(stage, 'release.json'), JSON.stringify({
-    name, version, node: engines.node, entry: 'tools/serve-console.mjs',
+    name,
+    version,
+    node: engines.node,
+    entry: 'tools/serve-console.mjs',
   }, null, 2) + '\n');
   mkdirSync('dist/releases', { recursive: true });
   const archive = resolve('dist/releases', 'perfeng-console-' + version + '.tar.gz');

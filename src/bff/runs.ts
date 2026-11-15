@@ -3,7 +3,10 @@ import type { ArtifactResult, RunResult } from './transport-result.ts';
 import type { Observation, RunDetail, ArtifactClaim } from '#perfeng/contracts';
 
 /** Scope provider failures and project only fields needed by the lookup screen. */
-export function runObservation(result: RunResult): { status: number; body: Observation<RunDetail> | { reason: string } } {
+export function runObservation(result: RunResult): {
+  status: number;
+  body: Observation<RunDetail> | { reason: string; };
+} {
   if (!result.ok) {
     switch (result.reason) {
       case 'invalid_input': return { status: 400, body: { reason: 'invalid_id' } };
@@ -18,7 +21,10 @@ export function runObservation(result: RunResult): { status: number; body: Obser
 }
 
 /** Exclude provider storage locations; digests remain claims until bytes are verified. */
-export function artifactObservation(result: ArtifactResult): { status: number; body: Observation<{ artifacts: ArtifactClaim[] }> | { reason: string } } {
+export function artifactObservation(result: ArtifactResult): {
+  status: number;
+  body: Observation<{ artifacts: ArtifactClaim[]; }> | { reason: string; };
+} {
   if (!result.ok) {
     const { status } = runObservation(result);
     return { status, body: { reason: status === 404 ? 'not_found' : 'unavailable' } };
