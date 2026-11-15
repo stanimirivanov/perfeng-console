@@ -20,8 +20,7 @@ function diagnostics(files: Record<string, string>, link = false): string {
 }
 
 test('browser may consume presentation, including a corrected forbidden edge', () => {
-  assert.equal(diagnostics({'src/browser/view.ts': "import '../presentation/view.js';",
-    'src/presentation/view.ts': 'export {};'}), '');
+  assert.equal(diagnostics({ 'src/browser/view.ts': "import '../presentation/view.js';",'src/presentation/view.ts': 'export {};' }), '');
 });
 
 for (const [name, code, rule] of [
@@ -35,16 +34,16 @@ for (const [name, code, rule] of [
   ['unadmitted package', "import 'unexpected';", 'package'],
   ['repository escape', "import '../../../secret.js';", 'escape'],
 ] as const) {
-  test(name, () => assert.match(diagnostics({'src/browser/view.ts':code}), new RegExp(rule)));
+  test(name, () => assert.match(diagnostics({ 'src/browser/view.ts':code }), new RegExp(rule)));
 }
 
 test('evaluator may not import the runner or provider comparison package', () => {
-  assert.match(diagnostics({'src/scenarios/evaluate.ts': "import '../simulator/runner.js';"}), /layer/);
-  assert.match(diagnostics({'src/scenarios/evaluate.ts': "import 'perfeng-analysis';"}), /package/);
+  assert.match(diagnostics({ 'src/scenarios/evaluate.ts': "import '../simulator/runner.js';" }), /layer/);
+  assert.match(diagnostics({ 'src/scenarios/evaluate.ts': "import 'perfeng-analysis';" }), /package/);
 });
 
 test('unknown layers, alternate source languages and symlinks fail closed', () => {
-  const results = diagnostics({'src/other/x.ts':'', 'src/browser/hide.cjs':''}, true);
+  const results = diagnostics({ 'src/other/x.ts':'', 'src/browser/hide.cjs':'' }, true);
   for (const reason of ['owner','extension','symlink']) assert.match(results, new RegExp(reason));
 });
 
@@ -59,7 +58,7 @@ test('generated schema namespace admits Effect Schema without admitting server c
     "type Client = import('../../bff/generated/client.js').Client;",
     "import * as Client from 'effect/unstable/http/HttpClient';",
   ]) {
-    assert.match(diagnostics({'src/generated/schemas/run.ts': code}), /layer|package/);
+    assert.match(diagnostics({ 'src/generated/schemas/run.ts': code }), /layer|package/);
   }
 });
 
@@ -73,12 +72,12 @@ test('generated schemas cannot smuggle server resources through URL constructors
 });
 
 test('Effect Node imports are admitted only to the reviewed BFF modules', () => {
-  assert.equal(diagnostics({'src/bff/run-reader.ts': "import * as N from '@effect/platform-node/NodeHttpClient';"}), '');
-  assert.equal(diagnostics({'src/bff/transport.ts': "import {Effect} from 'effect';"}), '');
+  assert.equal(diagnostics({ 'src/bff/run-reader.ts': "import * as N from '@effect/platform-node/NodeHttpClient';" }), '');
+  assert.equal(diagnostics({ 'src/bff/transport.ts': "import {Effect} from 'effect';" }), '');
   for (const path of ['src/bff/other.ts', 'src/browser/view.ts']) {
-    assert.match(diagnostics({[path]: "import * as N from '@effect/platform-node/NodeHttpClient';"}), /package/);
+    assert.match(diagnostics({ [path]: "import * as N from '@effect/platform-node/NodeHttpClient';" }), /package/);
   }
-  assert.match(diagnostics({'src/bff/transport.ts': "import 'node:https';"}), /package/);
+  assert.match(diagnostics({ 'src/bff/transport.ts': "import 'node:https';" }), /package/);
 });
 
 test('shared DTOs are consumable by browser and BFF without acquiring authority', () => {

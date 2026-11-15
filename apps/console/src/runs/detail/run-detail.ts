@@ -62,7 +62,11 @@ export class RunDetailView {
   }
   readonly run = input.required<RunDetail>();
   readonly artifacts = input.required<ArtifactObservation>();
-  readonly observations = input.required<readonly { revision: number; state: string; updatedAt: string }[]>();
+  readonly observations = input.required<readonly {
+    revision: number;
+    state: string;
+    updatedAt: string;
+  }[]>();
   states() { return Object.keys(this.run().transitions); }
   claims() { const value = this.artifacts(); return value.status === 'available' ? value.artifacts : []; }
 }

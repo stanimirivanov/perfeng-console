@@ -8,10 +8,21 @@ export interface QualificationInput {
   readonly profile: 'id' | 'initial-access';
   readonly nonce?: string | undefined;
   readonly nowMs: number;
-  readonly snapshot: { readonly fetchedAtMs: number; readonly keys: readonly JWK[] };
+  readonly snapshot: {
+    readonly fetchedAtMs: number;
+    readonly keys: readonly JWK[];
+  };
 }
-type Result = { readonly ok: true; readonly issuer: string; readonly subject: string; readonly profile: QualificationInput['profile'] } |
-  { readonly ok: false; readonly reason: 'invalid_token' | 'unavailable' };
+type Result = {
+  readonly ok: true;
+  readonly issuer: string;
+  readonly subject: string;
+  readonly profile: QualificationInput['profile'];
+} |
+  {
+    readonly ok: false;
+    readonly reason: 'invalid_token' | 'unavailable';
+  };
 const invalid = (): Result => ({ ok: false, reason: 'invalid_token' });
 const unavailable = (): Result => ({ ok: false, reason: 'unavailable' });
 
@@ -81,8 +92,7 @@ export async function verifyCandidate(token: unknown, input: QualificationInput)
         (claims.nbf !== undefined && (typeof claims.nbf !== 'number' || !Number.isSafeInteger(claims.nbf))) ||
         (profile === 'id' && (typeof nonce !== 'string' || !nonce || nonce.length > 256 || claims.nonce !== nonce))) return invalid();
     const cryptoKey = await importJWK({ kty: 'RSA', n: key.n, e: key.e, alg: 'RS256', use: 'sig' }, 'RS256');
-    await jwtVerify(token, cryptoKey, { algorithms: ['RS256'], typ: 'JWT', issuer, audience,
-      requiredClaims: ['iss', 'sub', 'aud', 'iat', 'exp'], maxTokenAge: 300, clockTolerance: 30, currentDate: new Date(nowMs) });
+    await jwtVerify(token, cryptoKey, { algorithms: ['RS256'], typ: 'JWT', issuer, audience,requiredClaims: ['iss', 'sub', 'aud', 'iat', 'exp'], maxTokenAge: 300, clockTolerance: 30, currentDate: new Date(nowMs) });
     return { ok: true, issuer, subject: claims.sub, profile };
   } catch { return invalid(); }
 }

@@ -10,9 +10,7 @@ export function decodeCodeTokens(body: unknown): DecodeResult<UnverifiedCodeToke
   const value = decodeTokenEnvelope(body);
   if (!value || !isJwtShapedToken(value.id_token) || Object.hasOwn(value, 'issued_token_type') ||
       (value.refresh_token !== undefined && !isJwtShapedToken(value.refresh_token))) return invalid();
-  return { ok: true, candidates: { stage: 'unverified-code', accessToken: value.access_token,
-    idToken: value.id_token, expiresIn: value.expires_in,
-    ...(value.refresh_token === undefined ? {} : { refreshToken: value.refresh_token }) } };
+  return { ok: true, candidates: { stage: 'unverified-code', accessToken: value.access_token,idToken: value.id_token, expiresIn: value.expires_in,...(value.refresh_token === undefined ? {} : { refreshToken: value.refresh_token }) } };
 }
 
 /** Decode only the access-token exchange profile; never retain exchanged refresh/ID tokens. */

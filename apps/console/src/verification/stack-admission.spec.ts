@@ -5,8 +5,7 @@ import { patchState, signalStore, withState, withMethods } from "@ngrx/signals";
 import { Effect, Fiber } from "effect";
 
 it("session presentation state can be invalidated without retaining a previous value", () => {
-  const Store = signalStore(withState({ observation: 42 as number | null }),
-    withMethods(store => ({ invalidate: () => patchState(store, { observation: null }) })));
+  const Store = signalStore(withState({ observation: 42 as number | null }),withMethods(store => ({ invalidate: () => patchState(store, { observation: null }) })));
   const store = TestBed.runInInjectionContext(() => new Store());
   expect(store.observation()).toBe(42);
   store.invalidate();

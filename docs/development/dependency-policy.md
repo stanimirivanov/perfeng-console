@@ -78,3 +78,12 @@ is isolated and not production admission. Exact candidate pins/metadata/lock and
 strict duplicate/encoding/time/profile tests live with the fixture. Run
 `make identity-jwt-qualification` before relying on its evidence. No production
 module receives new package, network or Promise-runtime authority from this target.
+
+## TypeScript formatting admission — issue #83
+
+Development-only @stylistic/eslint-plugin 5.9.0 is pinned for immediately used
+interface/type-member layout, semicolon delimiters, indentation and trailing-space
+rules. [ADR 0005](../decisions/0005-enforce-readable-typescript-formatting.md) records
+MIT/Node/ESLint peers, matured release-age evidence, dependency weight, experimental
+rule qualification and replacement boundary. Generated/vendor byte ownership and
+all existing security/import checks remain active. No release-age exception.

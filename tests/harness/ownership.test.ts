@@ -21,9 +21,14 @@ test('unregistered production modules and alternate executable extensions fail c
   assert.match(inspect({ 'apps/console/src/hidden.mts': 'fetch("/")' }, {}), /OWN-01/);
 });
 for (const code of [
-  'fetch("/")', 'globalThis.fetch("/")', 'window["fetch"]("/")',
-  'const send = fetch; send("/")', 'const { fetch: send } = globalThis; send("/")',
-  'new AbortController()', 'AbortSignal.timeout(10)', 'setInterval(() => {}, 1000)',
+  'fetch("/")',
+  'globalThis.fetch("/")',
+  'window["fetch"]("/")',
+  'const send = fetch; send("/")',
+  'const { fetch: send } = globalThis; send("/")',
+  'new AbortController()',
+  'AbortSignal.timeout(10)',
+  'setInterval(() => {}, 1000)',
 ]) test('component rejects ambient authority: ' + code, () => {
   assert.match(inspect({ [file]: code }, { [file]: 'component' }), /OWN-03/);
 });
@@ -36,20 +41,14 @@ for (const code of [
 });
 test('role edges reject barrels and type/lazy imports of adapters', () => {
   for (const code of ["export * from './adapter.ts';", "type A = import('./adapter.ts').A;", "import('./adapter.ts')"]) {
-    assert.match(inspect({ [file]: code, 'apps/console/src/adapter.ts': 'export {};' },
-      { [file]: 'store', 'apps/console/src/adapter.ts': 'adapter' }), /OWN-01/);
+    assert.match(inspect({ [file]: code, 'apps/console/src/adapter.ts': 'export {};' },{ [file]: 'store', 'apps/console/src/adapter.ts': 'adapter' }), /OWN-01/);
   }
 });
 test('compiler path aliases resolve to the actual owner', () => {
-  assert.match(inspect({ 'tsconfig.json': '{"compilerOptions":{"baseUrl":".","paths":{"@io":["apps/console/src/adapter.ts"]}}}',
-    [file]: "import '@io';", 'apps/console/src/adapter.ts': 'export {};'},
-    { [file]: 'component', 'apps/console/src/adapter.ts': 'adapter' }), /OWN-01/);
+  assert.match(inspect({ 'tsconfig.json': '{"compilerOptions":{"baseUrl":".","paths":{"@io":["apps/console/src/adapter.ts"]}}}',[file]: "import '@io';", 'apps/console/src/adapter.ts': 'export {};' },{ [file]: 'component', 'apps/console/src/adapter.ts': 'adapter' }), /OWN-01/);
 });
 test('permitted component to store and adapter I/O; runtime only in composition', () => {
-  assert.equal(inspect({ [file]: "import './store.ts';", 'apps/console/src/store.ts': 'export {};',
-    'apps/console/src/io.ts': 'fetch("/")', 'apps/console/src/root.ts': "import { Effect } from 'effect'; Effect.runFork(job);" },
-    { [file]: 'component', 'apps/console/src/store.ts': 'store', 'apps/console/src/io.ts': 'adapter',
-      'apps/console/src/root.ts': 'composition' }), '');
+  assert.equal(inspect({ [file]: "import './store.ts';", 'apps/console/src/store.ts': 'export {};','apps/console/src/io.ts': 'fetch("/")', 'apps/console/src/root.ts': "import { Effect } from 'effect'; Effect.runFork(job);" },{ [file]: 'component', 'apps/console/src/store.ts': 'store', 'apps/console/src/io.ts': 'adapter','apps/console/src/root.ts': 'composition' }), '');
 });
 test('native HTTP is refused outside an admitted adapter', () => {
   assert.match(inspect({ 'src/bff/new.ts': "import { request } from 'node:https';" }, { 'src/bff/new.ts': 'operation' }), /OWN-03/);
@@ -108,8 +107,7 @@ test('contracts contain only type declarations and admit no runtime consumers', 
     assert.match(inspect({ [dto]: source }, { [dto]: 'contract' }), /OWN-04/);
   }
   assert.equal(inspect({ [dto]: 'export interface Value { id: string }\nexport type Id = string;' }, { [dto]: 'contract' }), '');
-  assert.match(inspect({ [dto]: 'export interface Value {}', [file]: "import '../../../src/shared/contracts/observation.ts';" },
-    { [dto]: 'contract', [file]: 'component' }), /OWN-04/);
+  assert.match(inspect({ [dto]: 'export interface Value {}', [file]: "import '../../../src/shared/contracts/observation.ts';" },{ [dto]: 'contract', [file]: 'component' }), /OWN-04/);
 });
 
 test('the BFF public entry re-exports composition without becoming a runtime owner', () => {
@@ -140,12 +138,15 @@ test('qualification config entry contains only named re-exports of its config ow
 
 const schedulingCases = [
   ...['queueMicrotask', 'setImmediate', 'requestAnimationFrame', 'requestIdleCallback'].flatMap(name => [
-    `${name}(() => {});`, `globalThis.${name}(() => {});`, `window['${name}'](() => {});`,
+    `${name}(() => {});`,
+    `globalThis.${name}(() => {});`,
+    `window['${name}'](() => {});`,
     `const schedule = ${name}; schedule(() => {});`,
     `const { ${name}: schedule } = globalThis; schedule(() => {});`,
     `const { ['${name}']: schedule } = globalThis; schedule(() => {});`,
   ]),
-  'scheduler.postTask(() => {});', 'globalThis.scheduler.postTask(() => {});',
+  'scheduler.postTask(() => {});',
+  'globalThis.scheduler.postTask(() => {});',
   "const s = scheduler; s['postTask'](() => {});",
   'const { postTask: schedule } = scheduler; schedule(() => {});',
   "import { setImmediate as schedule } from 'node:timers'; schedule(() => {});",
@@ -166,14 +167,11 @@ test('an explicitly registered adapter can schedule but does not gain an Effect 
   const files = Object.fromEntries(schedulingCases.map((code, index) =>
     ['apps/console/src/adapter-' + index + '.ts', code]));
   assert.equal(inspect(files, Object.fromEntries(Object.keys(files).map(name => [name, 'adapter' as const]))), '');
-  assert.match(inspect({ [file]: "import { Effect } from 'effect'; Effect.runFork(job);" },
-    { [file]: 'adapter' }), /OWN-02/);
+  assert.match(inspect({ [file]: "import { Effect } from 'effect'; Effect.runFork(job);" },{ [file]: 'adapter' }), /OWN-02/);
 });
 test('framework rendering hooks and pure Effect descriptions do not confer native scheduling authority', () => {
-  assert.equal(inspect({ [file]: "import { afterNextRender } from '@angular/core'; afterNextRender(() => {});" },
-    { [file]: 'component' }), '');
-  assert.equal(inspect({ [file]: "import { Effect } from 'effect'; export const wait = Effect.sleep(10);" },
-    { [file]: 'operation' }), '');
+  assert.equal(inspect({ [file]: "import { afterNextRender } from '@angular/core'; afterNextRender(() => {});" },{ [file]: 'component' }), '');
+  assert.equal(inspect({ [file]: "import { Effect } from 'effect'; export const wait = Effect.sleep(10);" },{ [file]: 'operation' }), '');
 });
 
 test('computed scheduler authority cannot hide behind assigned or destructured aliases', () => {
@@ -183,16 +181,14 @@ test('computed scheduler authority cannot hide behind assigned or destructured a
   ]) {
     assert.match(inspect({ [file]: code }, { [file]: 'component' }), /OWN-03/);
   }
-  assert.match(inspect({ [file]: 'const s = scheduler; s[method](() => {});' },
-    { [file]: 'adapter' }), /Computed authority/);
+  assert.match(inspect({ [file]: 'const s = scheduler; s[method](() => {});' },{ [file]: 'adapter' }), /Computed authority/);
 });
 
 test('composition assembly no longer needs H4 mixed-component exceptions', () => {
   assert.equal(productionRoles['apps/console/src/shell/app.ts'], 'component');
   assert.equal(productionRoles['apps/console/src/runs/run-lookup.ts'], 'component');
   const app = 'apps/console/src/app.ts';
-  assert.match(inspect({ 'apps/console/src/other.ts': "import './app.ts';", [app]: 'export {};' },
-    { 'apps/console/src/other.ts': 'composition', [app]: 'composition' }), /OWN-01.*composition/);
+  assert.match(inspect({ 'apps/console/src/other.ts': "import './app.ts';", [app]: 'export {};' },{ 'apps/console/src/other.ts': 'composition', [app]: 'composition' }), /OWN-01.*composition/);
 });
 for (const role of ['composition', 'integration', 'adapter', 'store', 'operation', 'port'] as const) {
   test(role + ' cannot conceal a component or directive declaration', () => {
@@ -204,14 +200,12 @@ for (const role of ['composition', 'integration', 'adapter', 'store', 'operation
   });
 }
 test('registered framework integration executes Effects without gaining native I/O', () => {
-  assert.equal(inspect({ [file]: "import { Effect } from 'effect'; Effect.runFork(job);" },
-    { [file]: 'integration' }), '');
+  assert.equal(inspect({ [file]: "import { Effect } from 'effect'; Effect.runFork(job);" },{ [file]: 'integration' }), '');
   assert.match(inspect({ [file]: 'fetch("/")' }, { [file]: 'integration' }), /OWN-03/);
 });
 
 test('component declarations retain their component role', () => {
-  assert.equal(inspect({ [file]: "import { Component as View } from '@angular/core'; @View({}) class Screen {}" },
-    { [file]: 'component' }), '');
+  assert.equal(inspect({ [file]: "import { Component as View } from '@angular/core'; @View({}) class Screen {}" },{ [file]: 'component' }), '');
 });
 
 test('a re-exported decorator alias cannot conceal a component in an integration', () => {
@@ -225,28 +219,21 @@ test('a re-exported decorator alias cannot conceal a component in an integration
 test('feature boundaries reject private and unapproved cross-feature imports in every import form', () => {
   const view = 'apps/console/src/runs/probe.ts';
   const session = 'apps/console/src/session/session.store.ts';
-  for (const code of ["import '../session/session.store.ts';", "export * from '../session/session.store.ts';",
-    "type X = import('../session/session.store.ts').X;", "import('../session/session.store.ts');"]) {
-    assert.match(inspect({ [view]: code, [session]: 'export interface X {}' },
-      { [view]: 'integration', [session]: 'store' }), /OWN-11.*feature/i);
+  for (const code of ["import '../session/session.store.ts';", "export * from '../session/session.store.ts';","type X = import('../session/session.store.ts').X;", "import('../session/session.store.ts');"]) {
+    assert.match(inspect({ [view]: code, [session]: 'export interface X {}' },{ [view]: 'integration', [session]: 'store' }), /OWN-11.*feature/i);
   }
-  assert.match(inspect({ [view]: "import '../session/session-ui.ts';",
-    'apps/console/src/session/session-ui.ts': 'export {};' },
-    { [view]: 'integration', 'apps/console/src/session/session-ui.ts': 'port' }), /OWN-11/);
+  assert.match(inspect({ [view]: "import '../session/session-ui.ts';",'apps/console/src/session/session-ui.ts': 'export {};' },{ [view]: 'integration', 'apps/console/src/session/session-ui.ts': 'port' }), /OWN-11/);
 });
 test('component provider assembly is allowed only through the reviewed metadata entry', () => {
   const view = 'apps/console/src/runs/run-lookup.ts';
   const provider = 'apps/console/src/runs/run.providers.ts';
   const imports = "import { Component as View } from '@angular/core'; import { provideRunLookup as setup } from './run.providers.ts'; ";
   const registry: Record<string, Role> = { [view]: 'component', [provider]: 'provider' };
-  assert.equal(inspect({ [view]: imports + '@View({providers: setup()}) class Screen {}',
-    [provider]: 'export function provideRunLookup() { return []; }' }, registry), '');
-  for (const body of ['@View({}) class Screen { value = setup(); }',
-    '@View({}) class Screen { act() { return setup(); } }']) {
+  assert.equal(inspect({ [view]: imports + '@View({providers: setup()}) class Screen {}',[provider]: 'export function provideRunLookup() { return []; }' }, registry), '');
+  for (const body of ['@View({}) class Screen { value = setup(); }','@View({}) class Screen { act() { return setup(); } }']) {
     assert.match(inspect({ [view]: imports + body, [provider]: 'export function provideRunLookup() { return []; }' }, registry), /OWN-12/);
   }
-  assert.match(inspect({ [view]: "import * as setup from './run.providers.ts';",
-    [provider]: 'export function provideRunLookup() { return []; }' }, registry), /OWN-12/);
+  assert.match(inspect({ [view]: "import * as setup from './run.providers.ts';",[provider]: 'export function provideRunLookup() { return []; }' }, registry), /OWN-12/);
 });
 test('provider metadata does not acquire runtime execution or native I/O', () => {
   for (const code of ["import { Effect } from 'effect'; Effect.runFork(job);", 'fetch("/");']) {
@@ -267,27 +254,19 @@ test('tools scan rejects unregistered deep/spec-like modules, alternate formats 
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
 test('incoming listeners and CLI filesystem access use exact named platform imports', () => {
-  assert.equal(inspect({ 'tools/console-server.ts': "import { createServer as listen } from 'node:https'; new AbortController(); const server = listen({}); server.setTimeout(5000, () => {});" }), '');
+  assert.equal(inspect({ 'tools/console-server.ts': "import { createServer as listen } from 'node:https'; const server = listen({}); server.setTimeout(5000, () => {});" }), '');
   assert.equal(inspect({ 'tools/serve-console.ts': "import { readFile as load } from 'node:fs/promises'; load('cert');" }), '');
   assert.equal(inspect({ 'tools/preview.mjs': "import { createServer } from 'node:http'; createServer(() => {});" }), '');
-  for (const code of ["import { request as send } from 'node:https';", "import { get } from 'node:https';",
-    "import * as http from 'node:https';", "const http = await import('node:https');", "type T = import('node:https');",
-    "import { createServer } from 'https';", "import { execFile } from 'node:child_process';", 'fetch("/");',
-    'globalThis["fetch"]("/");', 'setTimeout(() => {}, 1);',
-    'const fake = {}; fake.setTimeout(5000);', 'const { fetch: send } = globalThis; send("/");',
-    'process.getBuiltinModule("https").request("/");',
-    "import { Effect as E } from 'effect'; E.runFork(job);"])
+  for (const code of ["import { request as send } from 'node:https';", "import { get } from 'node:https';","import * as http from 'node:https';", "const http = await import('node:https');", "type T = import('node:https');","import { createServer } from 'https';", "import { execFile } from 'node:child_process';", 'fetch("/");','globalThis["fetch"]("/");', 'setTimeout(() => {}, 1);','const fake = {}; fake.setTimeout(5000);', 'const { fetch: send } = globalThis; send("/");','process.getBuiltinModule("https").request("/");',"import { Effect as E } from 'effect'; E.runFork(job);"])
     assert.match(inspect({ 'tools/console-server.ts': code }), /OWN-02|OWN-03|OWN-13/, code);
   assert.match(inspect({ 'tools/serve-console.ts': "import { writeFile } from 'node:fs/promises';" }), /OWN-13/);
   assert.match(inspect({ 'tools/preview.mjs': 'new AbortController();' }), /OWN-03/);
 });
 test('tools cannot acquire undeclared helper edges or leak a native namespace through their public entry', () => {
-  assert.match(inspect({ 'tools/console-server.ts': "import './helper.ts';", 'tools/helper.ts': 'export {};' },
-    { ...productionRoles, 'tools/helper.ts': 'adapter' }), /OWN-13/);
+  assert.match(inspect({ 'tools/console-server.ts': "import './helper.ts';", 'tools/helper.ts': 'export {};' },{ ...productionRoles, 'tools/helper.ts': 'adapter' }), /OWN-13/);
   assert.match(inspect({ 'tools/public-api.ts': "export { createServer } from 'node:https';" }), /OWN-01|OWN-13/);
-  assert.match(inspect({ 'tools/console-server.ts': "import { createRunTransport } from '#perfeng/bff';" }), /OWN-13.*type/);
-  assert.equal(inspect({ 'tools/public-api.ts': "export { startConsole } from './console-server.ts';",
-    'tools/console-server.ts': 'export function startConsole() {}' }), '');
+  assert.match(inspect({ 'tools/console-server.ts': "import { createRunTransport } from '#perfeng/bff';" }), /OWN-13/);
+  assert.equal(inspect({ 'tools/public-api.ts': "export { startConsole } from './console-server.ts';",'tools/console-server.ts': 'export function startConsole() {}' }), '');
 });
 test('a symlinked tools root cannot turn an external tree into reviewed tooling', () => {
   const root = mkdtempSync(join(tmpdir(), 'tools-root-link-'));
@@ -302,10 +281,7 @@ test('a symlinked tools root cannot turn an external tree into reviewed tooling'
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
 test('tool native loaders cannot hide behind computed names or assigned process aliases', () => {
-  for (const code of ["process['getBuiltinModule']('https').request('/');",
-    "const p = process; p['binding']('tcp_wrap');",
-    "const { ['getBuiltinModule']: load } = process; load('https');",
-    'const p = process; p[method]("https");'])
+  for (const code of ["process['getBuiltinModule']('https').request('/');","const p = process; p['binding']('tcp_wrap');","const { ['getBuiltinModule']: load } = process; load('https');",'const p = process; p[method]("https");'])
     assert.match(inspect({ 'tools/console-server.ts': code }), /OWN-03|OWN-13/, code);
 });
 
@@ -313,9 +289,21 @@ test('token POST may read the effective header limit without acquiring native di
   const file = 'src/bff/login/token-post.ts';
   assert.equal(inspect({ [file]: "import { maxHeaderSize } from 'node:http'; void maxHeaderSize;" }), '');
   for (const source of [
-    "import { request } from 'node:http';", "import * as http from 'node:http';",
-    "import http from 'node:http';", "import { maxHeaderSize, get } from 'node:http';",
+    "import { request } from 'node:http';",
+    "import * as http from 'node:http';",
+    "import http from 'node:http';",
+    "import { maxHeaderSize, get } from 'node:http';",
     "export { maxHeaderSize } from 'node:http';",
   ]) assert.match(inspect({ [file]: source }), /Native dispatch/);
   assert.match(inspect({ 'src/bff/run-reader.ts': "import { maxHeaderSize } from 'node:http';" }), /Native dispatch/);
+});
+
+test('extracted server handlers retain exact capabilities', () => {
+  assert.equal(inspect({ 'tools/server/run-routes.ts': 'new AbortController();' }), '');
+  for (const file of ['tools/server/request-policy.ts', 'tools/server/session-routes.ts', 'tools/server/static-route.ts']) {
+    assert.match(inspect({ [file]: 'new AbortController();' }), /OWN-03/);
+    assert.match(inspect({ [file]: "import { request } from 'node:https';" }), /OWN-03|OWN-13/);
+  }
+  assert.match(inspect({ 'tools/server/run-routes.ts': "import { createRunTransport } from '#perfeng/bff';" }), /OWN-13/);
+  assert.match(inspect({ 'tools/server/request-policy.ts': "import { IncomingMessage } from 'node:http';" }), /OWN-13.*type/);
 });

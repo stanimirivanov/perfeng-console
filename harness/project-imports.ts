@@ -10,11 +10,16 @@ import { publicImports } from './imports.ts';
 
 // These roots also define dependency-cruiser's cross-owner cycle rules.
 export const ownerPatterns = [
-  '^apps/console/', '^apps/web-e2e/',
+  '^apps/console/',
+  '^apps/web-e2e/',
   ...['bff', 'browser', 'generated', 'presentation', 'shared', 'scenarios', 'simulator'].map(name => '^src/' + name + '/'),
   ...['effect-node', 'effect-codegen', 'effect-runtime', 'orval-fetch'].map(name => '^tools/qualification/' + name + '/'),
   '^tools/qualification/(?!effect-node/|effect-codegen/|effect-runtime/|orval-fetch/)',
-  '^tools/user-guide/', '^tools/(?!qualification/|user-guide/)', '^harness/', '^scripts/', '^tests/',
+  '^tools/user-guide/',
+  '^tools/(?!qualification/|user-guide/)',
+  '^harness/',
+  '^scripts/',
+  '^tests/',
 ];
 export const owner = (file: string) => ownerPatterns.find(pattern => new RegExp(pattern).test(file)) ?? dirname(file);
 const qualifier = /^tools\/qualification\/(effect-node|effect-codegen|effect-runtime|orval-fetch)\//;
@@ -81,7 +86,12 @@ if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1]
 
 export interface DependencyModule {
   source: string;
-  dependencies: readonly { resolved: string; coreModule?: boolean; couldNotResolve?: boolean; matchesDoNotFollow?: boolean }[];
+  dependencies: readonly {
+    resolved: string;
+    coreModule?: boolean;
+    couldNotResolve?: boolean;
+    matchesDoNotFollow?: boolean;
+  }[];
 }
 
 /** Collapse dependency-cruiser's resolved edges to owners before detecting cycles. */

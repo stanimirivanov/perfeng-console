@@ -56,9 +56,7 @@ test('each client assertion has exact fixed claims, bounded lifetime and a real 
 });
 
 test('client and issuer configuration is closed and every rejection has a fixed safe error', () => {
-  for (const changed of [ { clientId: 'perfeng-ci' }, { clientId: 'human-subject' }, { issuer: 'http://identity.example/realms/perfeng' },
-    { issuer: issuer + '/' }, { issuer: issuer + '?token=private' }, { issuer: issuer + '#fragment' },
-    { issuer: 'https://user:private@identity.example/realms/perfeng' }, { issuer: 'https://identity.example/realms/../evil' } ]) {
+  for (const changed of [{ clientId: 'perfeng-ci' }, { clientId: 'human-subject' }, { issuer: 'http://identity.example/realms/perfeng' },{ issuer: issuer + '/' }, { issuer: issuer + '?token=private' }, { issuer: issuer + '#fragment' },{ issuer: 'https://user:private@identity.example/realms/perfeng' }, { issuer: 'https://identity.example/realms/../evil' }]) {
     assert.throws(() => createClientAssertion({ ...config(), ...changed }), { message: 'Invalid client authentication configuration' });
   }
 });
@@ -68,12 +66,7 @@ test('only bounded unencrypted PKCS8 RSA keys with admitted size and exponent ca
   const exponent = generateKeyPairSync('rsa', { modulusLength: 2048, publicExponent: 3 });
   const ec = generateKeyPairSync('ec', { namedCurve: 'prime256v1' });
   const pss = generateKeyPairSync('rsa-pss', { modulusLength: 2048 });
-  const rejected = [ 'private-key-canary', 'x'.repeat(16_385), pem + pem,
-    key.publicKey.export({ type: 'spki', format: 'pem' }).toString(),
-    key.privateKey.export({ type: 'pkcs1', format: 'pem' }).toString(),
-    key.privateKey.export({ type: 'pkcs8', format: 'pem', cipher: 'aes-256-cbc', passphrase: 'test-only-password' }).toString(),
-    ...[weak, exponent, ec, pss].map(pair => pair.privateKey.export({ type: 'pkcs8', format: 'pem' }).toString()),
-  ];
+  const rejected = ['private-key-canary', 'x'.repeat(16_385), pem + pem,key.publicKey.export({ type: 'spki', format: 'pem' }).toString(),key.privateKey.export({ type: 'pkcs1', format: 'pem' }).toString(),key.privateKey.export({ type: 'pkcs8', format: 'pem', cipher: 'aes-256-cbc', passphrase: 'test-only-password' }).toString(),...[weak, exponent, ec, pss].map(pair => pair.privateKey.export({ type: 'pkcs8', format: 'pem' }).toString()),];
   for (const privateKeyPem of rejected) assert.throws(() => createClientAssertion({ ...config(), privateKeyPem }), { message: 'Invalid client authentication configuration' });
 });
 

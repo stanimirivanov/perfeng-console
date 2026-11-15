@@ -31,9 +31,21 @@ test('fixed-origin Run transport enforces credential, TLS and response boundarie
     const caFile = join(root, name + '.pem');
     const keyFile = join(root, name + '.key');
     execFileSync('openssl', [
-      'req', '-x509', '-newkey', 'rsa:2048', '-nodes', '-days', '1',
-      '-subj', '/CN=local-fixture', '-addext', 'subjectAltName=IP:127.0.0.1',
-      '-keyout', keyFile, '-out', caFile,
+      'req',
+      '-x509',
+      '-newkey',
+      'rsa:2048',
+      '-nodes',
+      '-days',
+      '1',
+      '-subj',
+      '/CN=local-fixture',
+      '-addext',
+      'subjectAltName=IP:127.0.0.1',
+      '-keyout',
+      keyFile,
+      '-out',
+      caFile,
     ], { stdio: 'ignore' });
     chmodSync(caFile, 0o600);
     return { caFile, keyFile };
@@ -50,7 +62,8 @@ test('fixed-origin Run transport enforces credential, TLS and response boundarie
   let responseClosed = () => {};
   const waitClose = () => Promise.race([new Promise<void>(resolve => { responseClosed = resolve; }), new Promise<never>((_, reject) => { const timer = setTimeout(() => reject(new Error('server response not closed')), 2000); timer.unref(); })]);
   const server = createServer({
-    cert: readFileSync(tls.caFile), key: readFileSync(tls.keyFile),
+    cert: readFileSync(tls.caFile),
+    key: readFileSync(tls.keyFile),
   }, (request, response) => {
     if (request.url === '/elsewhere') redirectHits++;
     hits++;
@@ -155,12 +168,14 @@ test('fixed-origin Run transport enforces credential, TLS and response boundarie
   await t.test('rejects wrong CA and TLS hostname and never follows a redirect', async () => {
     const before = hits;
     assert.deepEqual(await createRunTransport({ ...config, caFile: other.caFile }).getRun(run.id), {
-      ok: false, reason: 'unavailable',
+      ok: false,
+      reason: 'unavailable',
     });
     assert.equal(hits, before);
     const previousConnections = connections;
     assert.deepEqual(await createRunTransport({ ...config, origin: 'https://localhost:' + address.port }).getRun(run.id), {
-      ok: false, reason: 'unavailable',
+      ok: false,
+      reason: 'unavailable',
     });
     assert.equal(connections, previousConnections + 1);
     assert.equal(hits, before);
@@ -178,7 +193,9 @@ test('fixed-origin Run transport enforces credential, TLS and response boundarie
       assert.ok(response instanceof NodeHttpIncomingMessage);
       return { raw: response.source.rawHeaders, distinct: response.source.headersDistinct['content-type'] };
     })).pipe(Effect.provide(NodeHttpClient.layerNodeHttpOptions({
-      ca: readFileSync(tls.caFile), minVersion: 'TLSv1.2', rejectUnauthorized: true,
+      ca: readFileSync(tls.caFile),
+      minVersion: 'TLSv1.2',
+      rejectUnauthorized: true,
     }))));
     assert.deepEqual(observed.distinct, ['application/json', 'application/json']);
     assert.equal(observed.raw.filter(value => value.toLowerCase() === 'content-type').length, 2);
@@ -187,11 +204,20 @@ test('fixed-origin Run transport enforces credential, TLS and response boundarie
   await t.test('maps responses to bounded safe outcomes without logging provider data', async (subtest) => {
     const logs = [subtest.mock.method(console, 'log'), subtest.mock.method(console, 'warn'), subtest.mock.method(console, 'error')];
     for (const [scenario, reason] of [
-      ['duplicate-same', 'invalid_response'], ['duplicate-different', 'invalid_response'],
-      ['encoding', 'invalid_response'], ['utf8', 'invalid_response'],
-      ['unauthorized', 'forbidden'], ['forbidden', 'forbidden'], ['busy', 'unavailable'], ['server-error', 'unavailable'],
-      ['error', 'not_found'], ['wrong-media', 'invalid_response'], ['wrong-id', 'invalid_response'],
-      ['invalid', 'invalid_response'], ['malformed', 'invalid_response'], ['oversize', 'invalid_response'],
+      ['duplicate-same', 'invalid_response'],
+      ['duplicate-different', 'invalid_response'],
+      ['encoding', 'invalid_response'],
+      ['utf8', 'invalid_response'],
+      ['unauthorized', 'forbidden'],
+      ['forbidden', 'forbidden'],
+      ['busy', 'unavailable'],
+      ['server-error', 'unavailable'],
+      ['error', 'not_found'],
+      ['wrong-media', 'invalid_response'],
+      ['wrong-id', 'invalid_response'],
+      ['invalid', 'invalid_response'],
+      ['malformed', 'invalid_response'],
+      ['oversize', 'invalid_response'],
     ]) {
       mode = scenario!;
       const result = await createRunTransport({ ...config, maxResponseBytes: 4096 }).getRun(run.id);
@@ -219,7 +245,8 @@ test('fixed-origin Run transport enforces credential, TLS and response boundarie
     let sentBody = false;
     bodyStarted = () => { sentBody = true; };
     assert.deepEqual(await createRunTransport({ ...config, deadlineMs: 250 }).getRun(run.id), {
-      ok: false, reason: 'deadline',
+      ok: false,
+      reason: 'deadline',
     });
     assert.equal(sentBody, true);
     await deadlineClosed;
@@ -239,8 +266,7 @@ test('fixed-origin Run transport enforces credential, TLS and response boundarie
   });
 
   await t.test('TLS 1.1 is rejected while a deliberately permissive control connects', async () => {
-    const legacy = createServer({ cert: readFileSync(tls.caFile), key: readFileSync(tls.keyFile),
-      minVersion: 'TLSv1.1', maxVersion: 'TLSv1.1', ciphers: 'DEFAULT:@SECLEVEL=0' }, (_req, res) => res.end('control'));
+    const legacy = createServer({ cert: readFileSync(tls.caFile), key: readFileSync(tls.keyFile),minVersion: 'TLSv1.1', maxVersion: 'TLSv1.1', ciphers: 'DEFAULT:@SECLEVEL=0' }, (_req, res) => res.end('control'));
     legacy.listen(0, '127.0.0.1'); await once(legacy, 'listening');
     try {
       const addr = legacy.address(); assert.ok(addr && typeof addr === 'object');

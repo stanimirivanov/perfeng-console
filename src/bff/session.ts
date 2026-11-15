@@ -13,7 +13,12 @@ export function createSession(now = () => performance.now()) {
   const code = secret();
   const pairingEnd = now() + 300_000;
   let attempts = 0;
-  let grant: { id: string; csrf: string; idleEnd: number; absoluteEnd: number } | undefined;
+  let grant: {
+    id: string;
+    csrf: string;
+    idleEnd: number;
+    absoluteEnd: number;
+  } | undefined;
   function valid(id: string | undefined) {
     if (!grant) return;
     if (now() >= Math.min(grant.idleEnd, grant.absoluteEnd)) {

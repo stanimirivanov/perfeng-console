@@ -9,11 +9,8 @@ const now = 1_800_000_000;
 const pair = generateKeyPairSync('rsa', { modulusLength: 2048 });
 const other = generateKeyPairSync('rsa', { modulusLength: 2048 });
 const publicKey = { ...pair.publicKey.export({ format: 'jwk' }), kid: 'reviewed-key', use: 'sig', alg: 'RS256' };
-const options = (profile: 'id' | 'initial-access' = 'id') => ({ issuer, profile, nonce: 'expected-nonce', nowMs: now * 1000,
-  snapshot: { fetchedAtMs: now * 1000, keys: [publicKey] } });
-const claims = (profile: 'id' | 'initial-access' = 'id') => ({ iss: issuer, sub: 'fixture-subject', aud: profile === 'id' ? 'perfeng-console-login' : 'perfeng-console-delegate',
-  azp: 'perfeng-console-login', typ: profile === 'id' ? 'ID' : 'Bearer', iat: now, exp: now + 300, nonce: 'expected-nonce',
-  email_verified: false, realm_access: { roles: ['ignored-role'] } });
+const options = (profile: 'id' | 'initial-access' = 'id') => ({ issuer, profile, nonce: 'expected-nonce', nowMs: now * 1000,snapshot: { fetchedAtMs: now * 1000, keys: [publicKey] } });
+const claims = (profile: 'id' | 'initial-access' = 'id') => ({ iss: issuer, sub: 'fixture-subject', aud: profile === 'id' ? 'perfeng-console-login' : 'perfeng-console-delegate',azp: 'perfeng-console-login', typ: profile === 'id' ? 'ID' : 'Bearer', iat: now, exp: now + 300, nonce: 'expected-nonce',email_verified: false, realm_access: { roles: ['ignored-role'] } });
 function token(body: object | string = claims(), header: object | string = { alg: 'RS256', typ: 'JWT', kid: 'reviewed-key' }, key = pair.privateKey) {
   const encode = (value: object | string) => Buffer.from(typeof value === 'string' ? value : JSON.stringify(value)).toString('base64url');
   const input = encode(header) + '.' + encode(body);
@@ -27,12 +24,11 @@ test('real RSA signatures qualify separate exact ID and initial-access profiles 
 });
 
 test('signature, algorithm, identity, nonce and audience substitutions fail without partial claims', async () => {
-  for (const changed of [ { iss: 'https://foreign.example' }, { sub: '' }, { aud: 'perfeng-control-plane' }, { aud: ['perfeng-console-login', 'other'] },
-    { azp: 'perfeng-console-delegate' }, { typ: 'Bearer' }, { nonce: 'wrong' }, { iat: now + 31 }, { nbf: now + 31 }, { exp: now + 301 } ]) {
+  for (const changed of [{ iss: 'https://foreign.example' }, { sub: '' }, { aud: 'perfeng-control-plane' }, { aud: ['perfeng-console-login', 'other'] },{ azp: 'perfeng-console-delegate' }, { typ: 'Bearer' }, { nonce: 'wrong' }, { iat: now + 31 }, { nbf: now + 31 }, { exp: now + 301 }]) {
     assert.deepEqual(await verifyCandidate(token({ ...claims(), ...changed }), options()), { ok: false, reason: 'invalid_token' });
   }
   assert.equal((await verifyCandidate(token(claims(), undefined, other.privateKey), options())).ok, false);
-  for (const changed of [ { alg: 'HS256' }, { alg: 'none' }, { typ: 'at+jwt' }, { jku: 'https://never-fetch.invalid' }, { crit: ['unknown'] }, { kid: 'missing' } ]) {
+  for (const changed of [{ alg: 'HS256' }, { alg: 'none' }, { typ: 'at+jwt' }, { jku: 'https://never-fetch.invalid' }, { crit: ['unknown'] }, { kid: 'missing' }]) {
     assert.equal((await verifyCandidate(token(claims(), { alg: 'RS256', typ: 'JWT', kid: 'reviewed-key', ...changed }), options())).ok, false);
   }
   const { exp: removed, ...missing } = claims(); void removed;
@@ -42,8 +38,7 @@ test('signature, algorithm, identity, nonce and audience substitutions fail with
 
 test('decoded duplicate names at any depth, malformed syntax, escapes, unsafe encodings and oversized tokens refuse', async () => {
   const original = JSON.stringify(claims());
-  for (const body of [original.slice(0, -1) + ',"\\u0073ub":"attacker"}', original.slice(0, -1) + ',"extra":{"x":1,"\\u0078":2}}',
-    original.slice(0, -1) + ',}', original.slice(0, -1) + ',/*comment*/"x":1}', '{', '{"x":' + '['.repeat(32) + '1' + ']'.repeat(32) + '}' ]) {
+  for (const body of [original.slice(0, -1) + ',"\\u0073ub":"attacker"}', original.slice(0, -1) + ',"extra":{"x":1,"\\u0078":2}}',original.slice(0, -1) + ',}', original.slice(0, -1) + ',/*comment*/"x":1}', '{', '{"x":' + '['.repeat(32) + '1' + ']'.repeat(32) + '}']) {
     assert.equal((await verifyCandidate(token(body), options())).ok, false);
   }
   assert.equal((await verifyCandidate(token(claims(), '{"alg":"RS256","typ":"JWT","kid":"reviewed-key","\\u0061lg":"RS256"}'), options())).ok, false);

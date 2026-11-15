@@ -14,9 +14,7 @@ test('loopback HTTPS pairing is keyboard usable and session boundaries fail clos
   const key = join(directory, 'key.pem');
   let now = 0;
   try {
-    execFileSync('openssl', ['req', '-x509', '-newkey', 'rsa:2048', '-nodes', '-days', '1',
-      '-subj', '/CN=loopback-test', '-addext', 'subjectAltName=IP:127.0.0.1', '-out', cert, '-keyout', key],
-    { stdio: 'ignore' });
+    execFileSync('openssl', ['req', '-x509', '-newkey', 'rsa:2048', '-nodes', '-days', '1','-subj', '/CN=loopback-test', '-addext', 'subjectAltName=IP:127.0.0.1', '-out', cert, '-keyout', key],{ stdio: 'ignore' });
     const tls = { cert: readFileSync(cert), key: readFileSync(key), port: 0 };
     const example = JSON.parse(readFileSync('vendor/perfeng-contracts/api/run-management/v1/examples/completed.json', 'utf8'));
     const token = 'upstream-browser-fixture-canary';
@@ -57,13 +55,15 @@ test('loopback HTTPS pairing is keyboard usable and session boundaries fail clos
 
       const crossPage = await context.newPage();
       await crossPage.route(other.origin + '/attack', route => route.fulfill({
-        contentType: 'text/html', body: '<title>Cross-origin fixture</title>',
+        contentType: 'text/html',
+        body: '<title>Cross-origin fixture</title>',
       }));
       await crossPage.goto(other.origin + '/attack');
       expect(await crossPage.evaluate(async endpoint => {
         try {
           await fetch(endpoint, {
-            method: 'POST', credentials: 'include',
+            method: 'POST',
+            credentials: 'include',
             headers: { 'Content-Type': 'application/json', 'X-Perfeng-CSRF': 'pair' },
             body: '{}',
           });
@@ -74,11 +74,13 @@ test('loopback HTTPS pairing is keyboard usable and session boundaries fail clos
       expect((await context.request.get(base, { headers: { Host: 'rebound.invalid', 'X-Perfeng-CSRF': 'read' } })).status()).toBe(403);
 
       const cross = await context.request.post(base + '/pair', {
-        headers: { Origin: 'https://example.invalid', 'X-Perfeng-CSRF': 'pair' }, data: { code: local.code },
+        headers: { Origin: 'https://example.invalid', 'X-Perfeng-CSRF': 'pair' },
+        data: { code: local.code },
       });
       expect(cross.status()).toBe(403);
       expect((await context.request.post(base + '/pair', {
-        headers: { Origin: local.origin }, data: { code: local.code },
+        headers: { Origin: local.origin },
+        data: { code: local.code },
       })).status()).toBe(403);
       await page.keyboard.insertText(local.code);
       await page.keyboard.press('Enter');
@@ -113,7 +115,8 @@ test('loopback HTTPS pairing is keyboard usable and session boundaries fail clos
         headers: { Origin: local.origin, 'X-Perfeng-CSRF': 'wrong' },
       })).status()).toBe(403);
       expect((await context.request.post(base + '/pair', {
-        headers: { Origin: local.origin, 'X-Perfeng-CSRF': 'pair' }, data: { code: local.code },
+        headers: { Origin: local.origin, 'X-Perfeng-CSRF': 'pair' },
+        data: { code: local.code },
       })).status()).toBe(403);
       expect((await context.request.get(local.origin + '/console/api/unlisted')).status()).toBe(404);
       now += 899_999;

@@ -65,3 +65,8 @@ Qualified BFF examples: [lazy reader](src/bff/run-reader.ts) and
 is narrow; [H5 runtime boundaries](docs/development/harness-rules.md#h5-runtime-boundary-receipt)
 are enforced. [H6 session invalidation](docs/development/harness-rules.md#h6-shared-session-receipt)
 coordinates local-session epochs; general polling/provider-health coordination remains pending.
+
+Handwritten TypeScript formatting is enforced by ESLint: multi-member interfaces
+and type literals use one member per line, semicolon member delimiters, two-space
+indentation and no trailing spaces. Run `pnpm exec eslint . --fix` before verification.
+Generated contracts and vendored sources retain byte ownership; never reformat them.

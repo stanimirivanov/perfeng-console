@@ -6,7 +6,11 @@ export interface RunUi {
   readonly status: Signal<string>;
   readonly run: Signal<RunDetail | undefined>;
   readonly artifacts: Signal<ArtifactObservation>;
-  readonly observations: Signal<readonly { revision: number; state: string; updatedAt: string }[]>;
+  readonly observations: Signal<readonly {
+    revision: number;
+    state: string;
+    updatedAt: string;
+  }[]>;
   find(id: string): void;
   invalidate(reason: RunInvalidation): void;
 }

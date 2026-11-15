@@ -26,8 +26,7 @@ export class RunFacade implements RunUi {
     this.owner.onDestroy(() => { unsubscribe(); this.clear(''); this.disposed = true; });
   }
   invalidate(reason: RunInvalidation) {
-    this.clear({ input: 'Ready to look up this Run.', offline: 'Connection unavailable. Run evidence cleared.',
-      online: 'Connection restored. Look up the Run again.', hidden: 'Look up the Run again to see current evidence.' }[reason]);
+    this.clear({ input: 'Ready to look up this Run.', offline: 'Connection unavailable. Run evidence cleared.',online: 'Connection restored. Look up the Run again.', hidden: 'Look up the Run again to see current evidence.' }[reason]);
   }
   private clear(message: string, preserveObservations = false) {
     if (this.disposed) return;

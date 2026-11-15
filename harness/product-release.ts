@@ -10,13 +10,19 @@ const serverBuiltins = new Set(['node:crypto', 'node:events', 'node:fs/promises'
 const bundledBuiltins = new Set([...serverBuiltins, 'node:buffer', 'node:tls', 'node:stream', 'node:fs', 'node:module']);
 const runtimePackages = new Set(['effect', 'effect/http/HttpClient', '@effect/platform-node/NodeHttpClient', '@effect/platform-node/NodeHttpIncomingMessage']);
 const lockedRuntimeDirectories = new Set([
-  'effect@4.1.2', '@effect+platform-node@4.1.2_effect@4.1.2_redis@6.3.1',
-  '@effect+platform-node-shared@4.1.2_effect@4.1.2', 'undici@8.12.4',
+  'effect@4.1.2',
+  '@effect+platform-node@4.1.2_effect@4.1.2_redis@6.3.1',
+  '@effect+platform-node-shared@4.1.2_effect@4.1.2',
+  'undici@8.12.4',
 ]);
 
 const serverSources = new Set([
   'tools/serve-console.ts',
   'tools/console-server.ts',
+  'tools/server/request-policy.ts',
+  'tools/server/session-routes.ts',
+  'tools/server/run-routes.ts',
+  'tools/server/static-route.ts',
   'src/bff/public-api.ts',
   'src/bff/config-public-api.ts',
   'tools/public-api.ts',
@@ -28,7 +34,8 @@ const serverSources = new Set([
   'src/bff/transport-result.ts',
   'src/bff/run-reader.ts',
   'src/bff/runs.ts',
-  'src/generated/transitions.ts', 'src/generated/run.ts',
+  'src/generated/transitions.ts',
+  'src/generated/run.ts',
   'src/generated/validators.mjs',
   'src/shared/contracts/observation.ts',
 ]);
@@ -39,8 +46,14 @@ export async function bundleServer(root: string) {
   const aliasErrors = checkImportMaps(root, false);
   if (aliasErrors.length) throw new Error(aliasErrors.join('\n'));
   const bundle = await build({
-    absWorkingDir: root, entryPoints: ['tools/serve-console.ts'], bundle: true,
-    format: 'esm', platform: 'node', target: 'node26', metafile: true, write: false,
+    absWorkingDir: root,
+    entryPoints: ['tools/serve-console.ts'],
+    bundle: true,
+    format: 'esm',
+    platform: 'node',
+    target: 'node26',
+    metafile: true,
+    write: false,
   });
   for (const file of Object.keys(bundle.metafile.inputs)) {
     const dependency = /^node_modules\/\.pnpm\/([^/]+)\//.exec(file)?.[1];
@@ -50,6 +63,9 @@ export async function bundleServer(root: string) {
     inspectImports(source, (node, specifier) => {
       if (!specifier || !ts.isStringLiteralLike(specifier)) throw new Error('Computed product import: ' + file);
       const name = specifier.text;
+      if (name === 'node:http' && ['tools/server/request-policy.ts', 'tools/server/session-routes.ts', 'tools/server/run-routes.ts', 'tools/server/static-route.ts'].includes(file) &&
+          ts.isImportDeclaration(node) && node.importClause?.isTypeOnly && !node.importClause.name && node.importClause.namedBindings &&
+          ts.isNamedImports(node.importClause.namedBindings) && node.importClause.namedBindings.elements.length > 0 && node.importClause.namedBindings.elements.every(member => ['IncomingMessage', 'ServerResponse'].includes((member.propertyName ?? member.name).text))) return;
       if (serverBuiltins.has(name) || (file === 'src/bff/config.ts' && name === 'node:fs') || (file.startsWith('src/bff/') && runtimePackages.has(name))) return;
       const target = publicImports[name] ?? (name.startsWith('.') ? relative(root, resolve(root, dirname(file), name)) : name);
       if (target.startsWith('src/shared/contracts/') &&

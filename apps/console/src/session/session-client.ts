@@ -5,7 +5,10 @@ const endpoint = '/console/api/session';
 export function sessionRequest(action?: 'pair' | 'logout', credential?: string) {
   return Effect.tryPromise(async signal => {
     const response = await fetch(action ? endpoint + '/' + action : endpoint, {
-      signal, credentials: 'same-origin', cache: 'no-store', redirect: 'error',
+      signal,
+      credentials: 'same-origin',
+      cache: 'no-store',
+      redirect: 'error',
       ...(action ? {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-Perfeng-CSRF': action === 'pair' ? 'pair' : credential ?? '' },

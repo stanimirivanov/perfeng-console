@@ -7,7 +7,7 @@ export default class Accounting implements Reporter {
     this.count++;
     if (attempt.status !== "passed" || attempt.retry !== 0) this.failed = true;
   }
-  async onEnd(result: FullResult): Promise<{ status: "passed" | "failed" }> {
+  async onEnd(result: FullResult): Promise<{ status: "passed" | "failed"; }> {
     return { status: result.status === "passed" && this.count > 0 && !this.failed ? "passed" : "failed" };
   }
 }

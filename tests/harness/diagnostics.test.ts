@@ -28,8 +28,7 @@ test('architecture failures identify source/rule and give corrective rerun and g
     }
     put('apps/console/src/control\nname.ts', 'fetch("/");');
     put('apps/console/src/control\u009bname.ts', 'fetch("/");');
-    const messages = checkOwnership(root, { [file]: 'component', 'apps/console/src/control\nname.ts': 'component',
-      'apps/console/src/control\u009bname.ts': 'component' });
+    const messages = checkOwnership(root, { [file]: 'component', 'apps/console/src/control\nname.ts': 'component','apps/console/src/control\u009bname.ts': 'component' });
     assert.ok(messages.length);
     assert.ok(messages.every(value => !/[\x00-\x1f\x7f-\x9f]/u.test(value)), 'Source paths cannot inject terminal/log lines');
   } finally { rmSync(root, { recursive: true, force: true }); }
@@ -40,9 +39,7 @@ test('import graph and distribution failures guide correction without exposing m
   const { checkDistribution } = await import('#perfeng/harness/assets');
   const root = mkdtempSync(join(tmpdir(), 'safe-harness-errors-'));
   try {
-    const issues = [...inspectProjectImports(root, join(root, 'src/browser/view.ts'), "import '../bff/config.ts';"),
-      ...checkOwnerCycles([{ source: 'src/browser/view.ts', dependencies: [{ resolved: 'src/bff/config.ts' }] },
-        { source: 'src/bff/config.ts', dependencies: [{ resolved: 'src/browser/view.ts' }] }])];
+    const issues = [...inspectProjectImports(root, join(root, 'src/browser/view.ts'), "import '../bff/config.ts';"),...checkOwnerCycles([{ source: 'src/browser/view.ts', dependencies: [{ resolved: 'src/bff/config.ts' }] },{ source: 'src/bff/config.ts', dependencies: [{ resolved: 'src/browser/view.ts' }] }])];
     assert.ok(issues.length >= 2);
     for (const issue of issues) { assert.match(issue, /Rerun: make check-imports/); assert.match(issue, /Next:.*Guide:/); }
     const secret = 'PERFENG_SECRET_CANARY-private-content';

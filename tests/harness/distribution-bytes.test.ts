@@ -7,9 +7,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { checkDistribution } from '#perfeng/harness/assets';
 
-const markers = ['PERFENG_SECRET_CANARY', 'BEGIN PRIVATE KEY', 'BEGIN RSA PRIVATE KEY',
-  'BEGIN EC PRIVATE KEY', 'BEGIN OPENSSH PRIVATE KEY', 'Design fixture only', 'node:child_process',
-  ...[...'pousr'].map(family => 'gh' + family + '_' + 'A'.repeat(30))];
+const markers = ['PERFENG_SECRET_CANARY', 'BEGIN PRIVATE KEY', 'BEGIN RSA PRIVATE KEY','BEGIN EC PRIVATE KEY', 'BEGIN OPENSSH PRIVATE KEY', 'Design fixture only', 'node:child_process',...[...'pousr'].map(family => 'gh' + family + '_' + 'A'.repeat(30))];
 const encodings = (text: string) => [Buffer.from(text), Buffer.from(text, 'utf16le'), Buffer.from(text, 'utf16le').swap16()];
 
 test('all existing marker families are rejected in arbitrary binary and UTF-16 data at either alignment', () => {

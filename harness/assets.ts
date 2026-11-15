@@ -33,8 +33,7 @@ export function checkAssets(root: string) {
   if (errors.length) throw Error(errors.map(reason => diagnostic(options.styles[0], 1, 'asset', reason)).join('\n'));
 }
 
-const literalMarkers = ['PERFENG_SECRET_CANARY', 'BEGIN PRIVATE KEY', 'BEGIN RSA PRIVATE KEY',
-  'BEGIN EC PRIVATE KEY', 'BEGIN OPENSSH PRIVATE KEY', 'Design fixture only', 'node:child_process'];
+const literalMarkers = ['PERFENG_SECRET_CANARY', 'BEGIN PRIVATE KEY', 'BEGIN RSA PRIVATE KEY','BEGIN EC PRIVATE KEY', 'BEGIN OPENSSH PRIVATE KEY', 'Design fixture only', 'node:child_process'];
 const tokenSuffixMinimum = 30;
 const tokenMarker = new RegExp('gh[pousr]_[A-Za-z0-9]{' + tokenSuffixMinimum + ',}');
 // Recognition needs a prefix plus 30 token characters, not the entire unbounded token.

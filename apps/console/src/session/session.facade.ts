@@ -53,8 +53,7 @@ export class SessionFacade implements SessionUi {
     const reply = result.value;
     if (reply.mode !== 'paired') this.boundary.invalidate();
     this.csrf = reply.mode === 'paired' ? reply.csrf : '';
-    this.store.complete(reply.mode === 'unavailable' ? 'pairing' : reply.mode,
-      reply.mode === 'unavailable' ? 'Session unavailable. Check the code or restart the local server.' : '');
+    this.store.complete(reply.mode === 'unavailable' ? 'pairing' : reply.mode,reply.mode === 'unavailable' ? 'Session unavailable. Check the code or restart the local server.' : '');
     if (reply.mode === 'paired') void this.access.refresh();
     return reply.mode === 'paired';
   }

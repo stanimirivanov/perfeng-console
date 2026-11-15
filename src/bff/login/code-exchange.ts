@@ -24,8 +24,7 @@ export function createCodeExchange(config: CodeExchangeConfig, now = () => Date.
     signer = assertion;
     const wire = createTokenPost(config);
     let active = true;
-    const dependencies = { admit: login.callback, issue: assertion.issue, post: wire.post, decode: decodeCodeTokens,
-      active: () => active, now, redirectUri: config.consoleOrigin + '/console/auth/callback' };
+    const dependencies = { admit: login.callback, issue: assertion.issue, post: wire.post, decode: decodeCodeTokens,active: () => active, now, redirectUri: config.consoleOrigin + '/console/auth/callback' };
     return {
       begin: (intent: unknown) => active ? login.begin(intent) : undefined,
       complete: (target: string, cookies: readonly string[]) => exchangeCode(dependencies, target, [...cookies]),

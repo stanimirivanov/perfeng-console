@@ -19,12 +19,12 @@ test('dependency-cruiser rejects type-only alias cycles and presentation leakage
     write('package.json', JSON.stringify({ type: 'module', imports: { '#fixture/b': './src/bff/b.ts' } }));
     write('apps/console/a.ts', "import type { B } from '#fixture/b'; export interface A { b?: B }");
     write('src/bff/b.ts', "import type { A } from '../../apps/console/a.ts'; export interface B { a?: A }");
-    assert.throws(run, error => String((error as { stdout?: string }).stdout).includes('no-cross-owner-cycle'));
+    assert.throws(run, error => String((error as { stdout?: string; }).stdout).includes('no-cross-owner-cycle'));
     write('src/bff/b.ts', 'export interface B { id: string }');
     assert.match(run(), /no dependency violations/);
     write('src/presentation/view.ts', 'export interface View { id: string }');
     write('src/bff/b.ts', "import type { View } from '../presentation/view.ts'; export type B = View;");
-    assert.throws(run, error => String((error as { stdout?: string }).stdout).includes('no-external-presentation-consumer'));
+    assert.throws(run, error => String((error as { stdout?: string; }).stdout).includes('no-external-presentation-consumer'));
     write('apps/console/public-api.ts', 'export interface A {}');
     write('src/bff/public-api.ts', 'export interface B {}');
     write('apps/console/a.ts', "import type { B } from '../../src/bff/public-api.ts'; export type A = B;");

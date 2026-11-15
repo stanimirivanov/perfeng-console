@@ -13,20 +13,27 @@ if (aliasErrors.length) {
 } else {
   const errors = scanProjectImports(root);
   if (!errors.length) {
-    const result: { modules: DependencyModule[]; summary: { error: number; violations: { from: string; to: string; rule: { name: string } }[] } } = JSON.parse(execFileSync(
-      process.execPath, [resolve('node_modules/dependency-cruiser/bin/dependency-cruiser.mjs'),
-        '--config', '.dependency-cruiser.mjs', '--output-type', 'json', '--no-ignore-known', '--no-cache',
-        'apps', 'src', 'tools', 'tests', 'harness', 'scripts'],
+    const result: {
+      modules: DependencyModule[];
+      summary: {
+        error: number;
+        violations: {
+          from: string;
+          to: string;
+          rule: { name: string; };
+        }[];
+      };
+    } = JSON.parse(execFileSync(
+      process.execPath,
+      [resolve('node_modules/dependency-cruiser/bin/dependency-cruiser.mjs'),'--config', '.dependency-cruiser.mjs', '--output-type', 'json', '--no-ignore-known', '--no-cache','apps', 'src', 'tools', 'tests', 'harness', 'scripts'],
       { cwd: root, encoding: 'utf8', maxBuffer: 32 * 1024 * 1024 },
     ));
     // JSON reporting has no failure exit code: explicitly enforce its error count.
     if (!Array.isArray(result.modules) || !Number.isInteger(result.summary?.error))
       throw new Error('Invalid dependency-cruiser receipt');
     if (result.summary.error > 0) {
-      for (const violation of result.summary.violations) errors.push(diagnostic(violation.from, 1, 'dependency-graph',
-        violation.rule.name + ': dependency to ' + violation.to, 'imports'));
-      if (!result.summary.violations.length) errors.push(diagnostic('.dependency-cruiser.mjs', 1, 'dependency-graph',
-        'Dependency graph reports errors without violation details.', 'imports'));
+      for (const violation of result.summary.violations) errors.push(diagnostic(violation.from, 1, 'dependency-graph',violation.rule.name + ': dependency to ' + violation.to, 'imports'));
+      if (!result.summary.violations.length) errors.push(diagnostic('.dependency-cruiser.mjs', 1, 'dependency-graph','Dependency graph reports errors without violation details.', 'imports'));
     }
     errors.push(...checkOwnerCycles(result.modules));
   }
