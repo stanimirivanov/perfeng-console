@@ -46,4 +46,7 @@ raw-header, deadline and peer-closure tests before extending transport use.
 see [the phase and authority limits](../../docs/development/token-response-admission.md).
 Never treat its success as signed identity or serialize candidates to the browser.
 JWT type/signature/issuer/audience/nonce/time checks and current policy are later
-obligations. Keep native JSON grammar validation and decoded-name duplicate checks.
+obligations. `token-envelope.ts` owns common native JSON/decoded-name duplicate
+checks; keep its flat, syntax-validated scan precondition and standalone tests.
+Public decoder results/candidates use named readonly types; readonly does not
+replace server-side custody or JWT verification.

@@ -76,9 +76,23 @@ Keycloak/BFF/browser/shared-pilot receipts and named serving remain pending.
 
 ## Verification, choices and rollback
 
-Five node:test groups cover both envelopes, duplicate/escaped keys, safe refusal,
+Seven node:test groups cover the isolated common envelope and both response phases,
+duplicate/escaped keys, safe refusal,
 syntax/shape/size/member limits, Unicode well-formedness, escaped string values,
 known-field projection, duration equality/types and phase/offline-access confusion.
+Compile-only consumer assertions also check named `InvalidResponse` / `DecodeResult`
+returns and readonly candidates/results. Readonly is a TypeScript guarantee, not
+runtime freezing or credential zeroization.
+
+`token-envelope.ts` owns common validation and a private, documented
+`hasDuplicateJsonMemberNames` scan; `token-response.ts` owns only phase-specific
+projection. Named constants preserve all reviewed limits and units. The standalone
+JWT-shape predicate retains its own bound even when used outside the envelope.
+The duplicate scan has native-grammar/flat-shape preconditions; it is not a
+general-purpose duplicate-rejecting JSON parser. Any future structured-profile
+expansion needs a separately reviewed parser/admission choice. No dependency was
+added for this refactor.
+
 No new dependency, Effect runtime, network/filesystem permission or generated
 schema change is needed for synchronous pure validation. Existing alias/compiler/
 ownership gates register this private BFF adapter; Ajv remains unchanged.
