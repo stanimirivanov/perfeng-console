@@ -66,6 +66,9 @@
       ],
       "#perfeng/bff-login-protocol": [
         "./src/bff/login/protocol.ts"
+      ],
+      "#perfeng/bff-client-assertion": [
+        "./src/bff/login/client-assertion.ts"
       ]
     }
   }
