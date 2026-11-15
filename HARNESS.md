@@ -281,3 +281,12 @@ frozen install and full checks still run on cache hits. The staged pre-commit ho
 remains unchanged and always verifies its checkout-index snapshot. Read the
 [measurement, age-policy and cache receipt](docs/development/ci-efficiency.md) before
 changing scheduling, exceptions or cache trust. No hosted speedup is asserted yet.
+
+## Isolated identity-token qualification
+
+`make identity-jwt-qualification` performs locked, script-disabled offline fixture
+installation, strict fixture compilation and synthetic JWT tests. The separate
+identity-qualification workflow bootstraps the exact candidates and audits their
+isolated graph. This target is independent of `make verify` and is not production
+admission. See the [qualification contract](tools/qualification/identity-jwt/README.md)
+and [proposed ADR 0004](docs/decisions/0004-qualify-jwt-verification-before-runtime-adoption.md).

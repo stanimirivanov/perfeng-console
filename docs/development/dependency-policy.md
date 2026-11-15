@@ -70,3 +70,11 @@ negative fixtures proving lint/graph failure; receipts are reported with the cha
 Official sources: [dependency-cruiser](https://github.com/sverweij/dependency-cruiser),
 [Nx boundary rule](https://nx.dev/docs/kb/enforce-module-boundaries). Exact license,
 engine and peer metadata was read from the npm registry for these versions.
+
+## Isolated JWT candidate — issue #81
+
+[jose/jsonc-parser qualification](../../tools/qualification/identity-jwt/README.md)
+is isolated and not production admission. Exact candidate pins/metadata/lock and
+strict duplicate/encoding/time/profile tests live with the fixture. Run
+`make identity-jwt-qualification` before relying on its evidence. No production
+module receives new package, network or Promise-runtime authority from this target.
