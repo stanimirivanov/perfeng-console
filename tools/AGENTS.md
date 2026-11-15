@@ -29,3 +29,8 @@ private bearer, local CSRF, cookie, CSP and empty-environment installation behav
 Qualification and user-guide are separate owners with their existing import and
 qualification/guide gates. They are explicitly outside this incoming-tools role
 scan; that exclusion grants no permission to import them into product tools.
+
+Incoming HTTPS callbacks must contain rejected promises explicitly: EventEmitter does
+not observe an async listener's return value. Catch expected decode/missing-file
+failures locally; unexpected defects reach the terminal empty-500 boundary, which
+must never emit exception text, retain a pending cookie, or write after completion.
