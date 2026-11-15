@@ -22,9 +22,7 @@ test('BFF admission: Fetch layer can trust only the supplied CA', { timeout: 100
   const root = mkdtempSync(join(tmpdir(), 'perfeng-effect-tls-'));
   t.after(() => rmSync(root, { recursive: true, force: true }));
   const cert = join(root, 'ca.pem'); const key = join(root, 'key.pem');
-  execFileSync('openssl', ['req', '-x509', '-newkey', 'rsa:2048', '-nodes', '-days', '1',
-    '-subj', '/CN=local-fixture', '-addext', 'subjectAltName=IP:127.0.0.1',
-    '-keyout', key, '-out', cert], { stdio: 'ignore' });
+  execFileSync('openssl', ['req', '-x509', '-newkey', 'rsa:2048', '-nodes', '-days', '1','-subj', '/CN=local-fixture', '-addext', 'subjectAltName=IP:127.0.0.1','-keyout', key, '-out', cert], { stdio: 'ignore' });
   let hits = 0;
   const server = createServer({ cert: readFileSync(cert), key: readFileSync(key) }, (_req, res) => {
     hits++; res.end('approved');
@@ -36,7 +34,8 @@ test('BFF admission: Fetch layer can trust only the supplied CA', { timeout: 100
     const response = yield* client.get('https://127.0.0.1:' + server.address().port);
     return yield* response.text;
   })).pipe(
-    Effect.timeout(2000), Effect.provide(FetchHttpClient.layer),
+    Effect.timeout(2000),
+    Effect.provide(FetchHttpClient.layer),
     // Deliberately probe the tempting unsupported option. Web RequestInit has no ca field;
     // this JS test demonstrates that adding it does not establish a TLS trust boundary.
     Effect.provideService(FetchHttpClient.RequestInit, { redirect: 'error', ca: readFileSync(cert) }),

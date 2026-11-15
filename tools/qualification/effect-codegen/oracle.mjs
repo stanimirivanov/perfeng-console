@@ -14,6 +14,12 @@ for (const [path, expected] of Object.entries(expectedInputs)) {
   const actual = createHash("sha256").update(readFileSync(join(root, path))).digest("hex");
   assert.equal(actual, expected, "Input drift: " + path);
 }
+/**
+ * Read one pinned JSON fixture beneath the selected vendored contract root.
+ * @param {string} path - Contract-relative fixture path chosen by this qualification script.
+ * @returns {unknown} Parsed fixture without asserting runtime validity.
+ * @throws {Error} If fixture bytes are unavailable or invalid JSON.
+ */
 const load = path => JSON.parse(readFileSync(join(root, path), "utf8"));
 const capabilities = load("api/native-worker/v2/examples/presence.json").capabilities;
 const lease = load("api/native-worker/v2/examples/lease.json");

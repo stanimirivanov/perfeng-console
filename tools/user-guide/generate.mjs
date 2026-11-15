@@ -2,6 +2,13 @@ import { writeFileSync } from "node:fs";
 import { browserDigest, sourceDigest } from "./source.mjs";
 import { spawnSync } from "node:child_process";
 import { discardGuideOutput } from "./owned-output.mjs";
+
+/**
+ * Run one guide stage synchronously and refuse partial publication on failure.
+ * @param {string[]} args - Executable followed by its arguments, without shell interpolation.
+ * @param {NodeJS.ProcessEnv} [env] - Explicit stage environment, defaulting to the current process.
+ * @throws {Error} If the child cannot start or exits unsuccessfully.
+ */
 function execute(args, env = process.env) {
   const p = spawnSync(args[0], args.slice(1), { stdio: "inherit", env });
   if (p.error || p.status !== 0) throw Error("Guide stage failed.");

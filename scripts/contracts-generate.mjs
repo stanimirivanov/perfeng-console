@@ -20,8 +20,14 @@ if (JSON.stringify(Object.keys(transitions).sort()) !== JSON.stringify([...state
   throw Error("Transition graph disagrees with RunState enum.");
 output.set("transitions.ts", "export const transitions = " + JSON.stringify(transitions, null, 2) + " as const;\n");
 const ajv = new Ajv2020({
-  strict: false, inlineRefs: false, allErrors: true, validateFormats: true,
-  code: { source: true, esm: true }, removeAdditional: false, useDefaults: false, coerceTypes: false,
+  strict: false,
+  inlineRefs: false,
+  allErrors: true,
+  validateFormats: true,
+  code: { source: true, esm: true },
+  removeAdditional: false,
+  useDefaults: false,
+  coerceTypes: false,
 });
 addFormats(ajv);
 const exports = {};
@@ -53,7 +59,13 @@ for (const [path, doc] of files) {
 const code = standalone(ajv, exports);
 const bundled = await build({
   stdin: { contents: code, resolveDir: process.cwd(), sourcefile: "validators.js" },
-  bundle: true, write: false, minifyWhitespace: true, minifyIdentifiers: true, platform: "browser", format: "esm", legalComments: "inline",
+  bundle: true,
+  write: false,
+  minifyWhitespace: true,
+  minifyIdentifiers: true,
+  platform: "browser",
+  format: "esm",
+  legalComments: "inline",
 });
 output.set("validators.mjs", bundled.outputFiles[0].text);
 output.set("validators.d.mts", Object.keys(exports).map(name =>

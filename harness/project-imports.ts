@@ -37,7 +37,7 @@ export function inspectProjectImports(root: string, file: string, text: string):
   inspectImports(source, (node, literal) => {
     if (!literal || !ts.isStringLiteralLike(literal)) {
       const oracle = importer === 'tools/qualification/effect-codegen/oracle.mjs' &&
-        createHash('sha256').update(text).digest('hex') === 'caacbad61a8819666ece8c2a36e65e6472dd75e31797d34815de8c2b08c16d34' &&
+        createHash('sha256').update(text).digest('hex') === '7a20c022c1d3f4593a9751fabc02cd1bf6e14403ca729c6b3a996f28c7cac039' &&
         literal?.getText(source) === 'pathToFileURL(join(consoleRoot, "src/generated/validators.mjs")).href';
       if (!oracle) report(node, 'Use literal imports.');
       return;
