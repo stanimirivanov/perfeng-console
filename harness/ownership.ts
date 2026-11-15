@@ -41,6 +41,7 @@ export const roles: Readonly<Record<string, Role>> = {
   'src/bff/login/transactions.ts': 'adapter',
   'src/bff/login/protocol.ts': 'adapter',
   'src/bff/login/client-assertion.ts': 'adapter',
+  'src/bff/login/token-post.ts': 'adapter',
   'apps/console/src/runs/detail/run-detail.ts': 'component',
   'apps/console/src/runs/run.store.ts': 'store',
   'apps/console/src/runs/run-client.ts': 'adapter',
@@ -153,7 +154,10 @@ export function checkOwnership(root: string, registry: Readonly<Record<string, R
           report(node, 'OWN-01', `${role} cannot depend on ${targetRole ?? 'unregistered module'} ${targetName}. Use a port.`);
         }
       }
-      if (['node:http', 'node:https', 'http', 'https'].includes(spec) && !admittedToolImport) report(node, 'OWN-03', 'Native dispatch needs explicit platform admission, not just an adapter role.');
+      const headerConstant = name === 'src/bff/login/token-post.ts' && spec === 'node:http' && ts.isImportDeclaration(node) &&
+        !node.importClause?.name && !node.importClause?.isTypeOnly && node.importClause?.namedBindings && ts.isNamedImports(node.importClause.namedBindings) &&
+        node.importClause.namedBindings.elements.length === 1 && node.importClause.namedBindings.elements.every(binding => !binding.isTypeOnly && (binding.propertyName ?? binding.name).text === 'maxHeaderSize');
+      if (['node:http', 'node:https', 'http', 'https'].includes(spec) && !admittedToolImport && !headerConstant) report(node, 'OWN-03', 'Native dispatch needs explicit platform admission, not just an adapter role.');
       if ((role === 'presentation' || role === 'contract') && !spec.startsWith('.') && spec !== '#perfeng/contracts') report(node, 'OWN-04', 'Presentation and shared contracts stay framework/runtime independent.');
       if ((spec.startsWith('node:') || spec.startsWith('effect/http') || spec.startsWith('@effect/platform-node')) && role !== 'adapter' && !admittedToolImport)
         report(node, 'OWN-03', 'Platform I/O belongs in a reviewed adapter.');

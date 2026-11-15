@@ -11,7 +11,8 @@ per-request lifetimes separate. Expected internal failures are tagged and projec
 to safe public outcomes; retain generated types and Ajv. Native HTTP/abort interop
 belongs only in qualified platform adapters. [run-reader.ts](run-reader.ts) is the
 qualified lazy Effect reader; [transport.ts](transport.ts) owns execution and public
-failure projection. Keep the Node adapter imports local to the reader. No native HTTP
+failure projection. Keep Node adapter imports local to the reader and the separately
+[qualified token POST adapter](../../docs/development/token-post-transport.md). No native HTTP
 dispatch or transport legacy allowance remains. Preserve the real TLS, raw-header,
 byte/deadline, identity and lifecycle tests in tests/integration/transport.test.ts.
 
@@ -34,3 +35,9 @@ read [its custody and qualification limits](../../docs/development/client-assert
 Use separate configured owners/keys for login and delegation. Form fields are
 credentials, not response DTOs. Fresh jti values do not authorize retries of an
 uncertain code exchange. No token endpoint transport is admitted by this signer.
+
+`login/token-post.ts` is a private scoped wire primitive, not validated OAuth
+tokens or login success. Keep its response text and submitted form server-only.
+Its native HTTP permission is solely the named effective header-size constant;
+no request/get, namespace or copied adapter authority is admitted. Repeat TLS,
+raw-header, deadline and peer-closure tests before extending transport use.
