@@ -25,8 +25,9 @@ possible exceptions or judge prose truthfulness. No coverage quota or comment-co
 regex is introduced.
 
 `tools/user-guide/source.mjs` documents exactly the current digest behavior and its
-known unframed serialization limitation. Issue #88 owns the algorithm/version
-change; this formatting work does not fix it or reinterpret old receipts. Safe
+versioned framed serialization specified in the [guide provenance README](../../tools/user-guide/README.md).
+Issue #88 introduces that format; JavaScript formatting rules do not alter or
+reinterpret its historical receipts. Safe
 output deletion checks likewise retain their behavior and explain link refusal.
 
 Run `pnpm exec eslint . --fix` to apply layout, then fill accurate documentation

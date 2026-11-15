@@ -103,6 +103,9 @@ A normal workspace build cannot prove that the isolated source closure is comple
 `make verify` does not run browser, installation, stack-admission, guide or
 harness-self-test targets. Quality CI runs browser, installation, stack-admission and self-test separately; the
 [user-guide workflow](.github/workflows/user-guide.yml) publishes passing tagged journeys.
+Guide provenance names `perfeng-guide-sha256-framed-v1`; source/browser domains
+use length-framed file records. See the [format and legacy compatibility contract](tools/user-guide/README.md#framed-digest-format-v1--issue-88).
+Unversioned historical guide digests are not v1 evidence.
 The self-test itself invokes verify; making it a verify dependency would recurse.
 
 The hook uses the checkout's installed development tools. Rebootstrap after a lock change. CI installs the committed lock on a clean runner. A repository administrator can require the hosted job in branch rules and require human review of sensor changes. Installing the local hook does not change GitHub branch settings.
