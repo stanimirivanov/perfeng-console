@@ -7,8 +7,7 @@ import { chromium } from '@playwright/test';
 
 // Local synthetic wire fixtures only; no platform credentials or external traffic.
 test('pinned Effect browser adapter qualification', { timeout: 30000 }, async t => {
-  const bundle = await build({ entryPoints: ['tools/qualification/effect-runtime/browser.ts'], bundle: true,
-    platform: 'browser', format: 'iife', write: false });
+  const bundle = await build({ entryPoints: ['tools/qualification/effect-runtime/browser.ts'], bundle: true,platform: 'browser', format: 'iife', write: false });
   const counts = new Map();
   const closed = new Set();
   const server = createServer((req, res) => {
@@ -33,6 +32,7 @@ test('pinned Effect browser adapter qualification', { timeout: 30000 }, async t 
   const page = await browser.newPage();
   await page.goto('http://127.0.0.1:' + server.address().port);
   await page.addScriptTag({ url: '/bundle.js' });
+
   async function waitFor(predicate) {
     const deadline = Date.now() + 3000;
     while (!predicate()) {

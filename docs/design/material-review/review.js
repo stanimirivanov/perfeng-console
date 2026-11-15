@@ -9,6 +9,7 @@
   document.addEventListener('focusin', event => {
     if(event.target !== document.body) lastFocusedFrame = event.target.closest('.state');
   });
+
   function showState(announce) {
     if (!selector) return;
     const requested = location.hash.slice(1);
@@ -33,6 +34,7 @@
     event.preventDefault();
     main.focus();
   });
+
   function scrollRegions() {
     for (const container of document.querySelectorAll('.scroll')) {
       const overflow = container.clientWidth > 0 && container.scrollWidth > container.clientWidth;
@@ -53,6 +55,7 @@
   trigger.setAttribute('aria-controls','workspace-links directory-link');
   sidebar.prepend(trigger);
   const compact=matchMedia('(max-width:800px)');
+
   function setMenu(open) {
     if (!open && sidebar.contains(document.activeElement) && document.activeElement!==trigger) trigger.focus();
     nav.hidden=directory.hidden=!open;trigger.setAttribute('aria-expanded',String(open));

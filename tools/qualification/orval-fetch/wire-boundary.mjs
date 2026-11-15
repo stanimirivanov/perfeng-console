@@ -1,4 +1,12 @@
 // Qualification-only adapter. The injected Fetch implementation owns dispatch.
+/**
+ * Collect a qualification response under the byte limit and cancel on abort or failure.
+ * @param {ReadableStream<Uint8Array>} body - Response stream owned by the caller.
+ * @param {AbortSignal|undefined} signal - Caller cancellation signal.
+ * @param {number} maxBytes - Inclusive maximum body byte count.
+ * @returns {Promise<Buffer>} Completed bounded response bytes.
+ * @throws {Error} If the stream fails, is aborted or exceeds its limit; its reader is always released.
+ */
 async function readBounded(body, signal, maxBytes) {
   const reader = body.getReader();
   const cancel = () => { void reader.cancel().catch(() => {}); };
@@ -24,8 +32,23 @@ async function readBounded(body, signal, maxBytes) {
   }
 }
 
+/**
+ * Qualify a generated invocation against expected wire status, headers and an Ajv oracle.
+ * @param {(fetcher: typeof fetch) => Promise<object>} invoke - Generated invocation accepting the instrumented Fetch function.
+ * @param {typeof fetch} fetcher - Isolated caller-owned dispatch implementation.
+ * @param {object} options - Predeclared wire and schema expectations.
+ * @param {number} options.status - Exact accepted response status.
+ * @param {(data: unknown) => boolean} [options.validator] - Ajv oracle for decoded data; absent means a bodyless response.
+ * @param {string[]} [options.requiredHeaders] - Headers whose nonempty values must survive transport.
+ * @param {number} [options.maxBytes] - Inclusive response limit, defaulting to sixty-four KiB.
+ * @returns {Promise<object>} Generated result plus accepted flag from the independent validator.
+ * @throws {Error} If status/media/header/body or cancellation expectations fail.
+ */
 export async function observe(invoke, fetcher, {
-  status, validator, requiredHeaders = [], maxBytes = 64 * 1024,
+  status,
+  validator,
+  requiredHeaders = [],
+  maxBytes = 64 * 1024,
 }) {
   const result = await invoke(async (input, init) => {
     const signal = init?.signal;

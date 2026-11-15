@@ -21,7 +21,9 @@ createServer(async (req, res) => {
   try {
     const data = await readFile(file);
     res.setHeader("Content-Type", {
-      ".html": "text/html", ".js": "text/javascript", ".css": "text/css",
+      ".html": "text/html",
+      ".js": "text/javascript",
+      ".css": "text/css",
     }[extname(file)] ?? "application/octet-stream");
     if (extname(file) === ".html") {
       const page = renderConsoleHtml(data.toString().replace("</head>", '<meta name="perfeng-console-preview" content="true"></head>'));

@@ -7,7 +7,15 @@ import {
 } from "node:fs";
 import path from "node:path";
 
-/** Generated output is owned only below this exact root; links are never traversed. */
+/**
+ * Resolve an output path only within a real, non-redirected owned directory.
+ * @param {string} root - Existing canonical ownership root.
+ * @param {string} relative - Descendant path; the root itself and escapes are forbidden.
+ * @param {object} [options] - Inspection options.
+ * @param {boolean} [options.missing] - Permit absent descendants after their existing parents pass inspection.
+ * @returns {string} Absolute descendant path after inspecting existing path components.
+ * @throws {Error} If paths escape, traverse links, cross unsupported parents, or cannot be inspected.
+ */
 export function ownedPath(root, relative, { missing = false } = {}) {
   const resolvedRoot = path.resolve(root);
   const canonicalRoot = realpathSync(root);
@@ -48,7 +56,12 @@ export function ownedPath(root, relative, { missing = false } = {}) {
   return target;
 }
 
-/** Inspect before recursive removal; reject links and unsupported filesystem entries. */
+/**
+ * Inventory owned regular files before deletion, refusing redirected or special entries.
+ * @param {string} root - Real owned directory to inspect recursively.
+ * @returns {string[]} Sorted absolute regular-file paths, bounded to ten thousand entries.
+ * @throws {Error} If the root/tree contains links, unsupported entries or exceeds the file bound.
+ */
 export function inspectTree(root) {
   const info = lstatSync(root);
   if (info.isSymbolicLink() || !info.isDirectory())
@@ -74,7 +87,12 @@ export function inspectTree(root) {
   return files.sort();
 }
 
-/** Reset only the fixed guide output after inspecting every existing entry. */
+/**
+ * Reset only the fixed guide output after inspecting its existing tree.
+ * @param {string} repositoryRoot - Canonical checkout owning dist/user-guide.
+ * @returns {string} New absolute guide output directory.
+ * @throws {Error} If ownership/link checks or filesystem operations fail; an absent output is allowed.
+ */
 export function resetGuideOutput(repositoryRoot) {
   const target = ownedPath(repositoryRoot, "dist/user-guide", {
     missing: true,
@@ -89,6 +107,11 @@ export function resetGuideOutput(repositoryRoot) {
   return target;
 }
 
+/**
+ * Remove only the inspected guide publication, leaving unrelated distribution files intact.
+ * @param {string} repositoryRoot - Canonical checkout owning dist/user-guide.
+ * @throws {Error} If ownership/link checks or filesystem operations fail; an absent output is allowed.
+ */
 export function discardGuideOutput(repositoryRoot) {
   const target = ownedPath(repositoryRoot, "dist/user-guide", {
     missing: true,
@@ -101,7 +124,13 @@ export function discardGuideOutput(repositoryRoot) {
   }
 }
 
-/** A chapter reset cannot touch siblings or follow redirected asset directories. */
+/**
+ * Reset a valid chapter without touching siblings or following redirected assets.
+ * @param {string} outputRoot - Real guide publication directory.
+ * @param {string} slug - Lowercase hyphenated chapter identifier, never a relative path.
+ * @returns {string} New absolute chapter directory containing an assets directory.
+ * @throws {Error} If the slug or ownership checks fail, or filesystem access fails.
+ */
 export function resetChapter(outputRoot, slug) {
   if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/u.test(slug))
     throw new Error("Guide slug is invalid.");
@@ -116,6 +145,12 @@ export function resetChapter(outputRoot, slug) {
   return target;
 }
 
+/**
+ * Discard only the validated chapter directory after inspecting all existing entries.
+ * @param {string} outputRoot - Real guide publication directory.
+ * @param {string} slug - Lowercase hyphenated chapter identifier, never a relative path.
+ * @throws {Error} If the slug or ownership checks fail, or filesystem access fails.
+ */
 export function discardChapter(outputRoot, slug) {
   if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/u.test(slug))
     throw new Error("Guide slug is invalid.");

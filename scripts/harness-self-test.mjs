@@ -5,9 +5,20 @@ import { spawnSync } from "node:child_process";
 
 const root = process.cwd();
 const target = mkdtempSync(join(tmpdir(), "console-harness-probes-"));
+
+/**
+ * Check a disposable harness probe against its expected exit status and diagnostic.
+ * @param {string} command - Probe executable, invoked directly without a shell.
+ * @param {string[]} args - Arguments for the probe in the disposable checkout.
+ * @param {boolean} expected - Whether success is required; false requires a failing status.
+ * @param {RegExp} [evidence] - Required diagnostic pattern for expected failures.
+ * @throws {Error} If the probe times out, cannot run, or fails to demonstrate its expected result.
+ */
 function run(command, args, expected, evidence) {
   const result = spawnSync(command, args, {
-    cwd: target, encoding: "utf8", timeout: 120000,
+    cwd: target,
+    encoding: "utf8",
+    timeout: 120000,
     env: { ...process.env, NX_DAEMON: "false" },
   });
   const output = (result.stdout ?? "") + (result.stderr ?? "");
@@ -32,8 +43,7 @@ try {
     try {
       writeFileSync(path, source + probe);
       if (readFileSync(path, 'utf8') !== source + probe) throw Error('Compiler probe was not injected: ' + file);
-      run('make', ['typecheck'], false,
-        new RegExp(file.replaceAll('.', '\\.') + '\\(\\d+,\\d+\\): error TS2322:'));
+      run('make', ['typecheck'], false,new RegExp(file.replaceAll('.', '\\.') + '\\(\\d+,\\d+\\): error TS2322:'));
     } finally {
       writeFileSync(path, source);
     }

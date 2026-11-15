@@ -87,3 +87,11 @@ rules. [ADR 0005](../decisions/0005-enforce-readable-typescript-formatting.md) r
 MIT/Node/ESLint peers, matured release-age evidence, dependency weight, experimental
 rule qualification and replacement boundary. Generated/vendor byte ownership and
 all existing security/import checks remain active. No release-age exception.
+
+## JavaScript documentation admission — issue #91
+
+Development-only eslint-plugin-jsdoc 65.4.5 (BSD-3-Clause) owns the explicitly
+selected JavaScript boundary documentation checks. Its exact Node/ESLint peers,
+matured release date and replacement tests are recorded in the
+[JavaScript documentation guide](javascript-documentation.md). No age exception,
+implicit recommended configuration or runtime dependency admission.

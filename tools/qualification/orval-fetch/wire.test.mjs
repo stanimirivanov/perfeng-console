@@ -7,8 +7,14 @@ import { getDefault as getNative } from './generated/native/default/default.ts';
 import { getDefault as getIntegration } from './generated/integration/default/default.ts';
 import { observe } from './wire-boundary.mjs';
 
+/**
+ * Load a reviewed contract example for the isolated wire qualification.
+ * @param {string} path - Contract-relative example path selected by the test.
+ * @returns {unknown} Parsed fixture data for use with the independent Ajv oracle.
+ */
 const load = (path) => JSON.parse(readFileSync(new URL(
-  '../../../vendor/perfeng-contracts/' + path, import.meta.url,
+  '../../../vendor/perfeng-contracts/' + path,
+  import.meta.url,
 ), 'utf8'));
 const run = load('api/run-management/v1/examples/completed.json');
 const create = load('examples/create.json');
@@ -17,15 +23,46 @@ const renew = load('api/native-worker/v2/examples/renew.json');
 const renewal = load('api/native-worker/v2/examples/renewal.json');
 const gone = load('api/native-worker/v2/examples/lease-gone-error.json');
 const publication = load('examples/performance-analysis/published.json');
+/**
+ * Invoke the generated analysis lookup with a query containing reserved characters.
+ * @param {typeof fetch} fetcher - Isolated test dispatch to inject into the generated client.
+ * @returns {Promise<object>} Generated status/data/header result under test.
+ */
 const readAnalysis = (fetcher) => getIntegration(fetcher).getPerformanceAnalysis(
-  'request-1', { issuer: 'https://issuer.example/team?x=1&y=2' },
+  'request-1',
+  { issuer: 'https://issuer.example/team?x=1&y=2' },
 );
+/**
+ * Invoke the generated exact Run lookup with caller-owned cancellation.
+ * @param {typeof fetch} fetcher - Isolated test dispatch implementation.
+ * @param {AbortSignal} [signal] - Optional cancellation signal forwarded to the generated client.
+ * @returns {Promise<object>} Generated Run response under test.
+ */
 const readRun = (fetcher, signal) => getRuns(fetcher).getRun(run.id, { signal });
 const throttled = { code: 'rate_limited', message: 'Slow down' };
+/**
+ * Invoke generated lease acquisition using the reviewed acquisition fixture.
+ * @param {typeof fetch} fetcher - Isolated test dispatch to inject into the generated client.
+ * @returns {Promise<object>} Generated status/data/header result under test.
+ */
 const acquireLease = (fetcher) => getNative(fetcher).acquireNativeLease(acquire);
+/**
+ * Invoke generated lease renewal with its explicit fixture capability header.
+ * @param {typeof fetch} fetcher - Isolated test dispatch to inject into the generated client.
+ * @returns {Promise<object>} Generated status/data/header result under test.
+ */
 const renewLease = (fetcher) => getNative(fetcher).renewNativeLease(
-  renewal.leaseId, renew, { 'X-Perfeng-Lease': 'fixture-capability' },
+  renewal.leaseId,
+  renew,
+  { 'X-Perfeng-Lease': 'fixture-capability' },
 );
+/**
+ * Build a JSON response fixture while preserving supplied wire metadata.
+ * @param {unknown} data - Fixture value to serialize, not a production evidence source.
+ * @param {number} status - HTTP status for the scenario.
+ * @param {HeadersInit} [headers] - Additional scenario response metadata.
+ * @returns {Response} Serialized JSON response fixture.
+ */
 const json = (data, status, headers = {}) => Response.json(data, { status, headers });
 
 test('Run serializes create intent, preserves response headers and surfaces a conflict without retry', async () => {
@@ -107,7 +144,9 @@ for (const [name, invoke, status, headers, validator, input, expected] of cases)
     assert.equal(validator(input), expected);
     assert.deepEqual(input, original);
     const observed = await observe(invoke, fetcher, {
-      status, validator, requiredHeaders: expectedHeaders,
+      status,
+      validator,
+      requiredHeaders: expectedHeaders,
     });
     assert.equal(observed.status, status);
     assert.equal(observed.accepted, expected);
@@ -118,7 +157,8 @@ for (const [name, invoke, status, headers, validator, input, expected] of cases)
 
 test('Native distinguishes a bodyless 204 from a JSON object', async () => {
   const result = await observe(acquireLease, async () => new Response(null, {
-    status: 204, headers: { 'Retry-After': '5' },
+    status: 204,
+    headers: { 'Retry-After': '5' },
   }), { status: 204, requiredHeaders: ['Retry-After'] });
   assert.equal(result.status, 204);
   assert.equal(result.headers.get('retry-after'), '5');
@@ -134,14 +174,16 @@ for (const [name, body, contentType, status, message] of [
 ]) {
   test('Wire boundary rejects ' + name, async () => {
     await assert.rejects(observe(readRun, async () => new Response(body, {
-      status, headers: { 'Content-Type': contentType },
+      status,
+      headers: { 'Content-Type': contentType },
     }), { status: 200, validator: ajv.run_Run, maxBytes: 64 }), message);
   });
 }
 
 test('Wire boundary rejects missing required response metadata', async () => {
   await assert.rejects(observe(acquireLease, async () => new Response(null, { status: 204 }), {
-    status: 204, requiredHeaders: ['Retry-After'],
+    status: 204,
+    requiredHeaders: ['Retry-After'],
   }), /missing header/);
 });
 

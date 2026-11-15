@@ -39,3 +39,10 @@ abstraction cost alongside deterministic results. Optional isolated AI review is
 advisory and requires its own authorization; it cannot replace human review or
 turn passing structural checks into proof of semantics. See the
 [enforcement index](docs/development/harness-rules.md#semantic-review-duties).
+
+JavaScript boundary documentation is enforced by the scoped rules in
+[the module documentation guide](docs/development/javascript-documentation.md):
+exported functions and named top-level utilities need meaningful purpose, typed
+parameter descriptions and returned-value documentation. Callbacks/nested helpers
+are not blanket targets. Throws/rationale accuracy remains human review; generated
+inputs are not reformatted and no comment-count quota is used.

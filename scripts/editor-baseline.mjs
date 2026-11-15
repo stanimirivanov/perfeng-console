@@ -3,7 +3,8 @@ import { resolve } from "node:path";
 import { mkdirSync, writeFileSync, readFileSync } from "node:fs";
 
 const server = spawn(process.execPath, [
-  "node_modules/typescript/lib/tsserver.js", "--disableAutomaticTypingAcquisition",
+  "node_modules/typescript/lib/tsserver.js",
+  "--disableAutomaticTypingAcquisition",
 ], { stdio: ["pipe", "pipe", "pipe"] });
 const pending = new Map();
 let sequence = 0;
@@ -21,6 +22,14 @@ server.stdout.on("data", chunk => {
     if (message.type === "response") pending.get(message.request_seq)?.(message);
   }
 });
+
+/**
+ * Send a sequenced tsserver request and retire pending state on timeout.
+ * @param {string} command - TypeScript server protocol command.
+ * @param {object} args - Command-specific protocol arguments.
+ * @returns {Promise<object>} Successful matching tsserver response.
+ * @throws {Error} If the server rejects the request or does not respond within twenty seconds.
+ */
 async function request(command, args) {
   const seq = ++sequence;
   return await new Promise((accept, reject) => {
@@ -48,11 +57,7 @@ try {
   const warm = samples.slice(1).sort((a, b) => a - b);
   const rss = readFileSync("/proc/" + server.pid + "/status", "utf8").match(/^VmRSS:\s+(\d+)/m)?.[1];
   if (!rss) throw Error("tsserver resident memory unavailable.");
-  const receipt = { typescript: "6.0.3", node: process.versions.node,
-    workload: "Run.state completion at an actual generated-type consumer",
-    coldMs: samples[0], warmP50Ms: warm[Math.ceil(warm.length * 0.5) - 1],
-    warmP95Ms: warm[Math.ceil(warm.length * 0.95) - 1], samples,
-    rssKiB: Number(rss) };
+  const receipt = { typescript: "6.0.3", node: process.versions.node,workload: "Run.state completion at an actual generated-type consumer",coldMs: samples[0], warmP50Ms: warm[Math.ceil(warm.length * 0.5) - 1],warmP95Ms: warm[Math.ceil(warm.length * 0.95) - 1], samples,rssKiB: Number(rss) };
   writeFileSync("dist/qualification/editor-baseline.json", JSON.stringify(receipt, null, 2) + "\n");
   console.log(JSON.stringify(receipt, null, 2));
 } finally {

@@ -1,3 +1,4 @@
+import jsdoc from 'eslint-plugin-jsdoc';
 import stylistic from '@stylistic/eslint-plugin';
 import tseslint from 'typescript-eslint';
 import nxPlugin from '@nx/eslint-plugin';
@@ -42,6 +43,42 @@ export default [
       '@stylistic/no-trailing-spaces': 'error',
     },
   },
+  {
+    files: ['**/*.{js,jsx,mjs,cjs}'],
+    ignores: ['src/generated/**', 'vendor/**', 'tools/qualification/**/generated/**'],
+    plugins: { '@stylistic': stylistic, jsdoc },
+    rules: {
+      '@stylistic/exp-list-style': 'error',
+      '@stylistic/indent': ['error', 2],
+      '@stylistic/no-trailing-spaces': 'error',
+      '@stylistic/padding-line-between-statements': ['error',{ blankLine: 'always', prev: 'import', next: '*' },{ blankLine: 'any', prev: 'import', next: 'import' },{ blankLine: 'always', prev: '*', next: 'function' },{ blankLine: 'always', prev: '*', next: 'export' },],
+      'jsdoc/require-jsdoc': ['error', {
+        'require': { FunctionDeclaration: false },
+        contexts: [
+          'Program > FunctionDeclaration',
+          'ExportNamedDeclaration > FunctionDeclaration',
+          'ExportDefaultDeclaration > FunctionDeclaration',
+          'Program > VariableDeclaration > VariableDeclarator > ArrowFunctionExpression',
+          'Program > VariableDeclaration > VariableDeclarator > FunctionExpression',
+          'ExportNamedDeclaration > VariableDeclaration > VariableDeclarator > ArrowFunctionExpression',
+          'ExportNamedDeclaration > VariableDeclaration > VariableDeclarator > FunctionExpression',
+          'ExportDefaultDeclaration > ArrowFunctionExpression',
+          'ExportDefaultDeclaration > FunctionExpression',
+        ],
+      }],
+      'jsdoc/require-description': 'error',
+      'jsdoc/require-param': 'error',
+      'jsdoc/require-param-name': 'error',
+      'jsdoc/require-param-type': 'error',
+      'jsdoc/require-param-description': 'error',
+      'jsdoc/require-returns': 'error',
+      'jsdoc/require-returns-type': 'error',
+      'jsdoc/require-returns-description': 'error',
+      'jsdoc/check-param-names': 'error',
+      'jsdoc/check-tag-names': 'error',
+      'jsdoc/valid-types': 'error',
+    },
+  },
   // Compiler-owned output is byte-checked offline; Ajv emits unused validation context arguments.
   { files: ['src/generated/validators.mjs'], rules: { '@typescript-eslint/no-unused-vars': 'off' } },
 
@@ -53,11 +90,11 @@ export default [
       'no-eval': 'error',
       'no-new-func': 'error',
       '@typescript-eslint/ban-ts-comment': ['error', {
-        'ts-expect-error': true, 'ts-ignore': true, 'ts-nocheck': true,
+        'ts-expect-error': true,
+        'ts-ignore': true,
+        'ts-nocheck': true,
       }],
-      'no-restricted-syntax': ['error',
-        {selector: "CallExpression[callee.property.name=/^(skip|only|todo)$/]", message: 'Run every declared check.'},
-      ],
+      'no-restricted-syntax': ['error',{ selector: "CallExpression[callee.property.name=/^(skip|only|todo)$/]", message: 'Run every declared check.' },],
     },
   },
 ];
