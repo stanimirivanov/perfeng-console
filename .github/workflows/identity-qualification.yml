@@ -1,0 +1,21 @@
+name: Identity JWT qualification
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  qualify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/bootstrap
+      - name: Bootstrap isolated pinned candidates
+        run: pnpm --dir tools/qualification/identity-jwt install --ignore-workspace --frozen-lockfile --ignore-scripts
+      - run: make identity-jwt-qualification
+      - name: Audit isolated candidate graph
+        run: pnpm --dir tools/qualification/identity-jwt audit --audit-level high

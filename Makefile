@@ -92,3 +92,9 @@ contracts-restore-check:
 	@test -n "$(CONTRACTS_STAGING_TARGET)" && test -n "$(CONTRACTS_ROLLBACK_SNAPSHOT)"
 	@$(MAKE) --no-print-directory contracts-check >/dev/null
 	@sh scripts/contracts-offline.sh scripts/contracts.ts "$(CONTRACTS_SHADOW_ASSETS)" "$(CONTRACTS_BOOTSTRAP)" "$(CONTRACTS_VERIFIER)" "$(CONTRACTS_CONTROL_PLANE_RECEIPT)" --target "$(CONTRACTS_STAGING_TARGET)" --rollback "$(CONTRACTS_ROLLBACK_SNAPSHOT)"
+
+.PHONY: identity-jwt-qualification
+identity-jwt-qualification: doctor
+	pnpm --dir tools/qualification/identity-jwt install --ignore-workspace --frozen-lockfile --ignore-scripts --offline
+	node_modules/.bin/tsc --project tools/qualification/identity-jwt/tsconfig.json
+	node --test --test-isolation=none --test-reporter=tap tools/qualification/identity-jwt/qualification.test.ts
