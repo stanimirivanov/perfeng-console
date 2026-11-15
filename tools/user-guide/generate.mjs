@@ -1,5 +1,5 @@
 import { writeFileSync } from "node:fs";
-import { browserDigest, sourceDigest } from "./source.mjs";
+import { browserDigest, sourceDigest, GUIDE_DIGEST_FORMAT } from "./source.mjs";
 import { spawnSync } from "node:child_process";
 import { discardGuideOutput } from "./owned-output.mjs";
 
@@ -36,7 +36,7 @@ try {
   if (browserDigest() !== browser) throw Error("Browser build changed during capture.");
   writeFileSync(
     "dist/user-guide/provenance.json",
-    JSON.stringify({ sourceSha256: source, browserSha256: browser, node: process.versions.node }),
+    JSON.stringify({ digestFormat: GUIDE_DIGEST_FORMAT, sourceSha256: source, browserSha256: browser, node: process.versions.node }),
   );
 } catch (error) {
   discardGuideOutput(process.cwd());
