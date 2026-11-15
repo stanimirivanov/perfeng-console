@@ -90,3 +90,42 @@ test("source provenance covers shared layers and browser provenance covers lazy 
     rmSync(root, { recursive: true, force: true });
   }
 });
+
+test("guide source inventory excludes owned installs but retains authored fixture inputs and rejects source links", async () => {
+  const { sourceDigest } = await import("#perfeng/user-guide");
+  const { mkdirSync, writeFileSync, symlinkSync } = await import("node:fs");
+  const root = mkdtempSync(join(tmpdir(), "guide-installed-"));
+  const cwd = process.cwd();
+  try {
+    process.chdir(root);
+    for (const dir of ["src", "apps", "tools/qualification/orval-fetch"])
+      mkdirSync(dir, { recursive: true });
+    for (const path of ["pnpm-workspace.yaml", "angular.json", "nx.json", "tsconfig.base.json", "tsconfig.paths.json", "package.json", "pnpm-lock.yaml"])
+      writeFileSync(path, "");
+    const before = sourceDigest();
+    for (const fixture of ["effect-codegen", "effect-node", "effect-runtime", "identity-jwt", "orval-fetch"]) {
+      const modules = `tools/qualification/${fixture}/node_modules`;
+      mkdirSync(modules + "/.pnpm", { recursive: true });
+      symlinkSync(".pnpm/package", modules + "/package");
+    }
+    assert.equal(sourceDigest(), before);
+    mkdirSync("tools/qualification/orval-fetch/generated", { recursive: true });
+    writeFileSync("tools/qualification/orval-fetch/generated/client.ts", "generated client");
+    assert.equal(sourceDigest(), before);
+    mkdirSync("tools/handwritten/generated", { recursive: true });
+    writeFileSync("tools/handwritten/generated/input.ts", "authored input");
+    assert.notEqual(sourceDigest(), before);
+    const authored = sourceDigest();
+    writeFileSync("tools/qualification/orval-fetch/pnpm-lock.yaml", "authored lock");
+    assert.notEqual(sourceDigest(), authored);
+    symlinkSync("missing", "tools/qualification/orval-fetch/handwritten.mjs");
+    assert.throws(() => sourceDigest(), /Source links/);
+    rmSync("tools/qualification/orval-fetch/handwritten.mjs");
+    rmSync("tools/qualification/orval-fetch/node_modules", { recursive: true });
+    symlinkSync("missing", "tools/qualification/orval-fetch/node_modules");
+    assert.throws(() => sourceDigest(), /Source links/);
+  } finally {
+    process.chdir(cwd);
+    rmSync(root, { recursive: true, force: true });
+  }
+});
