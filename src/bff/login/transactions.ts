@@ -1,8 +1,8 @@
 import { createHash, randomBytes, timingSafeEqual } from 'node:crypto';
 import { run_RunId } from '#perfeng/validators';
 
-/** Closed navigation intent; never an arbitrary URL or a service-access grant. */
-export type LoginReturnIntent = { kind: 'home' } | { kind: 'run'; runId: string };
+import type { LoginReturnIntent } from './login-contracts.ts';
+export type { LoginReturnIntent } from './login-contracts.ts';
 
 function returnIntent(input: unknown): LoginReturnIntent | undefined {
   if (!input || typeof input !== 'object' || Array.isArray(input)) return;

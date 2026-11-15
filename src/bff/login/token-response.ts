@@ -1,20 +1,7 @@
 import { decodeTokenEnvelope, isJwtShapedToken } from './token-envelope.ts';
 
-/** Candidates are private credentials, not verified claims, sessions or grants. */
-export interface UnverifiedCodeTokens {
-  readonly stage: 'unverified-code';
-  readonly accessToken: string;
-  readonly idToken: string;
-  readonly expiresIn: number;
-  readonly refreshToken?: string;
-}
-export interface UnverifiedDelegatedTokens {
-  readonly stage: 'unverified-delegated';
-  readonly accessToken: string;
-  readonly expiresIn: number;
-}
-export type InvalidResponse = { readonly ok: false; readonly reason: 'invalid_response' };
-export type DecodeResult<T> = { readonly ok: true; readonly candidates: T } | InvalidResponse;
+import type { DecodeResult, InvalidResponse, UnverifiedCodeTokens, UnverifiedDelegatedTokens } from './login-contracts.ts';
+export type { DecodeResult, InvalidResponse, UnverifiedCodeTokens, UnverifiedDelegatedTokens } from './login-contracts.ts';
 
 const invalid = (): InvalidResponse => ({ ok: false, reason: 'invalid_response' });
 

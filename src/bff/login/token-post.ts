@@ -6,7 +6,10 @@ import * as Request from 'effect/http/HttpClientRequest';
 import * as NodeHttpClient from '@effect/platform-node/NodeHttpClient';
 import { NodeHttpIncomingMessage } from '@effect/platform-node/NodeHttpIncomingMessage';
 
-class TokenPostFailure extends Data.TaggedError('TokenPostFailure')<{ readonly reason: 'invalid_input' | 'invalid_response' | 'denied' | 'unavailable' | 'deadline' }> {}
+import type { TokenPostReason, TokenPostResult } from './login-contracts.ts';
+export type { TokenPostReason, TokenPostResult } from './login-contracts.ts';
+
+class TokenPostFailure extends Data.TaggedError('TokenPostFailure')<{ readonly reason: TokenPostReason }> {}
 const fail = (reason: TokenPostFailure['reason']) => Effect.fail(new TokenPostFailure({ reason }));
 
 /** Trusted server configuration; no request can supply a destination or CA. */
@@ -41,7 +44,7 @@ export function createTokenPost(config: TokenPostConfig) {
   const { endpoint, ca, deadlineMs, maxResponseBytes } = admitted(config);
   const layer = NodeHttpClient.layerNodeHttpOptions({ ca, minVersion: 'TLSv1.2', rejectUnauthorized: true, keepAlive: false });
   return {
-    post(form: string) {
+    post(form: string): Effect.Effect<TokenPostResult, unknown> {
       return Effect.scoped(Effect.gen(function* () {
         if (!form || form.length > 16_384 || !/^[\x21-\x7e]+$/.test(form)) return yield* fail('invalid_input');
         const client = HttpClient.withScope(yield* HttpClient.HttpClient);
