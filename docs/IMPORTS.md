@@ -127,15 +127,19 @@ Never add a broad exception or suppress a failing rule to make a build green.
 
 The isolated packages have their own package.json scopes: Node does not inherit
 root `#perfeng` imports inside them, and package-import targets cannot escape to a
-sibling package. No nonfunctional root alias or new dependency was added. One
-reviewed public-entry link therefore joins the existing pinned fixtures:
+sibling package. No nonfunctional root alias or new dependency was added. Exact
+reviewed public-entry links therefore join the existing pinned fixtures:
 
 `tools/qualification/effect-node/signing-key-source.ts` may statically import the
 named `admitSigningKeys` value and declaration-level type-only `SigningKeySnapshot`
-from `../identity-jwt/public-api.ts`. No other consumer, private target, namespace,
-dynamic import or re-export is admitted. The entry exposes only snapshot admission
-and its snapshot type. This creates a one-way Effect Node -> identity admission
-edge; reciprocal owner edges are still cycle violations.
+from `../identity-jwt/public-api.ts`. Issue #108 additionally admits only
+`tools/qualification/effect-node/code-pair-verifier.ts` importing named
+`codePairKeyIds`/`verifyCodePair` values and declaration-level type-only
+`CodePairRequest`/`CodePairResult` from that same entry. Each importer has its own
+member allowlist; the pair verifier cannot import snapshot admission or vice versa.
+No other consumer, private target, namespace, dynamic import or re-export is admitted.
+This creates a one-way Effect Node -> identity qualification edge; reciprocal owner
+edges remain cycle violations.
 
 `harness/project-imports.ts` enforces the exact source/target/member/import shape;
 resolved dependency-cruiser rules independently forbid production/unrelated
