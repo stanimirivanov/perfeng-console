@@ -294,3 +294,67 @@ Builtin API evidence (pinned installed source inspected):
 [ScopedCache](https://github.com/Effect-TS/effect/blob/effect%404.1.2/packages/effect/src/ScopedCache.ts),
 [Semaphore](https://github.com/Effect-TS/effect/blob/effect%404.1.2/packages/effect/src/Semaphore.ts),
 and [Effect scoped fibers](https://github.com/Effect-TS/effect/blob/effect%404.1.2/packages/effect/src/Effect.ts).
+
+## PR52m — bounded unknown-key resolution (issue #106)
+
+`makeSigningKeyResolver(config)` acquires a scoped `resolveKey(kid: unknown)` operation
+for exactly one captured issuer/CA/clock/limits set. It returns an admitted immutable
+RSA key with issuer and original fetchedAtMs, or a fixed safe refusal. IDs must be
+strings of length 1..128, matching the admitted key profile; they never become URLs.
+No token, claim, principal, enrollment or grant is created by this operation.
+
+The original `makeSigningKeyCache` read-only interface and immediate independent
+failure-retry behavior are preserved. Its implementation moves to an owner-local
+snapshot store, shared by both factories. The new resolver owns the stronger load
+gate and miss policy; the store privately constructs the real fixed-origin source.
+There is no mode flag or caller-supplied network adapter in either public factory.
+
+Resolver budgets are fixed conservative qualification choices, not universal OIDC
+requirements: 32 active callers with no waiting queue; one actual source operation
+per issuer with no wire-permit queue; at least 1000 ms between reserved wire starts,
+including failed/interrupted attempts; and one miss-specific refresh per call within
+a total 3000 ms deadline covering initial retrieval, refresh and body consumption.
+Normal initial/stale loads share their primary entry; different missing IDs share a
+single scoped refresh entry. A cold read immediately followed by a miss is denied
+without an immediate second wire request. Rate-limited initial reads return unavailable;
+rate-limited warm misses return unknown_key. Neither creates a negative entry.
+
+Refresh loads independently and updates the primary store only after successful strict
+admission, owner/interruption checks and a new clock/freshness check. An unavailable or
+malformed refresh cannot evict a still-fresh known key. The store retains the original
+retrieval-start timestamp; no refresh failure, read, rate refusal or negative hit can
+renew its 300000 ms freshness bound. Expired known keys fail closed during outages.
+Known keys are checked before miss state, so a successfully published rotation overrides
+an older negative result immediately. The result is valid at its observation instant;
+consumers must preserve freshness when using it later.
+
+Only absence in a successfully refreshed, fresh admitted snapshot enters negative state.
+The insertion-ordered map is bounded to 32 IDs, evicts its oldest insertion before a
+33rd, expires entries after 30000 ms (inclusive equality allowed), clears on clock faults
+or owner closure, and contains no key material. Its capacity/expiry tests use observable
+wire counts rather than a state-inspection API. Rate/source/deadline refusals never
+become evidence that the provider lacks a key. Negative entries intentionally suppress
+repeat refresh attempts; a rotation may therefore remain unknown until expiry unless
+another successful refresh publishes it earlier.
+
+The gate shares the store's clock high-water mark. Invalid/rollback clocks refuse
+without authority; a forward jump is rechecked after awaits and before publication.
+The existing scoped-child ownership pattern shares concurrent refreshes, preserves
+other readers when one cancels, interrupts remaining readers on owner closure and
+prevents escaped handles from starting or publishing work. Unexpected defects remain
+in the Effect unknown error channel; this is not an infallibility claim.
+
+Six real-TLS resolver cases cover malformed IDs, cold/warm rotation, shared failed
+refresh with known-key availability, rate reservations, 32-entry negative eviction/
+expiry and generation precedence, 32-reader overload and scope cleanup, whole-request
+deadline, expired-source outages, overlapping stale/miss wire refusal and clock rollback.
+All seven original cache tests remain unchanged; the joint gate compiles and executes
+both groups alongside historical transport/wire/composition cases. No new dependency,
+production runtime or credential configuration is introduced.
+
+**Still NOT_ADMITTED for production:** composing resolution with actual signed-token
+verification, real Keycloak rotation/mixed-key compatibility, live BFF session integration,
+root runtime/dependency admission and shared-pilot/browser qualification remain pending.
+The resolver is not an authorization decision or proof of identity. Roll back the resolver,
+store extraction, compiler roots and gate updates together, restoring the prior isolated
+snapshot factory; preserve the production adapter and trust boundaries.
