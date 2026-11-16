@@ -13,8 +13,8 @@ export const ownerPatterns = [
   '^apps/console/',
   '^apps/web-e2e/',
   ...['bff', 'browser', 'generated', 'presentation', 'shared', 'scenarios', 'simulator'].map(name => '^src/' + name + '/'),
-  ...['effect-node', 'effect-codegen', 'effect-runtime', 'orval-fetch'].map(name => '^tools/qualification/' + name + '/'),
-  '^tools/qualification/(?!effect-node/|effect-codegen/|effect-runtime/|orval-fetch/)',
+  ...['effect-node', 'effect-codegen', 'effect-runtime', 'orval-fetch', 'identity-jwt'].map(name => '^tools/qualification/' + name + '/'),
+  '^tools/qualification/(?!effect-node/|effect-codegen/|effect-runtime/|orval-fetch/|identity-jwt/)',
   '^tools/user-guide/',
   '^tools/(?!qualification/|user-guide/)',
   '^harness/',
@@ -50,6 +50,14 @@ export function inspectProjectImports(root: string, file: string, text: string):
     if (/[\\%?#]/u.test(spec)) { report(node, 'Use a canonical module specifier without encoding, query or fragment.'); return; }
     if (!spec.startsWith('.')) return;
     const target = relative(root, resolve(dirname(file), spec));
+    if (target === 'tools/qualification/identity-jwt/public-api.ts') {
+      const bindings = ts.isImportDeclaration(node) && node.importClause && !node.importClause.name && node.importClause.namedBindings;
+      const allowed = importer === 'tools/qualification/effect-node/signing-key-source.ts' && bindings && ts.isNamedImports(bindings) &&
+        bindings.elements.length > 0 && bindings.elements.every(member =>
+        (member.propertyName ?? member.name).text === (node.importClause?.isTypeOnly ? 'SigningKeySnapshot' : 'admitSigningKeys'));
+      if (!allowed) report(node, 'Snapshot admission has one reviewed static named qualification bridge; no production, private or dynamic access.');
+      return;
+    }
     if (owner(importer) === owner(target)) return;
     if (qualifier.test(importer) && qualificationEntries.has(target)) return;
     report(node, `Relative import crosses ownership from ${owner(importer)} to ${owner(target)}; use a public alias.`);

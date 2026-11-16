@@ -101,6 +101,7 @@ identity-jwt-qualification: doctor
 
 .PHONY: signing-key-wire-qualification
 signing-key-wire-qualification: doctor
+	pnpm --dir tools/qualification/identity-jwt install --ignore-workspace --frozen-lockfile --ignore-scripts --offline
 	pnpm --dir tools/qualification/effect-node install --ignore-workspace --frozen-lockfile --ignore-scripts --offline
 	node_modules/.bin/tsc --project tools/qualification/effect-node/tsconfig.json
-	node --test --test-isolation=none --test-reporter=tap tools/qualification/effect-node/parity.test.ts tools/qualification/effect-node/signing-key-get.test.ts
+	node --test --test-isolation=none --test-reporter=tap tools/qualification/effect-node/parity.test.ts tools/qualification/effect-node/signing-key-get.test.ts tools/qualification/effect-node/signing-key-source.test.ts

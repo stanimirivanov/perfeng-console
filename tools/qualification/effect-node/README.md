@@ -190,3 +190,46 @@ parser refusal, config bounds, pre-abort and before-header/mid-body timeout/abor
 cleanup. Keys/certificates are test-only and temporary. No real Keycloak receipt is
 claimed. Roll back this candidate/test, explicit gate roots and CI steps together;
 retain the historical Effect Node parity receipts and existing production adapter.
+
+## PR52k — real signing-key snapshot composition (issue #101)
+
+`signing-key-source.ts` combines the qualified GET and strict decoder in one lazy
+Effect operation. It captures issuer/CA/limits and the trusted clock function at
+construction, creates the private fixed-origin wire adapter itself, and exposes
+only `load()` without caller-supplied URLs, raw-reader callbacks or decoder choices.
+The configured issuer passed to the wire and decoder comes from the same captured
+primitive; response JSON cannot replace that association.
+
+At execution the operation observes start time, performs the actual bounded GET,
+then observes completion time. Clock exceptions, unsafe/non-Date-compatible values,
+negative instants, rollback or elapsed time beyond 300000 ms return invalid_clock.
+The decoder receives the original start as fetchedAtMs, conservatively charging
+retrieval latency rather than granting a new freshness interval after decoding.
+Wire failures remain safe wire failures; malformed/private/duplicate key documents
+return invalid_jwks. Raw unverified text is never a successful source result.
+Unexpected wire defects remain in the Effect unknown channel, not an infallibility
+claim. Scoped interruption/deadline still closes upstream work; an explicit yield
+before publication fences pending interruption after decoder admission.
+
+This is an **isolated composition receipt**, not production admission, a key cache,
+refresh scheduler or live-clock monitor after return. Repeated loads perform separate
+reads. A later cache must enforce freshness at use, bounded single-flight/missing-key
+refresh, rate/concurrency limits and outage behavior. Real Keycloak compatibility,
+rotation, root dependency/runtime adoption and browser/shared-pilot gates remain
+NOT_ADMITTED; control-plane issue #356 stays open.
+
+The joint gate now installs **both existing isolated graphs** offline/frozen/scripts
+disabled, compiles the operation and its decoder entry, and runs the real TLS joint
+test alongside old parity/wire tests. Existing identity CI already bootstraps/audits
+both graphs and runs the target. There is no new package or lockfile change. The
+[exact reviewed public-entry link](../../../docs/IMPORTS.md#isolated-signing-key-composition-bridge--issue-101)
+is needed because nested fixture package scopes cannot use root Node aliases.
+It grants no production access or general cross-fixture import permission.
+
+The joint test uses actual TLS+strict admission: mixed-public-key success, private/
+duplicate/malformed documents and body-supplied time refusal, captured configuration,
+start-versus-completion timestamp, unsafe/regressing/stale/throwing clocks and
+mid-body timeout/abort cleanup. Certificates/keys are temporary and synthetic; this
+is not a real Keycloak deployment receipt. Roll back operation/tests, public entry,
+exact syntax/graph bridge and gate changes together without loosening production
+boundaries or replacing strict decoder failure with raw wire success.

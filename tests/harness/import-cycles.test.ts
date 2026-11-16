@@ -48,3 +48,24 @@ test('owners cannot depend on each other through disjoint public entry modules',
   assert.match(checkOwnerCycles(modules).join('\n'), /owner-cycle/);
   assert.deepEqual(checkOwnerCycles(modules.filter(module => module.source !== 'src/bff/consumer.ts')), []);
 });
+
+test('resolved signing-key bridge permits only the exact composition through its public entry', () => {
+  const root = mkdtempSync(join(tmpdir(), 'snapshot-bridge-'));
+  const write = (file: string, source: string) => { mkdirSync(dirname(join(root, file)), { recursive: true }); writeFileSync(join(root, file), source); };
+  const cli = resolve('node_modules/dependency-cruiser/bin/dependency-cruiser.mjs');
+  const config = resolve('.dependency-cruiser.mjs');
+  const run = () => execFileSync(process.execPath, [cli, '--config', config, '--output-type', 'err', 'src', 'tools'], { cwd: root, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
+  try {
+    write('tsconfig.json', '{}'); write('package.json', '{"type":"module"}');
+    write('src/probe.ts', 'export {};');
+    write('tools/qualification/identity-jwt/jwks-candidate.ts', 'export function admitSigningKeys() {}');
+    write('tools/qualification/identity-jwt/public-api.ts', "export { admitSigningKeys } from './jwks-candidate.ts';");
+    write('tools/qualification/effect-node/signing-key-source.ts', "import { admitSigningKeys } from '../identity-jwt/public-api.ts'; admitSigningKeys();");
+    assert.match(run(), /no dependency violations/);
+    write('tools/qualification/effect-node/signing-key-source.ts', "import { admitSigningKeys } from '../identity-jwt/jwks-candidate.ts'; admitSigningKeys();");
+    assert.throws(run, error => String((error as { stdout?: string; }).stdout).includes('signing-key-composition-uses-public-entry-only'));
+    write('tools/qualification/effect-node/signing-key-source.ts', 'export {};');
+    write('src/probe.ts', "import { admitSigningKeys } from '../tools/qualification/identity-jwt/public-api.ts'; admitSigningKeys();");
+    assert.throws(run, error => String((error as { stdout?: string; }).stdout).includes('identity-qualification-is-not-production'));
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});

@@ -3,6 +3,18 @@ import { ownerPatterns } from '#perfeng/harness/project-imports';
 export default {
   forbidden: [
     {
+      name: 'identity-qualification-is-not-production',
+      severity: 'error',
+      from: { pathNot: '^tools/qualification/(identity-jwt/|effect-node/signing-key-source[.]ts$)' },
+      to: { path: '^tools/qualification/identity-jwt/' },
+    },
+    {
+      name: 'signing-key-composition-uses-public-entry-only',
+      severity: 'error',
+      from: { path: '^tools/qualification/effect-node/signing-key-source[.]ts$' },
+      to: { path: '^tools/qualification/identity-jwt/', pathNot: '^tools/qualification/identity-jwt/public-api[.]ts$' },
+    },
+    {
       name: 'no-unresolved-product-imports',
       severity: 'error',
       from: { path: '^(apps/|src/|harness/|scripts/|tools/(?!qualification/))' },

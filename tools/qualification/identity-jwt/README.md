@@ -259,3 +259,14 @@ Run `make identity-jwt-qualification` and the isolated audit, then root verifica
 Rollback the JWKS candidate/tests, shared-helper extraction and explicit gate roots
 together. Preserve the original per-token API/projections and do not relabel old
 receipts or activate an unqualified production fallback.
+
+## Qualification-only public entry — issue #101
+
+`public-api.ts` exposes only strict snapshot admission and its snapshot type to the
+reviewed Effect Node composition. It does not export JWT verification, parser
+internals, key predicates or credentials. The exact one-way public-entry bridge is
+recorded in docs/IMPORTS.md and independently guarded by syntax and resolved graph
+fixtures. The caller now obtains the candidate through an actual fixed-origin TLS
+operation with captured issuer/start/end context; this is still isolated and adds
+no production key cache or runtime admission. Original token/pair/decoder gates
+remain mandatory; both existing pinned graphs are explicitly installed/audited.

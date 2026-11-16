@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, symlinkSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { join, relative, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { test } from 'node:test';
 import { inspectProjectImports, scanProjectImports } from '#perfeng/harness/project-imports';
@@ -59,4 +59,18 @@ test('scanner includes handwritten generated directories, all module types and s
     symlinkSync(join(dir, 'src'), join(dir, 'tools/generated'));
     assert.match(scanProjectImports(dir).join('\n'), /symlink/);
   } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+
+test('isolated signing-key composition has one static named snapshot-admission bridge', () => {
+  const file = root + '/tools/qualification/effect-node/signing-key-source.ts';
+  const entry = '../identity-jwt/public-api.ts';
+  assert.deepEqual(inspectProjectImports(root, file, "import { admitSigningKeys } from '" + entry + "';"), []);
+  assert.deepEqual(inspectProjectImports(root, file, "import type { SigningKeySnapshot } from '" + entry + "';"), []);
+  for (const source of ["import * as snapshot from '" + entry + "';", "import('" + entry + "');", "export { admitSigningKeys } from '" + entry + "';", "import { verifyCandidate } from '" + entry + "';", "import { SigningKeySnapshot } from '" + entry + "';", "import { admitSigningKeys } from '../identity-jwt/jwks-candidate.ts';"])
+    assert.ok(inspectProjectImports(root, file, source).length, source);
+  for (const file of ['src/bff/key-source.ts', 'src/scenarios/probe.ts', 'tools/qualification/orval-fetch/probe.ts', 'tools/qualification/effect-node/generated/probe.ts', 'tools/qualification/other/probe.ts']) {
+    const target = relative(dirname(root + '/' + file), root + '/tools/qualification/identity-jwt/public-api.ts');
+    assert.ok(inspectProjectImports(root, root + '/' + file, "import { admitSigningKeys } from '" + target + "';").length, file);
+    assert.ok(inspectProjectImports(root, root + '/' + file, "import('" + target + "');").length, file);
+  }
 });
