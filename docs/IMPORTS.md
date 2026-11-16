@@ -122,3 +122,24 @@ make verify, which shares an early import preflight with its lint prerequisite. 
 When adding a public surface, update its exact alias/entry and ownership policy,
 add an adversarial fixture, and verify compiler, Node and product-release resolution.
 Never add a broad exception or suppress a failing rule to make a build green.
+
+## Isolated signing-key composition bridge — issue #101
+
+The isolated packages have their own package.json scopes: Node does not inherit
+root `#perfeng` imports inside them, and package-import targets cannot escape to a
+sibling package. No nonfunctional root alias or new dependency was added. One
+reviewed public-entry link therefore joins the existing pinned fixtures:
+
+`tools/qualification/effect-node/signing-key-source.ts` may statically import the
+named `admitSigningKeys` value and declaration-level type-only `SigningKeySnapshot`
+from `../identity-jwt/public-api.ts`. No other consumer, private target, namespace,
+dynamic import or re-export is admitted. The entry exposes only snapshot admission
+and its snapshot type. This creates a one-way Effect Node -> identity admission
+edge; reciprocal owner edges are still cycle violations.
+
+`harness/project-imports.ts` enforces the exact source/target/member/import shape;
+resolved dependency-cruiser rules independently forbid production/unrelated
+consumers and private decoder access. Positive and negative fixtures cover both.
+Production package permissions, product source closure and incoming server ownership
+remain unchanged. Both isolated graphs must be installed/audited before running
+the joint target; each decoder/library resolves within its owning pinned package.
