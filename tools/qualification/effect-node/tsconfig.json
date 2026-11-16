@@ -1,4 +1,13 @@
 {
   "extends": "../../../tsconfig.json",
-  "include": ["candidate.ts", "parity.test.ts", "signing-key-get.ts", "signing-key-get.test.ts", "signing-key-source.ts", "signing-key-source.test.ts"]
+  "include": [
+    "candidate.ts",
+    "parity.test.ts",
+    "signing-key-get.ts",
+    "signing-key-get.test.ts",
+    "signing-key-source.ts",
+    "signing-key-source.test.ts",
+    "signing-key-cache.ts",
+    "signing-key-cache.test.ts"
+  ]
 }

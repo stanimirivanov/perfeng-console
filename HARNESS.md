@@ -298,8 +298,12 @@ and [proposed ADR 0004](docs/decisions/0004-qualify-jwt-verification-before-runt
 
 `make signing-key-wire-qualification` uses the pinned Effect Node fixture for one
 fixed-origin HTTPS GET and runs parity/lifecycle, raw-wire and real-decoder
-composition tests. The identity workflow bootstraps/audits both existing fixtures.
+composition and scoped fresh-snapshot cache tests. The identity workflow
+bootstraps/audits both existing fixtures.
 Wire text remains unverified; the isolated source binds strict snapshot admission
-to captured issuer and retrieval times. Production runtime/cache/rotation and real
-provider/BFF/browser admission remain pending.
+to captured issuer and retrieval times. The isolated one-entry cache bounds active
+readers, shares retrievals and checks absolute freshness under an owner scope.
+Production runtime adoption, unknown-key refresh/rate/negative-cache policy, real
+provider rotation and BFF/browser admission remain pending.
+See [the cache qualification contract](tools/qualification/effect-node/README.md#pr52l--scoped-fresh-snapshot-cache-issue-104).
 See [the exact wire contract](tools/qualification/effect-node/README.md#pr52i--fixed-origin-signing-key-wire-candidate-issue-97).
