@@ -303,7 +303,9 @@ bootstraps/audits both existing fixtures.
 Wire text remains unverified; the isolated source binds strict snapshot admission
 to captured issuer and retrieval times. The isolated one-entry cache bounds active
 readers, shares retrievals and checks absolute freshness under an owner scope.
-Production runtime adoption, unknown-key refresh/rate/negative-cache policy, real
-provider rotation and BFF/browser admission remain pending.
+The isolated resolver additionally qualifies bounded missing-key refresh, one-wire
+concurrency, rate reservations and negative state. Production runtime/token composition,
+real provider rotation and BFF/browser admission remain pending.
+See [the resolver policy](tools/qualification/effect-node/README.md#pr52m--bounded-unknown-key-resolution-issue-106).
 See [the cache qualification contract](tools/qualification/effect-node/README.md#pr52l--scoped-fresh-snapshot-cache-issue-104).
 See [the exact wire contract](tools/qualification/effect-node/README.md#pr52i--fixed-origin-signing-key-wire-candidate-issue-97).

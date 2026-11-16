@@ -8,6 +8,9 @@
     "signing-key-source.ts",
     "signing-key-source.test.ts",
     "signing-key-cache.ts",
-    "signing-key-cache.test.ts"
+    "signing-key-cache.test.ts",
+    "signing-key-store.ts",
+    "signing-key-resolver.ts",
+    "signing-key-resolver.test.ts"
   ]
 }
