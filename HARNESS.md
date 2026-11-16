@@ -293,3 +293,12 @@ identity-qualification workflow bootstraps the exact candidates and audits their
 isolated graph. This target is independent of `make verify` and is not production
 admission. See the [qualification contract](tools/qualification/identity-jwt/README.md)
 and [proposed ADR 0004](docs/decisions/0004-qualify-jwt-verification-before-runtime-adoption.md).
+
+## Isolated signing-key wire qualification — issue #97
+
+`make signing-key-wire-qualification` uses the pinned Effect Node fixture for one
+fixed-origin HTTPS GET and runs its existing parity/lifecycle plus raw-wire tests.
+The identity qualification workflow bootstraps/audits this separate fixture.
+Successful text is explicitly unverified; strict JWKS decoding, key admission,
+freshness/cache/rotation and real provider/BFF/browser admission remain pending.
+See [the exact wire contract](tools/qualification/effect-node/README.md#pr52i--fixed-origin-signing-key-wire-candidate-issue-97).

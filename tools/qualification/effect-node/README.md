@@ -116,3 +116,76 @@ the native transport legacy allowance is removed. Earlier unchanged-root stateme
 above describe the qualification snapshot. The isolated candidates remain historical
 reproductions; current acceptance runs tests/integration/transport.test.ts through
 make verify. openapi-typescript and Ajv remain in production.
+
+## PR52i — fixed-origin signing-key wire candidate (issue #97)
+
+The [isolated GET candidate](signing-key-get.ts) reuses the already pinned Effect
+4.1.2 / platform-node 4.1.2 APIs and reviewed Node backend. No package/lock changes,
+new production import, runtime route, credential deployment or root dependency
+admission is made. This is a Keycloak-profile transport qualification, not a general
+OIDC resolver, trusted key decoder or completion of control-plane issue #356.
+
+Trusted construction accepts one canonical HTTPS realm issuer (no userinfo, query,
+fragment, alias spelling or trailing slash) and derives only
+`issuer + /protocol/openid-connect/certs`. A caller cannot pass a destination to
+`get()`. The CA is explicitly supplied, a single bounded PEM CA certificate just
+like the qualified token POST profile; this does not admit arbitrary CA bundles or
+system/default roots. Endpoint, CA and limits are captured before returning the
+lazy operation, so later caller mutation cannot redirect it.
+
+The read uses TLS >=1.2, strict certificate/hostname verification, no keepalive,
+proxy middleware, retry or redirect follower. It sends GET with JSON Accept, no
+Authorization, form or other caller-controlled credential header. The caller owns
+Effect execution/interruption; the operation scopes headers/body/finalizers and a
+total deadline (default/maximum 3000 ms, configurable down to 50 ms).
+
+The effective Node parser limit must be positive and <= 16384 bytes; an oversized
+process-wide `--max-http-header-size` refuses construction, since this pinned adapter
+does not expose an admitted per-request header-parser option. `node:http` supplies
+only the readonly maxHeaderSize constant here; native outbound dispatch is not used.
+Require a pinned Node response source, at most 128 raw header fields, exactly one
+application/json media field, no content-encoding, and a valid bounded Content-Length
+if present. Retained response bytes are limited while streaming, default/maximum
+65536 bytes, configurable down to 256 bytes. Empty or malformed UTF-8 bodies refuse.
+Media parameters may be present; actual decoding is always fatal UTF-8. Other media,
+including application/jwk-set+json, require separate profile admission.
+
+Only status 200 can succeed. 401/403/429/5xx map to unavailable; other statuses,
+including redirects, map to invalid_response. Parser/TLS/network failures map to
+unavailable and the total timeout maps to deadline. Refusal bodies are neither read
+nor echoed. Interruption is propagated rather than swallowed into a fabricated
+successful observation; unexpected defects remain in the Effect unknown error
+channel for its owning composition boundary. This candidate is not an infallible API.
+
+**Wire-only result:** `{ok: true, stage: "unverified-jwks", body}` contains bounded
+text, not admitted keys or a signing-key snapshot. Tests intentionally accept an
+empty keys array and an exact-limit non-JSON UTF-8 body to make that distinction
+observable. JSON grammar/duplicate members, private or unsafe keys, duplicate kids,
+key count/algorithm/material constraints, snapshot timestamp/freshness, cache and
+rotation/refresh concurrency are **not qualified** by this wire success. Do not
+feed body directly into a verifier as trusted material. The next decoder slice
+must admit strict JSON and a bounded reviewed public-key set; later runtime/cache
+and real Keycloak/BFF/browser gates remain NOT_ADMITTED. No token-selected jku,
+x5u, issuer discovery or remote verification-key resolver is installed.
+
+### Reproduction and CI
+
+```sh
+pnpm --dir tools/qualification/effect-node install --ignore-workspace --frozen-lockfile --ignore-scripts
+make signing-key-wire-qualification
+pnpm --dir tools/qualification/effect-node audit --audit-level high
+```
+
+The target repeats an offline frozen script-disabled fixture install, compiles the
+explicit tsconfig roots, and runs existing parity/lifecycle tests plus the new real
+TLS wire test. The existing identity-qualification workflow now bootstraps this
+fixture, runs the target and audits its graph; it does not enable production.
+
+The wire test covers exact endpoint/GET/no bearer, construction capture/laziness,
+CA and hostname refusal, redirect/no retry, raw duplicate media/length headers,
+parser/header count bounds, declared and streamed body bounds (including equality),
+UTF-8/compression/media/empty-body refusal, proxy-environment isolation, raised native
+parser refusal, config bounds, pre-abort and before-header/mid-body timeout/abort
+cleanup. Keys/certificates are test-only and temporary. No real Keycloak receipt is
+claimed. Roll back this candidate/test, explicit gate roots and CI steps together;
+retain the historical Effect Node parity receipts and existing production adapter.
