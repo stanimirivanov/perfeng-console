@@ -62,6 +62,13 @@ test('resolved signing-key bridge permits only the exact composition through its
     write('tools/qualification/identity-jwt/public-api.ts', "export { admitSigningKeys } from './jwks-candidate.ts';");
     write('tools/qualification/effect-node/signing-key-source.ts', "import { admitSigningKeys } from '../identity-jwt/public-api.ts'; admitSigningKeys();");
     assert.match(run(), /no dependency violations/);
+    write('tools/qualification/identity-jwt/pair-candidate.ts', 'export function verifyCodePair() {}');
+    write('tools/qualification/identity-jwt/public-api.ts', "export { admitSigningKeys } from './jwks-candidate.ts'; export { verifyCodePair } from './pair-candidate.ts';");
+    write('tools/qualification/effect-node/code-pair-verifier.ts', "import { verifyCodePair } from '../identity-jwt/public-api.ts'; verifyCodePair();");
+    assert.match(run(), /no dependency violations/);
+    write('tools/qualification/effect-node/code-pair-verifier.ts', "import { verifyCodePair } from '../identity-jwt/pair-candidate.ts'; verifyCodePair();");
+    assert.throws(run, error => String((error as { stdout?: string; }).stdout).includes('signing-key-composition-uses-public-entry-only'));
+    write('tools/qualification/effect-node/code-pair-verifier.ts', 'export {};');
     write('tools/qualification/effect-node/signing-key-source.ts', "import { admitSigningKeys } from '../identity-jwt/jwks-candidate.ts'; admitSigningKeys();");
     assert.throws(run, error => String((error as { stdout?: string; }).stdout).includes('signing-key-composition-uses-public-entry-only'));
     write('tools/qualification/effect-node/signing-key-source.ts', 'export {};');

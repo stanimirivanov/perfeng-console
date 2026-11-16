@@ -1,13 +1,10 @@
-import { verifyTokenProfile } from './candidate.ts';
+import { tokenKeyId, verifyTokenProfile } from './candidate.ts';
 import type { QualificationInput } from './candidate.ts';
 
 /** Fixture-owned structural input; it is not admission of a production callback adapter. */
-export interface CodePairQualificationInput {
-  readonly issuer: string;
+export interface CodePairRequest {
   readonly nonce: string;
   readonly requestStartedAtMs: number;
-  readonly nowMs: number;
-  readonly snapshot: QualificationInput['snapshot'];
   readonly candidates: {
     readonly stage: 'unverified-code';
     readonly idToken: string;
@@ -15,7 +12,12 @@ export interface CodePairQualificationInput {
     readonly expiresIn: number;
   };
 }
-type PairResult = {
+export interface CodePairQualificationInput extends CodePairRequest {
+  readonly issuer: string;
+  readonly nowMs: number;
+  readonly snapshot: QualificationInput['snapshot'];
+}
+export type CodePairResult = {
   readonly ok: true;
   readonly issuer: string;
   readonly subject: string;
@@ -24,23 +26,44 @@ type PairResult = {
   readonly ok: false;
   readonly reason: 'invalid_pair' | 'unavailable';
 };
-const invalid = (): PairResult => ({ ok: false, reason: 'invalid_pair' });
+const invalid = (): CodePairResult => ({ ok: false, reason: 'invalid_pair' });
 const safeInstant = (value: number): boolean => Number.isSafeInteger(value) && value >= 0 && !Number.isNaN(new Date(value).getTime());
+
+function validContext(input: CodePairRequest, nowMs: number): boolean {
+  const { nonce, requestStartedAtMs, candidates } = input;
+  if (!safeInstant(nowMs) || !safeInstant(requestStartedAtMs) || requestStartedAtMs > nowMs ||
+      typeof nonce !== 'string' || !nonce || nonce.length > 256 || candidates.stage !== 'unverified-code' ||
+      !Number.isSafeInteger(candidates.expiresIn) || candidates.expiresIn < 1 || candidates.expiresIn > 300) return false;
+  const end = requestStartedAtMs + candidates.expiresIn * 1000;
+  return Number.isSafeInteger(end) && end > nowMs;
+}
+
+/** Strict no-I/O preflight; selectors remain untrusted and never select an origin. */
+export function codePairKeyIds(input: CodePairRequest, nowMs: number): {
+  readonly ok: true;
+  readonly idKid: string;
+  readonly accessKid: string;
+} | {
+  readonly ok: false;
+  readonly reason: 'invalid_pair';
+} {
+  try {
+    if (!validContext(input, nowMs)) return { ok: false, reason: 'invalid_pair' };
+    return { ok: true, idKid: tokenKeyId(input.candidates.idToken), accessKid: tokenKeyId(input.candidates.accessToken) };
+  } catch { return { ok: false, reason: 'invalid_pair' }; }
+}
 
 /** Qualify a code-response observation at its captured instant, never create a session.
  * Nonce/POST context must come from a trusted consumed handoff; this fixture does not consume one.
  * Matching subjects/freshness do not cryptographically prove an exact common token response.
  */
-export async function verifyCodePair(input: CodePairQualificationInput): Promise<PairResult> {
+export async function verifyCodePair(input: CodePairQualificationInput): Promise<CodePairResult> {
   try {
     // Own both credentials, both clock observations and all trusted key/config data before awaits.
     const captured = structuredClone(input);
     const { issuer, nonce, requestStartedAtMs, nowMs, snapshot, candidates } = captured;
-    if (!safeInstant(nowMs) || !safeInstant(requestStartedAtMs) || requestStartedAtMs > nowMs ||
-        typeof nonce !== 'string' || !nonce || nonce.length > 256 || candidates.stage !== 'unverified-code' ||
-        !Number.isSafeInteger(candidates.expiresIn) || candidates.expiresIn < 1 || candidates.expiresIn > 300) return invalid();
+    if (!validContext(captured, nowMs)) return invalid();
     const responseEnd = requestStartedAtMs + candidates.expiresIn * 1000;
-    if (!Number.isSafeInteger(responseEnd) || responseEnd <= nowMs) return invalid();
     const id = await verifyTokenProfile(candidates.idToken, { issuer, nonce, nowMs, snapshot, profile: 'id' });
     if (!id.ok) return { ok: false, reason: id.reason === 'unavailable' ? 'unavailable' : 'invalid_pair' };
     const access = await verifyTokenProfile(candidates.accessToken, { issuer, nowMs, snapshot, profile: 'initial-access' });

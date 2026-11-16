@@ -40,6 +40,21 @@ function objectSegment(segment: string): Record<string, unknown> {
   return strictJsonObject(text, { maxNodes: 512 });
 }
 
+function compactToken(token: unknown) {
+  if (typeof token !== 'string' || token.length > 16384) throw new Error('Invalid token');
+  const parts = token.split('.');
+  if (parts.length !== 3 || parts[0]!.length > 2048 || !/^[A-Za-z0-9_-]+$/.test(parts[2]!)) throw new Error('Invalid token');
+  if (Buffer.from(parts[2]!, 'base64url').toString('base64url') !== parts[2]) throw new Error('Invalid token');
+  const header = objectSegment(parts[0]!);
+  const claims = objectSegment(parts[1]!);
+  if (Object.keys(header).sort().join(',') !== 'alg,kid,typ' || header.alg !== 'RS256' || header.typ !== 'JWT' ||
+      typeof header.kid !== 'string' || header.kid.length < 1 || header.kid.length > 128) throw new Error('Invalid token');
+  return { kid: header.kid, claims };
+}
+
+/** Return only the untrusted bounded selector; never an issuer or verified claim. */
+export function tokenKeyId(token: unknown): string { return compactToken(token).kid; }
+
 /** Isolated qualification only: explicit trusted snapshots, never remote discovery.
  * No session, service grant or enrolled HUMAN/CI kind is inferred from claims.
  */
@@ -54,15 +69,9 @@ export async function verifyTokenProfile(token: unknown, input: QualificationInp
     if (origin.protocol !== 'https:' || origin.href !== issuer || origin.username || origin.password || origin.search || origin.hash ||
         !/^\/realms\/[A-Za-z0-9_-]{1,128}$/.test(origin.pathname)) return unavailable();
     if (typeof token !== 'string' || token.length > 16384 || !['id', 'initial-access'].includes(profile)) return invalid();
-    const parts = token.split('.');
-    if (parts.length !== 3 || parts[0]!.length > 2048 || !/^[A-Za-z0-9_-]+$/.test(parts[2]!)) return invalid();
-    if (Buffer.from(parts[2]!, 'base64url').toString('base64url') !== parts[2]) return invalid();
-    const header = objectSegment(parts[0]!);
-    const claims = objectSegment(parts[1]!);
-    if (Object.keys(header).sort().join(',') !== 'alg,kid,typ' || header.alg !== 'RS256' || header.typ !== 'JWT' ||
-        typeof header.kid !== 'string' || header.kid.length < 1 || header.kid.length > 128) return invalid();
+    const { kid, claims } = compactToken(token);
     if (new Set(snapshot.keys.map(key => key.kid)).size !== snapshot.keys.length) return unavailable();
-    const selected = snapshot.keys.filter(key => key.kid === header.kid);
+    const selected = snapshot.keys.filter(key => key.kid === kid);
     if (selected.length !== 1) return invalid();
     const key = publicSigningKey(selected[0]);
     if (!key) return unavailable();

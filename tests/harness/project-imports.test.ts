@@ -74,3 +74,17 @@ test('isolated signing-key composition has one static named snapshot-admission b
     assert.ok(inspectProjectImports(root, root + '/' + file, "import('" + target + "');").length, file);
   }
 });
+
+
+test('resolved pair verifier has only its exact named identity-qualification entry', () => {
+  const file = root + '/tools/qualification/effect-node/code-pair-verifier.ts';
+  const entry = '../identity-jwt/public-api.ts';
+  assert.deepEqual(inspectProjectImports(root, file, "import { codePairKeyIds, verifyCodePair } from '" + entry + "';"), []);
+  assert.deepEqual(inspectProjectImports(root, file, "import type { CodePairRequest, CodePairResult } from '" + entry + "';"), []);
+  for (const source of ["import { admitSigningKeys } from '" + entry + "';", "import { CodePairRequest } from '" + entry + "';", "import * as identity from '" + entry + "';", "import('" + entry + "');", "export { verifyCodePair } from '" + entry + "';", "import { verifyCodePair } from '../identity-jwt/pair-candidate.ts';"])
+    assert.ok(inspectProjectImports(root, file, source).length, source);
+  for (const importer of ['src/bff/probe.ts', 'src/scenarios/probe.ts', 'tools/qualification/effect-node/generated/code-pair-verifier.ts', 'tools/qualification/other/probe.ts']) {
+    const target = relative(dirname(root + '/' + importer), root + '/tools/qualification/identity-jwt/public-api.ts');
+    assert.ok(inspectProjectImports(root, root + '/' + importer, "import { verifyCodePair } from '" + target + "';").length, importer);
+  }
+});

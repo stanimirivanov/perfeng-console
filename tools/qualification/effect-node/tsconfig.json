@@ -11,6 +11,8 @@
     "signing-key-cache.test.ts",
     "signing-key-store.ts",
     "signing-key-resolver.ts",
-    "signing-key-resolver.test.ts"
+    "signing-key-resolver.test.ts",
+    "code-pair-verifier.ts",
+    "code-pair-verifier.test.ts"
   ]
 }

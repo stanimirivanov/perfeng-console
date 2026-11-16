@@ -270,3 +270,14 @@ fixtures. The caller now obtains the candidate through an actual fixed-origin TL
 operation with captured issuer/start/end context; this is still isolated and adds
 no production key cache or runtime admission. Original token/pair/decoder gates
 remain mandatory; both existing pinned graphs are explicitly installed/audited.
+
+## PR52n resolved-key composition — issue #108
+
+The public qualification entry now exposes only `codePairKeyIds`, `verifyCodePair`
+and their named request/result types to the exact Effect Node pair-verifier importer.
+Pure preflight shares compact-token JSON/header validation with signature verification
+and returns no claims or credentials. Existing per-token and static-pair APIs preserve
+their behavior. The real-wire scoped composition is documented in the
+[Effect Node receipt](../effect-node/README.md#pr52n--resolved-key-code-token-pair-verification-issue-108).
+It does not admit production authentication, a consumed nonce handoff or exact common
+response proof. Both isolated graphs and their qualification gates remain required.

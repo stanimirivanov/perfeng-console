@@ -51,11 +51,16 @@ export function inspectProjectImports(root: string, file: string, text: string):
     if (!spec.startsWith('.')) return;
     const target = relative(root, resolve(dirname(file), spec));
     if (target === 'tools/qualification/identity-jwt/public-api.ts') {
-      const bindings = ts.isImportDeclaration(node) && node.importClause && !node.importClause.name && node.importClause.namedBindings;
-      const allowed = importer === 'tools/qualification/effect-node/signing-key-source.ts' && bindings && ts.isNamedImports(bindings) &&
-        bindings.elements.length > 0 && bindings.elements.every(member =>
-        (member.propertyName ?? member.name).text === (node.importClause?.isTypeOnly ? 'SigningKeySnapshot' : 'admitSigningKeys'));
-      if (!allowed) report(node, 'Snapshot admission has one reviewed static named qualification bridge; no production, private or dynamic access.');
+      const clause = ts.isImportDeclaration(node) ? node.importClause : undefined;
+      const bindings = clause && !clause.name && clause.namedBindings;
+      const permitted = importer === 'tools/qualification/effect-node/signing-key-source.ts'
+        ? clause?.isTypeOnly ? ['SigningKeySnapshot'] : ['admitSigningKeys']
+        : importer === 'tools/qualification/effect-node/code-pair-verifier.ts'
+          ? clause?.isTypeOnly ? ['CodePairRequest', 'CodePairResult'] : ['codePairKeyIds', 'verifyCodePair']
+          : [];
+      const allowed = bindings && ts.isNamedImports(bindings) && bindings.elements.length > 0 &&
+        bindings.elements.every(member => permitted.includes((member.propertyName ?? member.name).text));
+      if (!allowed) report(node, 'Identity qualification has exact static named bridges; no production, private or dynamic access.');
       return;
     }
     if (owner(importer) === owner(target)) return;

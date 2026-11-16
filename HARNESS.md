@@ -309,3 +309,9 @@ real provider rotation and BFF/browser admission remain pending.
 See [the resolver policy](tools/qualification/effect-node/README.md#pr52m--bounded-unknown-key-resolution-issue-106).
 See [the cache qualification contract](tools/qualification/effect-node/README.md#pr52l--scoped-fresh-snapshot-cache-issue-104).
 See [the exact wire contract](tools/qualification/effect-node/README.md#pr52i--fixed-origin-signing-key-wire-candidate-issue-97).
+
+The same isolated target now composes bounded key resolution with strict code-token
+pair verification, including no-I/O compact-token preflight and post-crypto freshness/
+validity checks. Exact importer/member/type permissions and syntax/graph regressions
+guard the qualification bridge. See [the composition receipt](tools/qualification/effect-node/README.md#pr52n--resolved-key-code-token-pair-verification-issue-108).
+It creates no production session, enrollment, service grant or browser admission.

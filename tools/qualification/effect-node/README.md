@@ -358,3 +358,54 @@ root runtime/dependency admission and shared-pilot/browser qualification remain 
 The resolver is not an authorization decision or proof of identity. Roll back the resolver,
 store extraction, compiler roots and gate updates together, restoring the prior isolated
 snapshot factory; preserve the production adapter and trust boundaries.
+
+## PR52n — resolved-key code-token pair verification (issue #108)
+
+`makeCodePairVerifier(config)` acquires a scoped `verify(request)` operation for one
+captured issuer/CA/clock/limit set. Each request owns a deep copy of its nonce,
+code-POST start and unverified token candidates before awaiting anything. A new
+identity-fixture `codePairKeyIds` preflight shares the existing strict compact-token
+parser and context bounds; it returns **only two untrusted bounded selectors**.
+Malformed, duplicate-aware JSON/header/signature-shape or context failures cannot
+start a key request. No unverified claim or token URL selects the configured issuer.
+
+Each distinct ID is resolved once through the qualified resolver. The operation
+requires exact issuer and key-ID correspondence, combines the minimal admitted keys
+with the oldest retrieval start, then invokes the existing `verifyCodePair` profile,
+signature, nonce, subject and time semantics at a fresh post-resolution observation.
+Different IDs may legitimately resolve across rotation generations; the oldest timestamp
+is conservative. Identical IDs are resolved once, so conflicting keys cannot be silently
+merged. This is not a claim that both keys came from one HTTP response.
+
+The complete pipeline has a fixed 3000 ms deadline and a nonblocking 32-operation
+semaphore, including cryptographic work after resolver permits are released. There
+are at most two cryptographic profile checks and no retries beyond the resolver's
+existing bounded miss policy. Trusted wall time has its own per-owner high-water mark
+shared into the resolver. After crypto, a new observation must preserve key age
+<=300000 ms and strictly precede validUntilMs. Clock faults/rollback, owner closure,
+caller interruption or timeout cannot publish late identity. JavaScript cryptographic
+promises may finish internally after interruption; their results are discarded, not
+published or claimed to be computationally preempted.
+
+Success exposes only issuer, subject and conservative validUntilMs. Safe refusals are
+invalid_pair, unavailable or deadline; no credential, claim set, key document or error
+text escapes. Source defects retain the existing unknown Effect channel. The exact
+[public-entry bridge](../../../docs/IMPORTS.md#isolated-signing-key-composition-bridge--issue-101)
+admits only this importer and named value/type members; production/private/dynamic
+access remains forbidden by syntax and resolved-graph tests. Both isolated package
+pins remain unchanged; identity uses its own jose/parser graph, Effect its own runtime.
+
+Six actual TLS/signed-token cases cover captured mutable inputs, mixed-key rotation,
+malformed preflight with zero network, signed subject/issuer/audience/nonce/signature
+substitution, bad clock, duration expiry while fetching, malformed JWKS, caller and
+owner teardown, 32-operation overload and total-deadline cleanup. The complete existing
+identity, wire/cache/resolver and root verification suites remain required.
+
+**Still NOT_ADMITTED:** this does not consume a real single-use login transaction or
+create a BFF session. The trusted consumed nonce/POST handoff is still an input premise.
+Matching subjects and freshness still do not cryptographically prove an exact common
+code response without at_hash; that earlier qualification limitation remains. Real
+Keycloak token/rotation compatibility, root dependency/runtime admission, actual code
+exchange/session composition and browser/shared-pilot gates remain separate work.
+Roll back operation/tests, narrow public-entry exports/permissions, compiler roots and
+joint gate together; preserve production authentication boundaries and pinned validators.
