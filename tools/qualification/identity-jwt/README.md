@@ -180,3 +180,82 @@ Reproduce with the existing `make identity-jwt-qualification` gate, which now
 explicitly runs both test files and compiles both candidates. Roll back the pair
 candidate, its tests and gate additions together; preserve the original per-token
 projection and do not activate production as a fallback for an unqualified fixture.
+
+## PR52j strict signing-key snapshot admission — issue #99
+
+[Console issue #99](https://github.com/stanimirivanov/perfeng-console/issues/99)
+qualifies `jwks-candidate.ts` on production baseline `d55f89e`. It consumes the
+structural unverified-jwks text observation from the prior wire slice, without
+importing that separate Effect fixture or adding dependencies. It is not a live
+transport/decoder/cache composition and does not enable production JWT verification.
+
+`admitSigningKeys` receives trusted `issuer`, `retrievalStartedAtMs`, `nowMs` and
+`wire: {ok: true, stage: "unverified-jwks", body}`. Validate nonnegative safe-integer
+Date-compatible times, retrieval start <= now and age <= 300000 ms, with equality
+accepted. Snapshot fetchedAtMs is conservatively the supplied retrieval start,
+never a JSON value or a new timestamp chosen after parsing. The configured issuer
+must be the canonical HTTPS realm profile with no credentials/query/fragment or
+trailing alias. The resulting issuer association expresses the **caller's trusted
+provenance premise**, not proof that this text actually traversed the fixed-origin
+HTTPS adapter. Future composition must capture and preserve that association.
+
+### Conservative document and selection profile
+
+- Body is a well-formed JavaScript string whose UTF-8 encoding is at most 65536 bytes.
+  The existing wire adapter supplies fatal-decoded UTF-8; this standalone runtime
+  boundary also rejects malformed input shapes/surrogates rather than trusting TS.
+- Share the existing jsonc-parser strict JSON preflight. JWT limits remain exactly
+  512 nodes, depth 16 and 64 members per object. JWKS uses 4096 nodes with the same
+  depth/member caps, so 32 keys can be admitted without loosening JWT preflight.
+  Escaped-name duplicates are rejected at every depth; comments/trailing commas,
+  malformed syntax/strings and structural overflow refuse before projection.
+- Require root exactly `{keys: [...]}` and 1–32 object entries. All entries, including
+  ignored siblings, need nonempty string kty/alg/use and a globally unique nonempty
+  kid of at most 128 UTF-16 units; selector strings are bounded to 128 units. Missing
+  selectors never default to signature authority. Root extensions/metadata and
+  unsupported ambiguous entries refuse. These are selected profile constraints,
+  not claims that RFC 7517 universally requires alg/use/kid or forbids extensions.
+- Reject private/secret JWK field names `d,p,q,dp,dq,qi,oth,k` **at any depth**, even
+  in ignored sibling metadata and under escaped spellings. This consciously strict
+  profile can refuse otherwise irrelevant extension names; it prevents hidden
+  private material from slipping through a nonselected entry.
+- Explicitly select alg RS256 + use sig. Public encryption/EC siblings with other
+  declared selectors are counted but ignored, reflecting the environment fixture's
+  selection from mixed Keycloak documents. Their cryptographic material is not
+  qualified or used. Require at least one selected signing key; a set containing
+  only ignored keys cannot become an empty trusted snapshot.
+- Validate **every** selected entry before releasing a snapshot: RSA, canonical
+  unsigned nonzero 2048–8192-bit modulus, exponent AQAB, and key_ops absent or a
+  real array containing only verify. Array-like objects are malformed and refuse.
+  The shared `signing-key.ts` predicate replaces the token fixture's inline public
+  key check; all original token/pair cases remain in the same qualification gate.
+- Retain only kid/kty/use/alg/n/e. Certificate chains, remote URLs, key_ops and all
+  other extensions do not acquire authority or trigger fetching. Every key, the
+  key array, snapshot and successful result wrapper are frozen. Returned data is
+  newly projected from parsed bytes and independent of caller mutation.
+
+Refusal is only `{ok: false, reason: "invalid_jwks"}`, with no partial IDs, keys,
+private values or parser/backend error detail. This is isolated **candidate
+admission at one captured instant**, not a signing-key-cache freshness promise or
+authorization to trust token roles, subjects or services.
+
+The gate runs 23 tests: original 17 token/pair checks plus six JWKS cases. They cover
+old/new rotation keys working through real signed-token verification, mixed public
+siblings, ignored metadata/private fields, duplicate JSON and key IDs, selected-key
+failure without partial results, 32/33 key bounds, exact 64 KiB and oversized multibyte
+inputs, deep/member overflow, malformed shapes and trusted-context freshness bounds.
+The private-key fixtures use distinct IDs so their refusal cannot be explained by
+an unrelated duplicate-ID check. A leading-zero modulus fixture is constructed
+from bytes, rather than assuming an arbitrary base64 prefix is noncanonical.
+
+**Still NOT_ADMITTED for production:** actual provider compatibility/Keycloak mixed
+metadata, Effect wire-to-decoder provenance binding, a bounded fresh-key cache with
+rotation/missing-key refresh/concurrency/outage behavior, live clock/lifetime fencing,
+root dependency/API admission and real BFF/browser/shared-pilot receipts. No network,
+cache, refresh scheduler or credential deployment occurs in this decoder. ADR 0004
+remains proposed; no status was silently accepted. Control-plane issue #356 stays open.
+
+Run `make identity-jwt-qualification` and the isolated audit, then root verification.
+Rollback the JWKS candidate/tests, shared-helper extraction and explicit gate roots
+together. Preserve the original per-token API/projections and do not relabel old
+receipts or activate an unqualified production fallback.

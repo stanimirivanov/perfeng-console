@@ -163,9 +163,10 @@ empty keys array and an exact-limit non-JSON UTF-8 body to make that distinction
 observable. JSON grammar/duplicate members, private or unsafe keys, duplicate kids,
 key count/algorithm/material constraints, snapshot timestamp/freshness, cache and
 rotation/refresh concurrency are **not qualified** by this wire success. Do not
-feed body directly into a verifier as trusted material. The next decoder slice
-must admit strict JSON and a bounded reviewed public-key set; later runtime/cache
-and real Keycloak/BFF/browser gates remain NOT_ADMITTED. No token-selected jku,
+feed body directly into a verifier as trusted material. The [isolated PR52j decoder](../identity-jwt/README.md#pr52j-strict-signing-key-snapshot-admission--issue-99)
+qualifies strict JSON and a bounded public-key selection separately. Actual
+wire-to-decoder provenance composition, runtime/cache and real Keycloak/BFF/browser
+gates remain NOT_ADMITTED. No token-selected jku,
 x5u, issuer discovery or remote verification-key resolver is installed.
 
 ### Reproduction and CI
