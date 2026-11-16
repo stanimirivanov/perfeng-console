@@ -233,3 +233,64 @@ mid-body timeout/abort cleanup. Certificates/keys are temporary and synthetic; t
 is not a real Keycloak deployment receipt. Roll back operation/tests, public entry,
 exact syntax/graph bridge and gate changes together without loosening production
 boundaries or replacing strict decoder failure with raw wire success.
+
+## PR52l — scoped fresh snapshot cache (issue #104)
+
+`makeSigningKeyCache(config)` captures configuration synchronously and returns an
+Effect requiring an owner Scope. Each acquisition creates independent clock history,
+source, entry and reader permits. Its sole operation is `readSnapshot()`; it accepts
+no issuer, URL or key ID at read time. Root production dependencies remain unchanged.
+
+Pinned Effect 4.1.2 `ScopedCache.makeWith` owns one entry, shares pending retrievals
+and interrupts the lookup after the last reader leaves. `Semaphore` admits at most
+32 active readers without a waiting queue; overload returns unavailable. The 32-reader
+cap is a conservative qualification choice, not an OIDC requirement or a refresh-rate
+limit. Source refusals have zero retention; a later read may try again. Pending reads
+share their original result, including a refusal, without a hidden retry. No background
+refresh or timer is introduced; expired entries are cleaned lazily on access/closure.
+
+Successful entries have a second, completion-relative TTL of 300000 ms. This never
+replaces the authority check against the snapshot's **original retrieval start**:
+each read observes trusted wall time before and after awaiting, accepts age 300000 ms
+inclusively (the existing decoder policy), and refuses/refreshes older observations.
+Reads do not renew the timestamp. A pre-read stale entry is conditionally removed by
+identity, then one fresh load is awaited. An observation that becomes stale while
+waiting is refused rather than returned. An unavailable source never authorizes use
+of an expired snapshot. Consumers still need freshness checks at their actual use;
+this is an observation-time promise, not a live-clock monitor after return.
+
+Clock values must be safe, nonnegative, Date-compatible integer milliseconds. The
+per-acquisition high-water mark covers cache and source observations; a clock exception
+or rollback invalidates cached authority and returns invalid_clock. Recovery requires
+a valid observation at or beyond that high-water mark; rollback cannot extend freshness.
+The clock and issuer remain trusted configuration, not provider response fields.
+
+The entry lookup explicitly forks the real source into the **entry Scope** and joins
+that fiber. Installed ScopedCache closes entry scopes on owner shutdown but detaches
+its lookup fiber; simply invoking source.load there left readers pending until the
+transport deadline. The regression caught that behavior. Scoped child ownership now
+closes the actual TLS operation promptly on owner shutdown. A second regression caught
+awaiting pending entries during preflight, which caused a hidden second retrieval after
+a shared refusal; non-awaiting completed-value inspection preserves single-flight.
+Closed handles interrupt without fetching, and closing/cancelling cannot publish a late
+snapshot. One caller's cancellation does not cancel another caller's shared retrieval.
+Unexpected source defects retain the existing unknown Effect error channel.
+
+Seven real-TLS tests cover exact freshness boundaries, expiry rotation, outage and
+refusal retry, invalid/rollback clocks, post-await clock jumps, 32-reader sharing and
+overload, individual/last-reader cancellation, owner shutdown and escaped handles,
+independent acquisitions and captured configuration. The joint target and existing
+identity CI execute them alongside all previous wire/parity/composition cases. No
+real Keycloak or browser/session admission is claimed.
+
+**NOT_ADMITTED for production:** missing-key lookup, bounded unknown-key refresh,
+refresh-rate and negative-cache policy, real Keycloak rotation, application runtime
+adoption, token verification/cache composition and shared-pilot/browser gates remain
+required. There is deliberately no key-ID resolver or unimplemented policy stub here.
+Roll back this cache/test, compiler roots and gate command together; retain the qualified
+uncached source, strict decoder and existing production boundaries.
+
+Builtin API evidence (pinned installed source inspected):
+[ScopedCache](https://github.com/Effect-TS/effect/blob/effect%404.1.2/packages/effect/src/ScopedCache.ts),
+[Semaphore](https://github.com/Effect-TS/effect/blob/effect%404.1.2/packages/effect/src/Semaphore.ts),
+and [Effect scoped fibers](https://github.com/Effect-TS/effect/blob/effect%404.1.2/packages/effect/src/Effect.ts).
