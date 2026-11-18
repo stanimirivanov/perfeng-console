@@ -92,7 +92,7 @@ and integration tests live under `tests/`. Follow the
 | Stack fixture | `make stack-admission` | Pinned Material/CSP/runtime qualification fixture fails |
 | Harness faults | `make harness-self-test` | An injected fault fails to trigger its intended product/accounting gate |
 | Guide artifact | `make guide` | Tagged journey/capture/provenance fails; output stays outside Git |
-| Supply chain | `make supply-chain` | Registry audit reports high/critical vulnerability or the check cannot complete |
+| Supply chain | `make supply-chain` | Raw audit evidence is incomplete/unavailable, high/critical risk is unaccepted, or an exact reviewed exception is invalid/expired/unused |
 | Pre-commit | `make hooks` once per checkout | Verifies the staged snapshot with the installed modules. Unstaged edits cannot mask a bad staged source |
 | Hosted CI | `quality.yml` jobs `verify`, `browser`, `supply-chain` | Frozen bootstrap; aggregate, browser/installation/stack/self-test and audit respectively; read-only contents permission and ten-minute job limits |
 
@@ -315,3 +315,9 @@ pair verification, including no-I/O compact-token preflight and post-crypto fres
 validity checks. Exact importer/member/type permissions and syntax/graph regressions
 guard the qualification bridge. See [the composition receipt](tools/qualification/effect-node/README.md#pr52n--resolved-key-code-token-pair-verification-issue-108).
 It creates no production session, enrollment, service grant or browser admission.
+
+The [root audit risk proposal](docs/development/dependency-policy.md#proposed-picomatch-risk-exception--issue-113)
+uses a strict, root-only evaluator of unchanged raw pnpm evidence. It retains all
+findings and visibly distinguishes accepted residual risk from remediation. Its
+exact package/version/high/development/unbundled/window checks have negative tests;
+isolated qualification audits remain raw and cannot reuse this policy command.

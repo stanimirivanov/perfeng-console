@@ -27,7 +27,7 @@ test:
 verify: doctor check-imports contracts-check lint typecheck architecture test component-test build
 
 supply-chain: doctor
-	pnpm audit --audit-level high
+	node harness/supply-chain.ts
 
 hooks:
 	git config --local core.hooksPath .githooks

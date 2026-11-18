@@ -81,6 +81,9 @@
       ],
       "#perfeng/bff-code-exchange": [
         "./src/bff/login/code-exchange.ts"
+      ],
+      "#perfeng/harness/supply-chain": [
+        "./harness/supply-chain.ts"
       ]
     }
   }
