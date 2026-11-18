@@ -3,3 +3,4 @@ export { admitSigningKeys } from './jwks-candidate.ts';
 export type { SigningKeySnapshot } from './jwks-candidate.ts';
 export { codePairKeyIds, verifyCodePair } from './pair-candidate.ts';
 export type { CodePairRequest, CodePairResult } from './pair-candidate.ts';
+export { strictJsonObject } from './strict-json.ts';

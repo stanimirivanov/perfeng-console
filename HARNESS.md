@@ -315,3 +315,9 @@ pair verification, including no-I/O compact-token preflight and post-crypto fres
 validity checks. Exact importer/member/type permissions and syntax/graph regressions
 guard the qualification bridge. See [the composition receipt](tools/qualification/effect-node/README.md#pr52n--resolved-key-code-token-pair-verification-issue-108).
 It creates no production session, enrollment, service grant or browser admission.
+
+The isolated wire gate also runs bounded private-stdin process and Python source/IPC
+tests. Identity CI uses Python 3.12; no Docker/provider execution runs automatically.
+The [opt-in real-provider runner](tools/qualification/effect-node/README.md#pr52p--real-provider-private-ipc-qualification-issue-110)
+reuses the exact environment fixture through its observer and keeps all credentials
+in memory/private stdin. Generated redacted receipts belong outside Git.
