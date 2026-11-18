@@ -61,6 +61,7 @@ parenthesized note may follow the target. Code review still governs permission c
 | `#perfeng/tooling/contracts` | `./scripts/contracts.ts` |
 | `#perfeng/run-transitions` | `./src/generated/transitions.ts` (BFF-owned graph projection) |
 | `#perfeng/run-types` | `./src/generated/run.ts` |
+| `#perfeng/harness/supply-chain` | `./harness/supply-chain.ts` |
 | `#perfeng/harness/imports` | `./harness/imports.ts` |
 | `#perfeng/harness/project-imports` | `./harness/project-imports.ts` |
 | `#perfeng/harness/import-lint` | `./harness/import-lint.mjs` |
