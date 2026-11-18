@@ -47,6 +47,14 @@ export const roles: Readonly<Record<string, Role>> = {
   'src/bff/login/login-contracts.ts': 'port',
   'src/bff/login/code-exchange.operation.ts': 'operation',
   'src/bff/login/code-exchange.ts': 'composition',
+  'src/bff/login/identity/strict-json.ts': 'adapter',
+  'src/bff/login/identity/signing-key.ts': 'adapter',
+  'src/bff/login/identity/token-profile.ts': 'adapter',
+  'src/bff/login/identity/code-pair.ts': 'adapter',
+  'src/bff/login/identity/snapshot-contracts.ts': 'port',
+  'src/bff/login/identity/snapshot-verifier.ts': 'adapter',
+  'src/bff/login/identity/qualification-api.ts': 'entry',
+
   'apps/console/src/runs/detail/run-detail.ts': 'component',
   'apps/console/src/runs/run.store.ts': 'store',
   'apps/console/src/runs/run-client.ts': 'adapter',
@@ -119,7 +127,7 @@ export function checkOwnership(root: string, registry: Readonly<Record<string, R
       }
     }
     const tool = name.startsWith('tools/');
-    const nativeAllowed = (member: string, node: ts.Node) => role === 'adapter' && (!tool ||
+    const nativeAllowed = (member: string, node: ts.Node) => role === 'adapter' && !name.startsWith('src/bff/login/identity/') && (!tool ||
       toolGlobalAllowed(name, member) || (member === 'setTimeout' && toolListenerTimerAllowed(name, node, checker)));
     const providerBindings = new Set<ts.Symbol>();
     inspectImports(source, (node, specifier) => {
@@ -147,7 +155,8 @@ export function checkOwnership(root: string, registry: Readonly<Record<string, R
         }
         const entryOwner = name === 'tools/public-api.ts' ? 'tools/console-server.ts' :
           name === 'src/bff/public-api.ts' ? 'src/bff/transport.ts' : 'src/bff/config.ts';
-        if (role === 'entry' && targetName !== entryOwner)
+        const identityEntry = name === 'src/bff/login/identity/qualification-api.ts' && ['strict-json', 'signing-key', 'token-profile', 'code-pair', 'snapshot-verifier', 'snapshot-contracts'].some(file => targetName === 'src/bff/login/identity/' + file + '.ts');
+        if (role === 'entry' && targetName !== entryOwner && !identityEntry)
           report(node, 'OWN-01', 'Public entry must re-export only its reviewed owner.');
         if (targetRole === 'contract' && !(ts.isImportDeclaration(node) && node.importClause?.isTypeOnly === true) &&
             !(role === 'contract' && ts.isExportDeclaration(node) && node.isTypeOnly))

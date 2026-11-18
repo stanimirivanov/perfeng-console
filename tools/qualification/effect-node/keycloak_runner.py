@@ -35,6 +35,37 @@ CLOSURE = (
 )
 
 
+# A moved implementation is covered by root source and resolution inputs, not fixture-only hashes.
+QUALIFICATION_PATHS = (
+    "tools/qualification/effect-node", "tools/qualification/identity-jwt",
+    "src/bff/login/identity", "package.json", "pnpm-lock.yaml",
+)
+
+
+def qualification_digest(console: Path) -> str:
+    """Frame adopted sources and both package scopes; refuse source-link substitution."""
+    files = []
+    for name in QUALIFICATION_PATHS:
+        root = console / name
+        if root.is_symlink() or not root.exists():
+            raise ValueError("Qualification input refused")
+        candidates = [root] if root.is_file() else sorted(root.rglob("*") if name == "src/bff/login/identity" else root.iterdir())
+        for file in candidates:
+            if file.is_symlink():
+                raise ValueError("Qualification input refused")
+            if file.is_file() and file.suffix in (".ts", ".py", ".json", ".yaml"):
+                files.append(file)
+    digest = hashlib.sha256(b"perfeng-keycloak-qualification-v2\0")
+    for file in sorted(files):
+        path = file.relative_to(console).as_posix().encode()
+        content = file.read_bytes()
+        digest.update(len(path).to_bytes(8, "big"))
+        digest.update(path)
+        digest.update(len(content).to_bytes(8, "big"))
+        digest.update(content)
+    return digest.hexdigest()
+
+
 def git(source: Path, *args: str) -> str:
     """Read only source metadata; never import from a mutable checkout."""
     return subprocess.check_output(
@@ -126,7 +157,7 @@ def execute(source: Path) -> dict:
         raise ValueError("Preloaded fixture module refused")
     console = HERE.parents[2]
     console_commit = git(console, "rev-parse", "HEAD")
-    paths = ("tools/qualification/effect-node", "tools/qualification/identity-jwt")
+    paths = QUALIFICATION_PATHS
     if git(console, "status", "--porcelain", "--untracked-files=normal", "--", *paths):
         raise ValueError("Commit qualification sources before executing")
     seen = []
@@ -193,23 +224,12 @@ def execute(source: Path) -> dict:
                 console, "status", "--porcelain", "--untracked-files=normal", "--", *paths
             ):
                 raise ValueError("Qualification sources changed during execution")
-            digest = hashlib.sha256(b"perfeng-keycloak-qualification-v1\0")
-            for root in (HERE, HERE.parent / "identity-jwt"):
-                for file in sorted(root.iterdir()):
-                    if not file.is_file() or file.suffix not in (".ts", ".py", ".json", ".yaml"):
-                        continue
-                    path = file.relative_to(HERE.parent).as_posix().encode()
-                    content = file.read_bytes()
-                    digest.update(len(path).to_bytes(8, "big"))
-                    digest.update(path)
-                    digest.update(len(content).to_bytes(8, "big"))
-                    digest.update(content)
             return {
                 "mode": "executed",
                 "consoleCommit": console_commit,
                 "environmentCommit": PIN["commit"],
-                "consoleQualificationDigestFormat": "sha256-length-framed-v1",
-                "consoleQualificationSha256": digest.hexdigest(),
+                "consoleQualificationDigestFormat": "sha256-length-framed-v2",
+                "consoleQualificationSha256": qualification_digest(console),
                 "provider": provider,
                 "console": PASSED,
                 "cacheRotation": {

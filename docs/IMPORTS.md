@@ -34,6 +34,7 @@ parenthesized note may follow the target. Code review still governs permission c
 
 | Alias | Target |
 |---|---|
+| `#perfeng/bff-snapshot-verifier` | `./src/bff/login/identity/snapshot-verifier.ts` |
 | `#perfeng/contracts` | `./src/shared/contracts/public-api.ts` |
 | `#perfeng/bff` | `./src/bff/public-api.ts` |
 | `#perfeng/bff-config` | `./src/bff/config-public-api.ts` |
@@ -151,3 +152,10 @@ consumers and private decoder access. Positive and negative fixtures cover both.
 Production package permissions, product source closure and incoming server ownership
 remain unchanged. Both isolated graphs must be installed/audited before running
 the joint target; each decoder/library resolves within its owning pinned package.
+
+Identity qualification delegates to src/bff/login/identity/qualification-api.ts via
+exact static named re-exports in candidate.ts, pair-candidate.ts, strict-json.ts,
+signing-key.ts and public-api.ts. This one-way bridge is checked by project-imports;
+other fixture modules, wildcard/dynamic exports and private targets are forbidden.
+The resolved-key fixture uses makeSnapshotVerifier, replacing its old direct pair
+primitive permission. Production imports no qualification module.

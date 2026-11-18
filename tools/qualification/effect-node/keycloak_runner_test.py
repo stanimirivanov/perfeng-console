@@ -19,6 +19,26 @@ spec.loader.exec_module(runner)
 
 
 class RunnerTests(unittest.TestCase):
+    def test_adopted_sources_and_root_lock_are_in_versioned_provenance(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            for name in ["package.json", "pnpm-lock.yaml", "src/bff/login/identity/token-profile.ts", "tools/qualification/identity-jwt/candidate.ts", "tools/qualification/effect-node/keycloak_runner.py"]:
+                file = root / name
+                file.parent.mkdir(parents=True, exist_ok=True)
+                file.write_text(name)
+            original = runner.qualification_digest(root)
+            for name in ["package.json", "pnpm-lock.yaml", "src/bff/login/identity/token-profile.ts"]:
+                file = root / name
+                old = file.read_text()
+                file.write_text(old + "changed")
+                self.assertNotEqual(runner.qualification_digest(root), original)
+                file.write_text(old)
+            self.assertEqual(runner.qualification_digest(root), original)
+            (root / "src/bff/login/identity/token-profile.ts").unlink()
+            (root / "src/bff/login/identity/token-profile.ts").symlink_to(root / "package.json")
+            with self.assertRaises(ValueError):
+                runner.qualification_digest(root)
+
     def test_selection_refuses_stale_dirty_and_shadowed_source_without_import(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)

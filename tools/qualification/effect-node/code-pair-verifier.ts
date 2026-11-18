@@ -2,7 +2,7 @@ import { Effect, Option, Semaphore } from 'effect';
 import type { SigningKeyResolution } from './signing-key-resolver.ts';
 import { makeSigningKeyResolver } from './signing-key-resolver.ts';
 import type { SigningKeySourceConfig } from './signing-key-source.ts';
-import { codePairKeyIds, verifyCodePair } from '../identity-jwt/public-api.ts';
+import { codePairKeyIds, makeSnapshotVerifier } from '../identity-jwt/public-api.ts';
 import type { CodePairRequest, CodePairResult } from '../identity-jwt/public-api.ts';
 
 export type ResolvedCodePairResult = CodePairResult | {
@@ -24,6 +24,7 @@ export function makeCodePairVerifier(config: SigningKeySourceConfig) {
       return value;
     }
     function observe() { try { return clock(); } catch { return undefined; } }
+    const snapshotVerifier = yield* makeSnapshotVerifier({ issuer, now: clock });
     const resolver = yield* makeSigningKeyResolver({ issuer, ca, ...(deadlineMs === undefined ? {} : { deadlineMs }), ...(maxResponseBytes === undefined ? {} : { maxResponseBytes }), now: clock });
     yield* Effect.addFinalizer(() => Effect.sync(() => { closed = true; }));
     return {
@@ -49,7 +50,7 @@ export function makeCodePairVerifier(config: SigningKeySourceConfig) {
           }
           const verifiedAt = observe();
           if (verifiedAt === undefined) return { ok: false as const, reason: 'unavailable' as const };
-          const result = yield* Effect.promise(() => verifyCodePair({ ...request, issuer, nowMs: verifiedAt, snapshot: { fetchedAtMs, keys } }));
+          const result = yield* snapshotVerifier.verify({ ...request, snapshot: { fetchedAtMs, keys } });
           yield* Effect.yieldNow;
           if (closed) return yield* Effect.interrupt;
           const finished = observe();

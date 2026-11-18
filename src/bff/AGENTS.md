@@ -57,3 +57,9 @@ The operation depends on feature-owned contracts/capabilities, not adapters.
 Execute its Effect only at composition; interruption owns network cancellation.
 Owner retirement fences late results but does not itself interrupt request fibers.
 A returned expected nonce/candidate is not verified identity or a session.
+
+`login/identity/snapshot-verifier.ts` is the scoped private verifier over caller-trusted
+public snapshots; read [its custody, Effect and remaining gates](../../docs/development/snapshot-verifier.md).
+Only token-profile.ts may import the reviewed jose members, and strict-json.ts the
+reviewed parser members. Qualification delegates through its exact entry; production
+never imports fixtures. A verified observation is not a session, enrollment or grant.

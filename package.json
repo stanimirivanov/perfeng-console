@@ -48,6 +48,8 @@
     "@effect/platform-node": "4.1.2",
     "@ngrx/signals": "22.0.1",
     "effect": "4.1.2",
+    "jose": "6.2.17",
+    "jsonc-parser": "3.3.1",
     "rxjs": "7.8.2",
     "tslib": "2.8.1"
   },
@@ -91,6 +93,7 @@
     "#perfeng/bff-token-response": "./src/bff/login/token-response.ts",
     "#perfeng/bff-token-envelope": "./src/bff/login/token-envelope.ts",
     "#perfeng/bff-code-exchange": "./src/bff/login/code-exchange.ts",
-    "#perfeng/harness/supply-chain": "./harness/supply-chain.ts"
+    "#perfeng/harness/supply-chain": "./harness/supply-chain.ts",
+    "#perfeng/bff-snapshot-verifier": "./src/bff/login/identity/snapshot-verifier.ts"
   }
 }

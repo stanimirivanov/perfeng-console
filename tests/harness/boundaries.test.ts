@@ -114,3 +114,26 @@ test('token POST platform admission belongs only to its concrete BFF adapter', (
   assert.match(diagnostics({ 'src/browser/token-post.ts': code }), /package/);
   assert.match(diagnostics({ 'src/bff/login/token-post.ts': "import { request } from 'node:https';" }), /package/);
 });
+
+test('identity dependencies admit exact named members in their reviewed private adapters only', () => {
+  const profile = 'src/bff/login/identity/token-profile.ts';
+  const json = 'src/bff/login/identity/strict-json.ts';
+  assert.equal(diagnostics({ [profile]: "import { importJWK, jwtVerify } from 'jose';" }), '');
+  assert.equal(diagnostics({ [json]: "import { parseTree } from 'jsonc-parser'; import type { Node, ParseError } from 'jsonc-parser';" }), '');
+  for (const [file, source] of [
+    [profile, "import * as jose from 'jose';"],
+    [profile, "import { createRemoteJWKSet } from 'jose';"],
+    [profile, "import('jose');"],
+    [json, "export { parseTree } from 'jsonc-parser';"],
+    ['src/bff/other.ts', "import { jwtVerify } from 'jose';"],
+    ['src/browser/view.ts', "import { parseTree } from 'jsonc-parser';"],
+  ]) assert.match(diagnostics({ [file!]: source! }), /package/);
+});
+
+
+test('private identity helpers do not inherit general BFF filesystem, network or runtime packages', () => {
+  for (const source of ["import { readFileSync } from 'node:fs';", "import { createRemoteJWKSet } from 'jose';", "import { HttpClient } from 'effect/http';", "import { randomBytes } from 'node:crypto';"]) {
+    assert.match(diagnostics({ 'src/bff/login/identity/snapshot-verifier.ts': source }), /package/);
+  }
+  assert.match(diagnostics({ 'src/bff/login/identity/code-pair.ts': "import * as crypto from 'node:crypto';" }), /package/);
+});
