@@ -76,11 +76,11 @@ test('the retired source-to-fixture snapshot-admission bridge refuses every old 
 });
 
 
-test('resolved pair verifier has only its exact named identity-qualification entry', () => {
+test('the retired resolved verifier-to-identity fixture bridge refuses all forms', () => {
   const file = root + '/tools/qualification/effect-node/code-pair-verifier.ts';
   const entry = '../identity-jwt/public-api.ts';
-  assert.deepEqual(inspectProjectImports(root, file, "import { codePairKeyIds, makeSnapshotVerifier } from '" + entry + "';"), []);
-  assert.deepEqual(inspectProjectImports(root, file, "import type { CodePairRequest, CodePairResult } from '" + entry + "';"), []);
+  assert.ok(inspectProjectImports(root, file, "import { codePairKeyIds, makeSnapshotVerifier } from '" + entry + "';").length);
+  assert.ok(inspectProjectImports(root, file, "import type { CodePairRequest, CodePairResult } from '" + entry + "';").length);
   for (const source of ["import { admitSigningKeys } from '" + entry + "';", "import { CodePairRequest } from '" + entry + "';", "import * as identity from '" + entry + "';", "import('" + entry + "');", "export { verifyCodePair } from '" + entry + "';", "import { verifyCodePair } from '../identity-jwt/pair-candidate.ts';"])
     assert.ok(inspectProjectImports(root, file, source).length, source);
   for (const importer of ['src/bff/probe.ts', 'src/scenarios/probe.ts', 'tools/qualification/effect-node/generated/code-pair-verifier.ts', 'tools/qualification/other/probe.ts']) {
@@ -124,4 +124,14 @@ test('key qualification bridges delegate only exact static names and retire sour
   }
   assert.ok(inspectProjectImports(root, root + '/tools/qualification/effect-node/signing-key-source.ts', "import { admitSigningKeys } from '../identity-jwt/public-api.ts';").length);
   assert.ok(inspectProjectImports(root, root + '/src/bff/login/identity/signing-key-source.ts', "import { admitSigningKeys } from '../../../../tools/qualification/identity-jwt/public-api.ts';").length);
+});
+
+test('resolved verifier qualification delegates only exact factory/type exports to its BFF owner', () => {
+  const file = root + '/tools/qualification/effect-node/code-pair-verifier.ts';
+  const entry = '../../../src/bff/login/identity/qualification-api.ts';
+  assert.deepEqual(inspectProjectImports(root, file, `export { makeCodePairVerifier } from '${entry}';`), []);
+  assert.deepEqual(inspectProjectImports(root, file, `export type { ResolvedCodePairResult } from '${entry}';`), []);
+  for (const source of [`export * from '${entry}';`, `import('${entry}');`, `export { makeSnapshotVerifier } from '${entry}';`, "import { codePairKeyIds } from '../identity-jwt/public-api.ts';"]) {
+    assert.ok(inspectProjectImports(root, file, source).length);
+  }
 });

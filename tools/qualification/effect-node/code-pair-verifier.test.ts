@@ -115,3 +115,19 @@ test('the whole pair operation bounds active callers and the deadline closes unr
   for (const result of await Promise.all(calls)) assert.deepEqual(result, { ok: false, reason: 'deadline' });
   assert.ok(Date.now() - started < 3500); await f.until(() => f.state.closed === 1); assert.equal(f.state.hits, 1);
 });
+
+test('a closing parent scope refuses escaped verification before delayed resource cleanup', { timeout: 10000 }, async t => {
+  const f = await verifier(t);
+  assert.equal((await Effect.runPromise(f.operation.verify(f.request()))).ok, true);
+  let release!: () => void;
+  const gate = new Promise<void>(resolve => { release = resolve; });
+  await Effect.runPromise(Scope.addFinalizer(f.scope, Effect.promise(() => gate)));
+  const closing = Effect.runPromise(Scope.close(f.scope, Exit.succeed(undefined)));
+  try {
+    await f.until(() => f.scope.state._tag === 'Closed');
+    await assert.rejects(Effect.runPromise(f.operation.verify(f.request())));
+  } finally {
+    release();
+    await closing;
+  }
+});

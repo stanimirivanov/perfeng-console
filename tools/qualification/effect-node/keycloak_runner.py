@@ -38,7 +38,7 @@ CLOSURE = (
 # A moved implementation is covered by root source and resolution inputs, not fixture-only hashes.
 QUALIFICATION_PATHS = (
     "tools/qualification/effect-node", "tools/qualification/identity-jwt",
-    "src/bff/login/identity", "package.json", "pnpm-lock.yaml",
+    "src/bff/login", "package.json", "pnpm-lock.yaml",
 )
 
 
@@ -49,7 +49,7 @@ def qualification_digest(console: Path) -> str:
         root = console / name
         if root.is_symlink() or not root.exists():
             raise ValueError("Qualification input refused")
-        candidates = [root] if root.is_file() else sorted(root.rglob("*") if name == "src/bff/login/identity" else root.iterdir())
+        candidates = [root] if root.is_file() else sorted(root.rglob("*") if name == "src/bff/login" else root.iterdir())
         for file in candidates:
             if file.is_symlink():
                 raise ValueError("Qualification input refused")

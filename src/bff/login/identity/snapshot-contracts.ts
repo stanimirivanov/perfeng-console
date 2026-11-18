@@ -57,3 +57,15 @@ export type PublicSigningKey = Readonly<{
   n: string;
   e: 'AQAB';
 }>;
+
+export type CodePairKeySelection = {
+  readonly ok: true;
+  readonly idKid: string;
+  readonly accessKid: string;
+} | {
+  readonly ok: false;
+  readonly reason: 'invalid_pair';
+};
+export interface CodePairVerifier {
+  readonly verify: (input: CodePairRequest) => Effect.Effect<SnapshotVerificationResult, unknown>;
+}

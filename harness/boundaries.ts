@@ -63,6 +63,8 @@ function inspectFile(root: string, file: string, owner: string): string[] {
         values: readonly string[];
         types?: readonly string[];
       }>> = {
+        'resolved-pair.operation.ts': { effect: { values: ['Effect', 'Option', 'Semaphore'] } },
+        'resolved-pair-verifier.ts': { effect: { values: ['Effect'], types: ['Scope'] } },
         'snapshot-verifier.ts': { effect: { values: ['Effect', 'Option', 'Semaphore'] } },
         'code-pair.ts': { 'node:crypto': { values: ['createHash'] } },
         'snapshot-contracts.ts': { effect: { values: [], types: ['Effect'] } },
@@ -89,6 +91,23 @@ function inspectFile(root: string, file: string, owner: string): string[] {
       if (!bindings || !ts.isNamedImports(bindings) || !bindings.elements.length || !bindings.elements.every(member =>
         (clause?.isTypeOnly || member.isTypeOnly ? allowedTypes : allowedValues).includes((member.propertyName ?? member.name).text)))
         report(node, 'package', 'Private identity modules admit only their reviewed named members; key-network authority belongs solely to the wire adapter.');
+      return;
+    }
+    const verifiedExchangeEffect: Record<string, {
+      values: readonly string[];
+      types: readonly string[];
+    }> = {
+      'src/bff/login/verified-code-exchange.ts': { values: ['Effect', 'Option', 'Semaphore'], types: ['Scope'] },
+      'src/bff/login/verified-exchange.operation.ts': { values: ['Effect'], types: [] },
+      'src/bff/login/verified-exchange-contracts.ts': { values: [], types: ['Effect'] },
+    };
+    const verifiedAdmission = verifiedExchangeEffect[relative(root, file)];
+    if (verifiedAdmission && name === 'effect') {
+      const clause = ts.isImportDeclaration(node) ? node.importClause : undefined;
+      const bindings = clause && !clause.name && clause.namedBindings;
+      if (!bindings || !ts.isNamedImports(bindings) || !bindings.elements.length || !bindings.elements.every(member =>
+        (clause?.isTypeOnly || member.isTypeOnly ? verifiedAdmission.types : verifiedAdmission.values).includes((member.propertyName ?? member.name).text)))
+        report(node, 'package', 'Verified exchange uses exact named Effect capabilities; ports stay type-only.');
       return;
     }
     const rules = policy[owner]!;

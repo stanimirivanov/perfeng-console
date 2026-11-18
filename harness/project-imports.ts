@@ -73,13 +73,14 @@ export function inspectProjectImports(root: string, file: string, text: string):
         values: readonly string[];
         types: readonly string[];
       }> = {
-        'candidate.ts': { values: ['verifyCandidate', 'verifyTokenProfile', 'tokenKeyId'], types: ['QualificationInput'] },
-        'pair-candidate.ts': { values: ['codePairKeyIds', 'verifyCodePair'], types: ['CodePairRequest', 'CodePairResult'] },
-        'strict-json.ts': { values: ['strictJsonObject'], types: [] },
-        'signing-key.ts': { values: ['PRIVATE_KEY_MEMBERS', 'publicSigningKey'], types: ['PublicSigningKey'] },
-        'public-api.ts': { values: ['makeSnapshotVerifier'], types: [] },
+        'identity-jwt/candidate.ts': { values: ['verifyCandidate', 'verifyTokenProfile', 'tokenKeyId'], types: ['QualificationInput'] },
+        'identity-jwt/pair-candidate.ts': { values: ['codePairKeyIds', 'verifyCodePair'], types: ['CodePairRequest', 'CodePairResult'] },
+        'identity-jwt/strict-json.ts': { values: ['strictJsonObject'], types: [] },
+        'identity-jwt/signing-key.ts': { values: ['PRIVATE_KEY_MEMBERS', 'publicSigningKey'], types: ['PublicSigningKey'] },
+        'identity-jwt/public-api.ts': { values: ['makeSnapshotVerifier'], types: [] },
+        'effect-node/code-pair-verifier.ts': { values: ['makeCodePairVerifier'], types: ['ResolvedCodePairResult'] },
       };
-      const entry = Object.entries(bridges).find(([file]) => importer === 'tools/qualification/identity-jwt/' + file)?.[1];
+      const entry = Object.entries(bridges).find(([file]) => importer === 'tools/qualification/' + file)?.[1];
       const clause = ts.isExportDeclaration(node) && node.exportClause;
       const allowed = entry && clause && ts.isNamedExports(clause) && clause.elements.length > 0 && clause.elements.every(member =>
         (node.isTypeOnly || member.isTypeOnly ? entry.types : entry.values).includes((member.propertyName ?? member.name).text));
@@ -89,11 +90,8 @@ export function inspectProjectImports(root: string, file: string, text: string):
     if (target === 'tools/qualification/identity-jwt/public-api.ts') {
       const clause = ts.isImportDeclaration(node) ? node.importClause : undefined;
       const bindings = clause && !clause.name && clause.namedBindings;
-      const permitted = importer === 'tools/qualification/effect-node/code-pair-verifier.ts'
-        ? clause?.isTypeOnly ? ['CodePairRequest', 'CodePairResult'] : ['codePairKeyIds', 'makeSnapshotVerifier']
-        : ['tools/qualification/effect-node/code-pair-cli.ts', 'tools/qualification/effect-node/cache-rotation-cli.ts'].includes(importer) && !clause?.isTypeOnly
-          ? ['strictJsonObject']
-          : [];
+      const permitted = ['tools/qualification/effect-node/code-pair-cli.ts', 'tools/qualification/effect-node/cache-rotation-cli.ts'].includes(importer) && !clause?.isTypeOnly
+        ? ['strictJsonObject'] : [];
       const allowed = bindings && ts.isNamedImports(bindings) && bindings.elements.length > 0 &&
         bindings.elements.every(member => permitted.includes((member.propertyName ?? member.name).text));
       if (!allowed) report(node, 'Identity qualification has exact static named bridges; no production, private or dynamic access.');

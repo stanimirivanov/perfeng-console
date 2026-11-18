@@ -95,6 +95,7 @@
     "#perfeng/bff-code-exchange": "./src/bff/login/code-exchange.ts",
     "#perfeng/harness/supply-chain": "./harness/supply-chain.ts",
     "#perfeng/bff-snapshot-verifier": "./src/bff/login/identity/snapshot-verifier.ts",
-    "#perfeng/bff-key-resolver": "./src/bff/login/identity/signing-key-resolver.ts"
+    "#perfeng/bff-key-resolver": "./src/bff/login/identity/signing-key-resolver.ts",
+    "#perfeng/bff-verified-exchange": "./src/bff/login/verified-code-exchange.ts"
   }
 }

@@ -152,3 +152,13 @@ test('the key wire admits exact platform members without giving its source or ca
     }
   }
 });
+
+test('verified exchange ports and operations gain only their reviewed Effect members', () => {
+  const file = 'src/bff/login/verified-exchange-contracts.ts';
+  assert.equal(diagnostics({ [file]: "import type { Effect } from 'effect';" }), '');
+  for (const source of ["import { Effect } from 'effect';", "import * as E from 'effect';", "import { ManagedRuntime } from 'effect';"]) {
+    assert.match(diagnostics({ [file]: source }), /package/);
+  }
+  assert.equal(diagnostics({ 'src/bff/login/identity/resolved-pair.operation.ts': "import { Effect, Option, Semaphore } from 'effect';" }), '');
+  assert.match(diagnostics({ 'src/bff/login/identity/resolved-pair.operation.ts': "import { HttpClient } from 'effect/http/HttpClient';" }), /package/);
+});

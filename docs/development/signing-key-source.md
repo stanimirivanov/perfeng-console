@@ -74,7 +74,7 @@ Git, record redacted PASS/fail evidence with exact commits in the PR.
 Current listener/product closure remains unchanged; no unused authority is added to
 the release allowlist. Run supply-chain with unchanged thresholds/unused-exception refusal. The advisory
 withdrawal discovered in #121 requires retiring its dormant waiver; withdrawal is
-not a package fix, and #111 remains open. Next: consume one actual single-use exchange with the
-verifier; delegated/session/current-policy and browser/shared-pilot admission remain
+not a package fix, and #111 remains open. Issue #123 now [consumes the single-use exchange through verification](verified-code-exchange.md);
+provider-driven BFF consumption, delegated/session/current-policy and browser/shared-pilot admission remain
 separate. Revert implementation/bridges/contracts/harness updates together to retire
 this slice without activating routes or weakening local pairing/validators.

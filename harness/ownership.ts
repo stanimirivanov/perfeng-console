@@ -47,6 +47,11 @@ export const roles: Readonly<Record<string, Role>> = {
   'src/bff/login/login-contracts.ts': 'port',
   'src/bff/login/code-exchange.operation.ts': 'operation',
   'src/bff/login/code-exchange.ts': 'composition',
+  'src/bff/login/verified-code-exchange.ts': 'composition',
+  'src/bff/login/verified-exchange.operation.ts': 'operation',
+  'src/bff/login/verified-exchange-contracts.ts': 'port',
+  'src/bff/login/identity/resolved-pair-verifier.ts': 'composition',
+  'src/bff/login/identity/resolved-pair.operation.ts': 'operation',
   'src/bff/login/identity/strict-json.ts': 'adapter',
   'src/bff/login/identity/signing-key.ts': 'adapter',
   'src/bff/login/identity/token-profile.ts': 'adapter',
@@ -163,7 +168,7 @@ export function checkOwnership(root: string, registry: Readonly<Record<string, R
         }
         const entryOwner = name === 'tools/public-api.ts' ? 'tools/console-server.ts' :
           name === 'src/bff/public-api.ts' ? 'src/bff/transport.ts' : 'src/bff/config.ts';
-        const identityEntry = name === 'src/bff/login/identity/qualification-api.ts' && ['strict-json', 'signing-key', 'token-profile', 'code-pair', 'snapshot-verifier', 'snapshot-contracts'].some(file => targetName === 'src/bff/login/identity/' + file + '.ts');
+        const identityEntry = name === 'src/bff/login/identity/qualification-api.ts' && ['strict-json', 'signing-key', 'token-profile', 'code-pair', 'snapshot-verifier', 'snapshot-contracts', 'resolved-pair-verifier'].some(file => targetName === 'src/bff/login/identity/' + file + '.ts');
         const keyEntry = name === 'src/bff/login/identity/key-qualification-api.ts' && ['signing-key-get', 'signing-key-source', 'signing-key-store', 'signing-key-cache', 'signing-key-resolver', 'signing-key-contracts', 'jwks-admission'].some(file => targetName === 'src/bff/login/identity/' + file + '.ts');
         if (role === 'entry' && targetName !== entryOwner && !identityEntry && !keyEntry)
           report(node, 'OWN-01', 'Public entry must re-export only its reviewed owner.');
@@ -172,7 +177,16 @@ export function checkOwnership(root: string, registry: Readonly<Record<string, R
           report(node, 'OWN-04', 'Consume shared contracts through declaration-level import type.');
         if (targetName.startsWith('src/generated/')) return;
         const keyContractExport = keyEntry && targetName === 'src/bff/login/identity/signing-key-contracts.ts' && ts.isExportDeclaration(node) && node.isTypeOnly;
-        if ((!targetRole || !edges[role].includes(targetRole)) && !providerEdge && !admittedToolImport && !keyContractExport) {
+        // PR52v composes constructors, never another runtime; keep this exception exact.
+        const factoryMember = name === 'src/bff/login/verified-code-exchange.ts' && targetRole === 'composition'
+          ? targetName === 'src/bff/login/code-exchange.ts' ? 'createCodeExchange'
+            : targetName === 'src/bff/login/identity/resolved-pair-verifier.ts' ? 'makeCodePairVerifier' : undefined : undefined;
+        const factoryClause = ts.isImportDeclaration(node) ? node.importClause : undefined;
+        const factoryBindings = factoryClause && !factoryClause.name && factoryClause.namedBindings;
+        const factoryImport = factoryMember && !factoryClause?.isTypeOnly && factoryBindings && ts.isNamedImports(factoryBindings) &&
+          factoryBindings.elements.length === 1 && factoryBindings.elements.every(member => !member.isTypeOnly && (member.propertyName ?? member.name).text === factoryMember);
+        if ((!targetRole || !edges[role].includes(targetRole)) && !providerEdge && !admittedToolImport && !keyContractExport && !factoryImport) {
+
           report(node, 'OWN-01', `${role} cannot depend on ${targetRole ?? 'unregistered module'} ${targetName}. Use a port.`);
         }
       }

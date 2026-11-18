@@ -552,3 +552,14 @@ imports the identity fixture; strict JWKS admission is adopted too. [Current
 ownership and gates](../../../docs/development/signing-key-source.md). The existing
 v2 committed-source digest already covers these adopted identity modules. No session
 or shared-pilot activation follows from a passing provider receipt.
+
+## PR52v — consumed owner and resolved operation (issue #123)
+
+code-pair-verifier.ts now delegates to the adopted BFF resolved operation/composition,
+not an isolated duplicate. Its old identity-fixture import authority is retired. The
+existing provider CLI exercises that actual resolved verifier; it still receives
+credentials after the Python-owned exchange and cannot certify the new BFF-owned
+transaction. [Current evidence boundaries](../../../docs/development/verified-code-exchange.md).
+The v2 framing stays unchanged, with source guard/digest coverage extended to all
+login modules (including raw exchange/protocol/transport dependencies). Old receipt
+input sets and claims remain historical, never retroactively expanded.

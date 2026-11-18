@@ -22,12 +22,12 @@ class RunnerTests(unittest.TestCase):
     def test_adopted_sources_and_root_lock_are_in_versioned_provenance(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
-            for name in ["package.json", "pnpm-lock.yaml", "src/bff/login/identity/token-profile.ts", "tools/qualification/identity-jwt/candidate.ts", "tools/qualification/effect-node/keycloak_runner.py"]:
+            for name in ["package.json", "pnpm-lock.yaml", "src/bff/login/identity/token-profile.ts", "src/bff/login/code-exchange.operation.ts", "tools/qualification/identity-jwt/candidate.ts", "tools/qualification/effect-node/keycloak_runner.py"]:
                 file = root / name
                 file.parent.mkdir(parents=True, exist_ok=True)
                 file.write_text(name)
             original = runner.qualification_digest(root)
-            for name in ["package.json", "pnpm-lock.yaml", "src/bff/login/identity/token-profile.ts"]:
+            for name in ["package.json", "pnpm-lock.yaml", "src/bff/login/identity/token-profile.ts", "src/bff/login/code-exchange.operation.ts"]:
                 file = root / name
                 old = file.read_text()
                 file.write_text(old + "changed")

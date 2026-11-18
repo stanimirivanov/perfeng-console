@@ -78,3 +78,11 @@ Rollback removes the unmounted operation/composition/public alias. Shared data
 type location and explicit wire result annotations preserve existing APIs and
 can remain. No dependency, generated contract, provider state, cookie, route,
 local-session or persistence migration is required.
+
+## PR52v composition — issue #123
+
+The raw factory/operation above remain private and unverified. The separate
+[verified owner](verified-code-exchange.md) now joins their consumed response to the
+admitted key/crypto stack without changing their wire/one-shot semantics. It returns
+no raw credentials and activates no route/session. Historical evidence above remains
+wire-only; current signed-issuer and provider limitations are recorded in that guide.

@@ -323,3 +323,15 @@ test('key qualification entry may re-export its reviewed contract types without 
   assert.equal(inspect(files, { [entry]: 'entry', [contract]: 'port' }), '');
   assert.match(inspect({ ...files, [entry]: "export { SigningKeySourceConfig } from './signing-key-contracts.ts';" }, { [entry]: 'entry', [contract]: 'port' }), /OWN-01/);
 });
+
+test('verified exchange composes only the two reviewed factories without a general composition edge', () => {
+  const file = 'src/bff/login/verified-code-exchange.ts';
+  const raw = 'src/bff/login/code-exchange.ts';
+  const verifier = 'src/bff/login/identity/resolved-pair-verifier.ts';
+  const roles = { [file]: 'composition', [raw]: 'composition', [verifier]: 'composition' } as const;
+  const files = { [raw]: 'export function createCodeExchange() {}', [verifier]: 'export function makeCodePairVerifier() {}' };
+  assert.equal(inspect({ ...files, [file]: "import { createCodeExchange } from './code-exchange.ts'; import { makeCodePairVerifier } from './identity/resolved-pair-verifier.ts';" }, roles), '');
+  for (const source of ["import * as raw from './code-exchange.ts';", "import('./code-exchange.ts');", "export { createCodeExchange } from './code-exchange.ts';", "import { unknownFactory } from './code-exchange.ts';"]) {
+    assert.match(inspect({ ...files, [file]: source }, roles), /OWN-01/);
+  }
+});
