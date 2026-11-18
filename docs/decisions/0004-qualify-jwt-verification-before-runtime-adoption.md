@@ -1,6 +1,7 @@
 # ADR 0004 — Qualify JWT verification before runtime adoption
 
-Status: **Proposed — scoped runtime-admission decision pending owner review.**
+Status: **Accepted — scoped private runtime admission; serving activation remains gated.**
+Accepted: 2026-11-18 by explicit owner instruction, issue #119 (M05-PR52t).
 Original date: 2026-11-15, issue #81 (M05-PR52g).
 Proposal updated: 2026-11-18, issue #117 (M05-PR52s).
 
@@ -17,22 +18,21 @@ runtime authority. Qualification has now reached actual provider and persistent-
 evidence. Those receipts justify proposing a private production implementation;
 they do not make a fixture a BFF adapter or approve identity activation.
 
-## Proposed decision
+## Decision
 
-Recommend exactly **jose 6.2.17** for maintained JWT signature/standard-claim checks
+Use exactly **jose 6.2.17** for maintained JWT signature/standard-claim checks
 and **jsonc-parser 3.3.1** for bounded syntax-tree/decoded-duplicate preflight.
 The [recorded official package metadata](../../tools/qualification/identity-jwt/admission.json)
 identifies both as MIT with no declared runtime dependencies, peers or engines.
-That is dated isolated evidence; a subsequent root-admission PR must recheck current
+That is dated isolated evidence; every root-admission PR must recheck current
 license/engine/peer, release-age, frozen-lock and vulnerability requirements before
 adding either package for an immediately implemented consumer.
 
-**This PR changes no package, import permission or application code.** Keep this ADR
-Proposed until the owner accepts the decision. Review/merge of this proposal does
-not activate shared-user mode or waive later implementation/admission gates. The
-recommended first code slice is a private non-authorizing verifier over explicit
-trusted snapshots. Browser/session gates block activation, not all staged private
-implementation forever; they must remain identified and unwaived throughout it.
+Owner acceptance authorizes the scoped implementation slices below. Issue #119 admits
+only the private snapshot verifier and its exact dependencies/qualification bridges;
+it mounts no route and creates no session. Browser/session gates block activation,
+not staged private implementation. Historical fixture receipts remain evidence for
+their recorded sources, not production or shared-user admission.
 
 ## Evidence and its limits
 
@@ -51,9 +51,9 @@ The private resolver clock advanced by fixed 1001 ms and 300001 ms; host/provide
 clocks were unchanged. Generated receipts stay outside Git; linked PRs record the
 redacted evidence. All these receipts remain **NOT_ADMITTED for production**.
 
-## Proposed private API and ownership
+## Private API and ownership
 
-The future contract belongs to the login feature, not generated/public browser DTOs:
+The contract belongs to the login feature, not generated/public browser DTOs:
 
 - **Pair input:** readonly unverified ID/access candidates and expiresIn, expected
   nonce and requestStartedAtMs from one consumed code-exchange operation. Capture
@@ -110,16 +110,17 @@ the actual adopted implementation, not a copied fixture.
 [OIDC Core 1.0 errata set 2, section 3.1.3.6](https://openid.net/specs/openid-connect-core-1_0.html#CodeIDToken)
 makes at_hash optional in authorization-code ID tokens; [section 3.1.3.8](https://openid.net/specs/openid-connect-core-1_0.html#CodeFlowTokenValidation)
 permits using it for access-token validation. ADR 0046 does not establish mandatory
-presence. The current qualified pair wrapper does **not** validate it, and the
-existing redacted provider receipt does not establish whether Keycloak emitted it.
+presence. The PR52s fixture did **not** validate it; issue #119 adds the conditional
+check to the admitted private implementation. The earlier redacted provider receipt
+does not establish whether Keycloak emitted it.
 
-Propose a stricter local rule: when present, validate the signed at_hash against
+Adopt the stricter local rule: when present, validate the signed at_hash against
 the exact accompanying access-token bytes and refuse malformed/mismatched values.
-This is a new proposed check requiring implementation and independent tests, not
-an OIDC requirement being claimed as already met. Before session activation, obtain
+The local rule is implemented and independently tested in issue #119; it is not
+a mandatory-presence OIDC requirement. Before session activation, obtain
 non-secret provider-profile evidence for presence/absence and qualify both paths.
 
-For absence, recommend preserving one immutable pair directly from the authenticated,
+For absence, preserve one immutable pair directly from the authenticated,
 fixed-origin token POST for one consumed state/nonce/PKCE transaction. Review that
 custody/substitution threat model explicitly with the real code-exchange integration.
 It establishes response provenance under those assumptions, **not cryptographic proof
@@ -130,11 +131,11 @@ introduced by this proposal.
 
 ## Subsequent implementation slices and gates
 
-These are bounded follow-ups after owner decision, not new changes to the agreed
+These are bounded slices under the accepted decision, not new changes to the agreed
 M05 architecture or evidence that these modules exist today:
 
 1. **Private snapshot verifier admission.** Add exact immediately used root packages,
-   named feature contracts and private syntax/crypto adapters [new]. Register only
+   named feature contracts and private syntax/crypto adapters. Register only
    exact file/member/role permissions with negative fixtures. Move/adapt the qualified
    implementation into its BFF owner; fixture consumers must delegate to that same
    implementation through a narrow reviewed entry, retiring duplicate crypto/parsers.
@@ -172,10 +173,10 @@ qualification on upgrades. A full OIDC client could reduce glue, but its transpo
 credential custody and semantics remain unqualified; reselecting the platform or
 Angular/Effect architecture is outside this decision.
 
-The owner is asked to approve the scoped private implementation boundary, conditional
-hash rule and response-custody default above. This ADR remains Proposed until that
-review; no approval signature is inferred from passing tests. Even acceptance authorizes
-only separately reviewed implementation slices, never immediate serving activation.
-Rollback of this documentation proposal restores the earlier isolated-only proposal.
-Later code PRs must be independently revertible without opening routes, accepting
-unverified candidates or weakening validators/security gates.
+The owner explicitly accepted the scoped private implementation boundary, conditional
+hash rule and response-custody default on 2026-11-18. Acceptance permits separately
+reviewed implementation slices, never immediate serving activation. Issue #119 records
+the first private implementation and its current evidence in the
+[snapshot verifier guide](../development/snapshot-verifier.md). Subsequent gates above
+remain required. Rollback reverts the private implementation/dependency/bridge changes
+together; preserve local pairing, validators and the remaining activation restrictions.

@@ -50,13 +50,31 @@ export function inspectProjectImports(root: string, file: string, text: string):
     if (/[\\%?#]/u.test(spec)) { report(node, 'Use a canonical module specifier without encoding, query or fragment.'); return; }
     if (!spec.startsWith('.')) return;
     const target = relative(root, resolve(dirname(file), spec));
+    if (target === 'src/bff/login/identity/qualification-api.ts') {
+      const bridges: Record<string, {
+        values: readonly string[];
+        types: readonly string[];
+      }> = {
+        'candidate.ts': { values: ['verifyCandidate', 'verifyTokenProfile', 'tokenKeyId'], types: ['QualificationInput'] },
+        'pair-candidate.ts': { values: ['codePairKeyIds', 'verifyCodePair'], types: ['CodePairRequest', 'CodePairResult'] },
+        'strict-json.ts': { values: ['strictJsonObject'], types: [] },
+        'signing-key.ts': { values: ['PRIVATE_KEY_MEMBERS', 'publicSigningKey'], types: ['PublicSigningKey'] },
+        'public-api.ts': { values: ['makeSnapshotVerifier'], types: [] },
+      };
+      const entry = Object.entries(bridges).find(([file]) => importer === 'tools/qualification/identity-jwt/' + file)?.[1];
+      const clause = ts.isExportDeclaration(node) && node.exportClause;
+      const allowed = entry && clause && ts.isNamedExports(clause) && clause.elements.length > 0 && clause.elements.every(member =>
+        (node.isTypeOnly || member.isTypeOnly ? entry.types : entry.values).includes((member.propertyName ?? member.name).text));
+      if (!allowed) report(node, 'Private identity entry has exact static qualification re-exports only.');
+      return;
+    }
     if (target === 'tools/qualification/identity-jwt/public-api.ts') {
       const clause = ts.isImportDeclaration(node) ? node.importClause : undefined;
       const bindings = clause && !clause.name && clause.namedBindings;
       const permitted = importer === 'tools/qualification/effect-node/signing-key-source.ts'
         ? clause?.isTypeOnly ? ['SigningKeySnapshot'] : ['admitSigningKeys']
         : importer === 'tools/qualification/effect-node/code-pair-verifier.ts'
-          ? clause?.isTypeOnly ? ['CodePairRequest', 'CodePairResult'] : ['codePairKeyIds', 'verifyCodePair']
+          ? clause?.isTypeOnly ? ['CodePairRequest', 'CodePairResult'] : ['codePairKeyIds', 'makeSnapshotVerifier']
           : ['tools/qualification/effect-node/code-pair-cli.ts', 'tools/qualification/effect-node/cache-rotation-cli.ts'].includes(importer) && !clause?.isTypeOnly
             ? ['strictJsonObject']
             : [];

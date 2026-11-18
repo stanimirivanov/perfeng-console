@@ -73,13 +73,18 @@ Official sources: [dependency-cruiser](https://github.com/sverweij/dependency-cr
 [Nx boundary rule](https://nx.dev/docs/kb/enforce-module-boundaries). Exact license,
 engine and peer metadata was read from the npm registry for these versions.
 
-## Isolated JWT candidate — issue #81
+## Private JWT verifier admission — issues #81 and #119
 
-[jose/jsonc-parser qualification](../../tools/qualification/identity-jwt/README.md)
-is isolated and not production admission. Exact candidate pins/metadata/lock and
-strict duplicate/encoding/time/profile tests live with the fixture. Run
-`make identity-jwt-qualification` before relying on its evidence. No production
-module receives new package, network or Promise-runtime authority from this target.
+[ADR 0004](../decisions/0004-qualify-jwt-verification-before-runtime-adoption.md)
+is accepted for the private snapshot verifier. Root dependencies jose 6.2.17 and
+jsonc-parser 3.3.1 have immediate, exact adapter consumers; browser/session/network
+activation remains unadmitted. Both are MIT, declare no engines, peers or runtime
+dependencies, and satisfy the unchanged 1440-minute release-age floor. Exact official
+registry metadata was rechecked on 2026-11-18; the root frozen lock records integrity.
+Metadata and earlier evidence: [candidate record](../../tools/qualification/identity-jwt/admission.json).
+No install lifecycle scripts are admitted. Root and nested package graphs retain
+their own audits; an isolated audit cannot certify root-resolved production imports.
+See [the admission guide](snapshot-verifier.md) for ownership and replacement gates.
 
 ## TypeScript formatting admission — issue #83
 

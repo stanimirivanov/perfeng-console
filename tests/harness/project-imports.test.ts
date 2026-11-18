@@ -79,7 +79,7 @@ test('isolated signing-key composition has one static named snapshot-admission b
 test('resolved pair verifier has only its exact named identity-qualification entry', () => {
   const file = root + '/tools/qualification/effect-node/code-pair-verifier.ts';
   const entry = '../identity-jwt/public-api.ts';
-  assert.deepEqual(inspectProjectImports(root, file, "import { codePairKeyIds, verifyCodePair } from '" + entry + "';"), []);
+  assert.deepEqual(inspectProjectImports(root, file, "import { codePairKeyIds, makeSnapshotVerifier } from '" + entry + "';"), []);
   assert.deepEqual(inspectProjectImports(root, file, "import type { CodePairRequest, CodePairResult } from '" + entry + "';"), []);
   for (const source of ["import { admitSigningKeys } from '" + entry + "';", "import { CodePairRequest } from '" + entry + "';", "import * as identity from '" + entry + "';", "import('" + entry + "');", "export { verifyCodePair } from '" + entry + "';", "import { verifyCodePair } from '../identity-jwt/pair-candidate.ts';"])
     assert.ok(inspectProjectImports(root, file, source).length, source);
@@ -99,4 +99,18 @@ test('private qualifier CLI imports only its reviewed strict parser bridge', () 
       assert.ok(inspectProjectImports(root, file, source).length, source);
   }
   assert.ok(inspectProjectImports(root, root + '/src/bff/cli.ts', "import { strictJsonObject } from '../../tools/qualification/identity-jwt/public-api.ts';").length);
+});
+
+test('identity fixture delegates only exact static members to the private BFF qualification entry', () => {
+  const file = root + '/tools/qualification/identity-jwt/candidate.ts';
+  const bridge = '../../../src/bff/login/identity/qualification-api.ts';
+  assert.deepEqual(inspectProjectImports(root, root + '/tools/qualification/identity-jwt/pair-candidate.ts', `export { codePairKeyIds, verifyCodePair } from '${bridge}';`), []);
+  assert.deepEqual(inspectProjectImports(root, file, `export { verifyCandidate, verifyTokenProfile, tokenKeyId } from '${bridge}';`), []);
+  for (const source of [
+    `export * from '${bridge}';`,
+    `export { makeSnapshotVerifier } from '${bridge}';`,
+    `import('${bridge}');`,
+    "export { verifyCandidate } from '../../../src/bff/login/identity/token-profile.ts';",
+  ]) assert.ok(inspectProjectImports(root, file, source).length);
+  assert.ok(inspectProjectImports(root, root + '/tools/qualification/identity-jwt/other.ts', `export { verifyCandidate } from '${bridge}';`).length);
 });

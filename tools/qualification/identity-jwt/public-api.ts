@@ -4,3 +4,4 @@ export type { SigningKeySnapshot } from './jwks-candidate.ts';
 export { codePairKeyIds, verifyCodePair } from './pair-candidate.ts';
 export type { CodePairRequest, CodePairResult } from './pair-candidate.ts';
 export { strictJsonObject } from './strict-json.ts';
+export { makeSnapshotVerifier } from '../../../src/bff/login/identity/qualification-api.ts';

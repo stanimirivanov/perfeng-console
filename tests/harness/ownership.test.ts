@@ -307,3 +307,11 @@ test('extracted server handlers retain exact capabilities', () => {
   assert.match(inspect({ 'tools/server/run-routes.ts': "import { createRunTransport } from '#perfeng/bff';" }), /OWN-13/);
   assert.match(inspect({ 'tools/server/request-policy.ts': "import { IncomingMessage } from 'node:http';" }), /OWN-13.*type/);
 });
+
+
+test('private snapshot adapters cannot acquire ambient network or scheduling authority', () => {
+  const file = 'src/bff/login/identity/snapshot-verifier.ts';
+  for (const code of ['fetch("https://issuer.invalid")', 'setTimeout(() => {}, 10)', 'new AbortController()']) {
+    assert.match(inspect({ [file]: code }, { [file]: 'adapter' }), /OWN-03/);
+  }
+});

@@ -40,10 +40,41 @@ function inspectFile(root: string, file: string, owner: string): string[] {
       report(node, 'specifier', 'Use a canonical module path without encoding, query or fragment.');
       return;
     }
+    const identityPackages: Record<string, {
+      file: string;
+      values: readonly string[];
+      types: readonly string[];
+    }> = {
+      'jose': { file: 'src/bff/login/identity/token-profile.ts', values: ['importJWK', 'jwtVerify'], types: [] },
+      'jsonc-parser': { file: 'src/bff/login/identity/strict-json.ts', values: ['parseTree'], types: ['Node', 'ParseError'] },
+    };
+    if (Object.hasOwn(identityPackages, name)) {
+      const admission = identityPackages[name]!;
+      const clause = ts.isImportDeclaration(node) ? node.importClause : undefined;
+      const bindings = clause && !clause.name && clause.namedBindings;
+      if (relative(root, file) !== admission.file || !bindings || !ts.isNamedImports(bindings) || !bindings.elements.length ||
+          !bindings.elements.every(member => (clause?.isTypeOnly || member.isTypeOnly ? admission.types : admission.values).includes((member.propertyName ?? member.name).text)))
+        report(node, 'package', 'Identity dependencies require exact reviewed named adapter imports.');
+      return;
+    }
+    if (relative(root, file).startsWith('src/bff/login/identity/') && !name.startsWith('.') && !name.startsWith('#')) {
+      const fileName = relative(root, file);
+      const allowedValues = fileName === 'src/bff/login/identity/snapshot-verifier.ts' && name === 'effect'
+        ? ['Effect', 'Option', 'Semaphore'] : fileName === 'src/bff/login/identity/code-pair.ts' && name === 'node:crypto' ? ['createHash'] : [];
+      const allowedTypes = fileName === 'src/bff/login/identity/snapshot-contracts.ts' && name === 'effect' ? ['Effect'] : [];
+      const clause = ts.isImportDeclaration(node) ? node.importClause : undefined;
+      const bindings = clause && !clause.name && clause.namedBindings;
+      if (!bindings || !ts.isNamedImports(bindings) || !bindings.elements.length || !bindings.elements.every(member =>
+        (clause?.isTypeOnly || member.isTypeOnly ? allowedTypes : allowedValues).includes((member.propertyName ?? member.name).text)))
+        report(node, 'package', 'Private identity modules admit only reviewed crypto/parser/Effect members, no general BFF I/O.');
+      return;
+    }
     const rules = policy[owner]!;
     // Exact module admission: package installation alone grants no BFF authority.
     const admitted: Readonly<Record<string, readonly string[]>> = {
       'src/bff/transport.ts': ['effect'],
+      'src/bff/login/identity/snapshot-verifier.ts': ['effect'],
+      'src/bff/login/identity/snapshot-contracts.ts': ['effect'],
       'src/bff/login/code-exchange.operation.ts': ['effect'],
       'src/bff/login/token-post.ts': ['node:http', 'effect', 'effect/http/HttpClient', 'effect/http/HttpClientRequest', '@effect/platform-node/NodeHttpClient', '@effect/platform-node/NodeHttpIncomingMessage'],
       'src/bff/run-reader.ts': ['effect', 'effect/http/HttpClient', '@effect/platform-node/NodeHttpClient', '@effect/platform-node/NodeHttpIncomingMessage'],

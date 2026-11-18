@@ -3,7 +3,7 @@
 Issue: https://github.com/stanimirivanov/perfeng-console/issues/81
 Qualification date: 2026-11-15. Base production main: 52d3df1.
 
-**Isolated qualification PASS; production admission NOT_ADMITTED.** Root dependencies,
+**Historical isolated qualification PASS; private verifier admitted by issue #119.** Root dependencies,
 contracts/Ajv, login operation, session and route behavior are unchanged. This fixture
 qualifies a candidate wrapper, not raw library defaults or a real identity deployment.
 
@@ -281,3 +281,15 @@ their behavior. The real-wire scoped composition is documented in the
 [Effect Node receipt](../effect-node/README.md#pr52n--resolved-key-code-token-pair-verification-issue-108).
 It does not admit production authentication, a consumed nonce handoff or exact common
 response proof. Both isolated graphs and their qualification gates remain required.
+
+## PR52t — shared implementation admission (issue #119)
+
+The owner accepted ADR 0004. candidate.ts, pair-candidate.ts, strict-json.ts and
+signing-key.ts now delegate to the private BFF identity owner through exact named
+entry bridges. There is one crypto/parser implementation. Root package admission
+and its current limits are recorded in [the verifier guide](../../../docs/development/snapshot-verifier.md).
+Earlier baseline/receipt sections remain historical; they do not describe a newly
+activated browser/session. A present at_hash is now verified; absence still carries
+no cryptographic common-response guarantee. Nested crypto dependencies also remain
+for the independent raw-library contrast tests; root-resolved imports require the
+root lock/audit, not only this nested graph.

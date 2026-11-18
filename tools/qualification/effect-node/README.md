@@ -531,3 +531,13 @@ NOT_ADMITTED: production dependency/runtime/BFF exchange-session integration,
 consumed transaction binding and browser/shared-pilot gates are separate. Revert
 persistent worker/consumer, fixture pin and gate/bridge/docs updates together;
 preserve production trust boundaries and the original provider owner.
+
+## PR52t — adopted snapshot verifier (issue #119)
+
+The resolved-key fixture now invokes the actual private BFF makeSnapshotVerifier
+through its exact identity qualification entry, retiring direct verifyCodePair
+permission. Source/cache/resolver production ownership remains pending; token/network/
+session serving is unchanged. [The admission guide](../../../docs/development/snapshot-verifier.md)
+records the boundaries. The provider runner now guards and hashes actual adopted
+identity sources plus root manifest/lock, with sha256-length-framed-v2 framing and
+a new domain separator. Earlier v1 receipts certify only their historical inputs.
