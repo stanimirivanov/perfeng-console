@@ -73,8 +73,8 @@ provider receipt is still NOT_ADMITTED for shared-user activation. Repeat provid
 qualification on committed sources before relying on this admission; record its
 redacted result in the PR, not credentials or generated receipts in Git.
 
-Remaining: actual consumed exchange custody,
-delegated token/session/current policy, browser and shared-pilot gates. No service
+Issue #123 adds [consumed exchange custody](verified-code-exchange.md). Remaining:
+real-provider BFF transaction, delegated token/session/current policy, browser and shared-pilot gates. No service
 permission or HUMAN/CI enrollment is derived from token role claims. Revert this
 coherent dependency/implementation/fixture bridge change to retire the slice; preserve
 local pairing and original validators/security gates.

@@ -7,3 +7,5 @@ export type { QualificationInput } from './token-profile.ts';
 export { codePairKeyIds, verifyCodePair } from './code-pair.ts';
 export type { CodePairRequest, CodePairResult } from './code-pair.ts';
 export { makeSnapshotVerifier } from './snapshot-verifier.ts';
+export { makeCodePairVerifier } from './resolved-pair-verifier.ts';
+export type { ResolvedCodePairResult } from './resolved-pair-verifier.ts';

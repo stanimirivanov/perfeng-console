@@ -70,3 +70,10 @@ Read [their ports, lifetime, freshness and qualification guide](../../docs/devel
 Use named feature contracts, not factory-derived types. Exact named platform imports
 and the read-only maxHeaderSize guard grant no native dispatch, proxy or discovery.
 Keep keys/observations private; fresh cached authority is bounded, never stale-on-error.
+
+`login/verified-code-exchange.ts` owns the unmounted consumed-exchange verification
+lifetime; [read its sequence and limits](../../docs/development/verified-code-exchange.md).
+Operations consume named ports and never import concrete HTTP/crypto adapters. Its
+result is a minimal verified observation, not a session or service grant. Preserve
+once-only consumption, response/return-intent custody, caller interruption and late
+retirement/expiry fences. begin's cookie instructions remain server-only.

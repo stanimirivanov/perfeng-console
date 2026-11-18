@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 export const publicImports: Readonly<Record<string, string>> = {
+  "#perfeng/bff-verified-exchange": "src/bff/login/verified-code-exchange.ts",
   "#perfeng/bff-key-resolver": "src/bff/login/identity/signing-key-resolver.ts",
   "#perfeng/bff-snapshot-verifier": "src/bff/login/identity/snapshot-verifier.ts",
   "#perfeng/run-transitions": "src/generated/transitions.ts",

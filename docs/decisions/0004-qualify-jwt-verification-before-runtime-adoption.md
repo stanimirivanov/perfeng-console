@@ -190,3 +190,12 @@ source-to-fixture bridge; no new dependencies or serving activation. The
 [key-source guide](../development/signing-key-source.md) records exact authority,
 freshness/refusal/rotation boundaries and repeat-provider gates. Subsequent consumed
 exchange/session/browser/shared-pilot slices above remain separate and required.
+
+## Consumed-exchange extension — 2026-11-18, issue #123
+
+PR52v composes actual single-use exchange through feature-owned verification ports
+and returns only a private verified observation. The qualified resolved verifier is
+now BFF-owned and fixtures delegate to it. [The evidence/limit guide](../development/verified-code-exchange.md)
+distinguishes signed synthetic-issuer consumption from real-Keycloak verifier/cache
+receipts; a provider-driven BFF transaction is still an activation prerequisite. No
+session, delegated authority, browser route or shared-pilot enablement is admitted.

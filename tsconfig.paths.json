@@ -90,6 +90,9 @@
       ],
       "#perfeng/bff-key-resolver": [
         "./src/bff/login/identity/signing-key-resolver.ts"
+      ],
+      "#perfeng/bff-verified-exchange": [
+        "./src/bff/login/verified-code-exchange.ts"
       ]
     }
   }

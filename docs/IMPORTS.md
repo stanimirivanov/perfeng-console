@@ -34,6 +34,7 @@ parenthesized note may follow the target. Code review still governs permission c
 
 | Alias | Target |
 |---|---|
+| `#perfeng/bff-verified-exchange` | `./src/bff/login/verified-code-exchange.ts` |
 | `#perfeng/bff-key-resolver` | `./src/bff/login/identity/signing-key-resolver.ts` |
 | `#perfeng/bff-snapshot-verifier` | `./src/bff/login/identity/snapshot-verifier.ts` |
 | `#perfeng/contracts` | `./src/shared/contracts/public-api.ts` |
@@ -166,3 +167,8 @@ src/bff/login/identity/key-qualification-api.ts: the four effect-node wire/sourc
 cache/resolver shims and identity-jwt/jwks-candidate.ts. The unused fixture store
 and old source-to-identity-fixture admission are retired. This does not admit
 production-to-fixture imports, wildcard/dynamic bridges or direct private targets.
+
+The resolved-verifier fixture now delegates only makeCodePairVerifier and its result
+type to identity/qualification-api.ts; its old identity-fixture imports are retired.
+Only verified-code-exchange.ts can statically import the two reviewed composition
+constructors; this is not a general composition-to-composition or runtime permission.
