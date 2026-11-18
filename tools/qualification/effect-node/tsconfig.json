@@ -15,6 +15,8 @@
     "code-pair-verifier.ts",
     "code-pair-verifier.test.ts",
     "code-pair-cli.ts",
-    "code-pair-cli.test.ts"
+    "code-pair-cli.test.ts",
+    "cache-rotation-cli.ts",
+    "cache-rotation-cli.test.ts"
   ]
 }

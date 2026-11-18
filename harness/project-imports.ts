@@ -57,7 +57,7 @@ export function inspectProjectImports(root: string, file: string, text: string):
         ? clause?.isTypeOnly ? ['SigningKeySnapshot'] : ['admitSigningKeys']
         : importer === 'tools/qualification/effect-node/code-pair-verifier.ts'
           ? clause?.isTypeOnly ? ['CodePairRequest', 'CodePairResult'] : ['codePairKeyIds', 'verifyCodePair']
-          : importer === 'tools/qualification/effect-node/code-pair-cli.ts' && !clause?.isTypeOnly
+          : ['tools/qualification/effect-node/code-pair-cli.ts', 'tools/qualification/effect-node/cache-rotation-cli.ts'].includes(importer) && !clause?.isTypeOnly
             ? ['strictJsonObject']
             : [];
       const allowed = bindings && ts.isNamedImports(bindings) && bindings.elements.length > 0 &&

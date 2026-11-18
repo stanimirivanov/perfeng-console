@@ -327,3 +327,9 @@ uses a strict, root-only evaluator of unchanged raw pnpm evidence. It retains al
 findings and visibly distinguishes accepted residual risk from remediation. Its
 exact package/version/high/development/unbundled/window checks have negative tests;
 isolated qualification audits remain raw and cannot reuse this policy command.
+
+The [persistent cache rotation qualifier](tools/qualification/effect-node/README.md#pr52r--persistent-cache-across-real-provider-rotation-issue-115)
+holds one scoped resolver across verified provider phases, then uses declared
+qualification-only clock advances to test bounded retirement lag. Its private
+process transport is shared with pair qualification; actual receipts remain opt-in
+and never grant production session/runtime admission.

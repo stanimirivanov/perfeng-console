@@ -469,8 +469,65 @@ Keycloak receipt: the pinned runner and environment observation establish that p
 
 The actual observation proves initial code-pair/provider compatibility, not a
 shared Console cache surviving real provider rotation. That real cache-rotation
-receipt remains pending. This gate does not create a Console session, consume the actual BFF single-use
+receipt is addressed separately by the PR52r persistent consumer below. This gate does not create a Console session, consume the actual BFF single-use
 transaction, prove common-response binding without at_hash, enable identity serving,
 or qualify shared-pilot/browser behavior. Runtime/root dependency and actual exchange/
 session integration still need review. Roll back the runner/CLI/pin, exact parser
 bridge and offline gate additions together; preserve production trust boundaries.
+
+## PR52r — persistent cache across real provider rotation (issue #115)
+
+The pinned environment observer now drives `cache-rotation-cli.ts` through one
+persistent Node process and one scoped resolver/cache. The exact sequence is
+initial→overlap→retired, followed by clean EOF and exit 0. Initial supplies the fixed
+loopback issuer/CA and old ID; subsequent frames bind the same old/new IDs and cannot
+change trust. Input is fatal UTF-8, duplicate-aware NDJSON, at most 64 KiB across the
+entire session. The worker has a 60 s scoped lifetime; stalled partial input reads are
+bounded at 8 s per read. The parent independently enforces 8 s for each write/ACK and a 60 s
+whole-process budget, with at most 4096 bytes of combined output. Incomplete, repeated,
+out-of-order, mismatched, malformed or extra commands fail, including extra data after
+the final ACK. A final ACK without clean terminal EOF/exit is never a receipt.
+
+Expectations are declared in code before execution:
+
+1. Initial old ID resolves, seeding the persistent cache.
+2. Advance only the private resolver clock offset by 1001 ms, allowing the existing
+   minimum refresh interval. The distinct new ID must trigger missing-key refresh;
+   old and new both resolve from overlapping published keys.
+3. After provider retirement, old and new must still resolve while the already-cached
+   overlapping snapshot is fresh. Advance that offset by 300001 ms; the old ID must
+   return exactly unknown_key and the new ID must resolve after refreshing current
+   JWKS. Unavailability or a blank cache is not accepted as old-key retirement proof.
+
+These offsets neither change the host/provider clock nor claim five real minutes
+elapsed or any latency/performance result. One process/cache survives all phases:
+retained-old success after the server removes it detects accidental per-phase reset.
+The real-TLS regression observes exactly three retrievals: initial, overlap refresh,
+then post-expiry refresh. This proves public-key cache continuity/freshness behavior,
+not human JWT verification after rotation or immediate IdP-retirement revocation.
+
+`private_session.py` owns bounded pipe writes, replies, EOF, process exit and cleanup.
+The existing one-shot code-pair consumer reuses it with explicit input closure;
+rotation retains the same pipes until completion. No feature-mode switch recreates
+the cache. Acquisition failures kill/reap partially acquired children, and invalid
+or unbounded timeouts are rejected before spawning. Additional buffered replies are
+rejected; the owner also checks the expected ACK phase/schema and terminal exit.
+Node receives PATH only. Rotation IPC contains public IDs/trust, never JWTs, raw keys
+or administrative credentials; existing pair credentials still cross private stdin
+only. Errors stay generic and all generated receipts stay outside Git.
+
+The runner pins environment 58ab60ee6ac470037627bd1cf73a15d2cadce91f and reuses its
+normal lifecycle through observe_key_phase. Every phase must preserve issuer/CA; no
+observer result changes provider expectations. Source export, subject expectation,
+committed-input checks, bytecode prevention, digest framing and preview/--execute
+rules from PR52p remain unchanged. The literal-owned helper import works under -I.
+The final receipt separately records code-pair PASS and cacheRotation PASS with the
+three phases and explicit clock offsets, only after both child processes finish.
+
+The existing offline gate now includes persistent TLS/protocol cases and Python
+session/lifecycle/source tests. Actual provider qualification remains opt-in using
+the already authorized disposable fixture. Even a passing receipt remains
+NOT_ADMITTED: production dependency/runtime/BFF exchange-session integration,
+consumed transaction binding and browser/shared-pilot gates are separate. Revert
+persistent worker/consumer, fixture pin and gate/bridge/docs updates together;
+preserve production trust boundaries and the original provider owner.

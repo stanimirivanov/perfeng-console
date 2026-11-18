@@ -5,17 +5,21 @@ from __future__ import annotations
 import argparse
 import hashlib
 import importlib
+import importlib.util
 import json
-import os
-import selectors
 import shutil
 import subprocess
 import sys
 import tempfile
-import time
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
+# -I intentionally excludes the script directory; load only this literal trusted file.
+_spec = importlib.util.spec_from_file_location("private_session", HERE / "private_session.py")
+assert _spec and _spec.loader
+_session = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(_session)
+PrivateSession = _session.PrivateSession
 PIN = json.loads((HERE / "keycloak-fixture.json").read_text())
 PASSED = {
     "profile": "perfeng-keycloak-code-pair-v1",
@@ -74,64 +78,34 @@ def message(observation) -> dict:
 
 
 def run_client(value: dict, command: list[str], timeout: float = 8) -> dict:
-    """Bound both pipe directions and child lifetime; never expose child diagnostics."""
-    process = None
+    """Preserve the one-shot private pair contract through the owned pipe session."""
     try:
-        payload = json.dumps(value, ensure_ascii=False).encode()
-        if len(payload) > 65536:
-            raise ValueError("oversized")
-        process = subprocess.Popen(
-            command,
-            stdin=subprocess.PIPE,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            env={"PATH": os.environ.get("PATH", "")},
-        )
-        assert process.stdin and process.stdout and process.stderr
-        output = {process.stdout: bytearray(), process.stderr: bytearray()}
-        pending = memoryview(payload)
-        deadline = time.monotonic() + timeout
-        with selectors.DefaultSelector() as selector:
-            for stream in (process.stdin, process.stdout, process.stderr):
-                os.set_blocking(stream.fileno(), False)
-                selector.register(
-                    stream,
-                    selectors.EVENT_WRITE if stream is process.stdin else selectors.EVENT_READ,
-                )
-            while selector.get_map():
-                remaining = deadline - time.monotonic()
-                if remaining <= 0:
-                    raise ValueError("deadline")
-                for key, _mask in selector.select(remaining):
-                    stream = key.fileobj
-                    if stream is process.stdin:
-                        count = os.write(stream.fileno(), pending[:16384])
-                        pending = pending[count:]
-                        if not pending:
-                            selector.unregister(stream)
-                            stream.close()
-                    else:
-                        data = os.read(stream.fileno(), 4096)
-                        if not data:
-                            selector.unregister(stream)
-                        else:
-                            output[stream].extend(data)
-                            if sum(map(len, output.values())) > 4096:
-                                raise ValueError("output limit")
-        status = process.wait(timeout=max(0.01, deadline - time.monotonic()))
-        if status != 0 or output[process.stderr] or json.loads(output[process.stdout]) != PASSED:
-            raise ValueError("refused")
-        return dict(PASSED)
+        with PrivateSession(command, total_timeout=timeout) as client:
+            client.write(json.dumps(value, ensure_ascii=False).encode())
+            client.close_input()
+            result = client.reply()
+            client.finish()
+            if result != PASSED:
+                raise ValueError("refused")
+            return dict(PASSED)
     except (ValueError, OSError, subprocess.SubprocessError, UnicodeError):
         raise ValueError("Private qualifier refused") from None
-    finally:
-        if process is not None:
-            if process.poll() is None:
-                process.kill()
-            process.wait(timeout=2)
-            for stream in (process.stdin, process.stdout, process.stderr):
-                if stream:
-                    stream.close()
+
+
+ROTATION_CHECKS = {
+    "initial": ["initial-old-key"],
+    "overlap": ["missing-key-refresh", "overlap-old-and-new"],
+    "retired": ["fresh-old-key-retention", "expired-old-key-refusal", "new-key-survival"],
+}
+
+
+def rotation_message(observation):
+    """Only public IDs cross the ongoing phase boundary; initial supplies fixed trust."""
+    phase = observation.phase
+    value = {"phase": phase.phase, "oldKeyId": phase.old_key_id, "newKeyId": phase.new_key_id}
+    if phase.phase == "initial":
+        value.update(issuer=phase.issuer, ca=observation.tls_ca_pem)
+    return value
 
 
 def execute(source: Path) -> dict:
@@ -156,6 +130,9 @@ def execute(source: Path) -> dict:
     if git(console, "status", "--porcelain", "--untracked-files=normal", "--", *paths):
         raise ValueError("Commit qualification sources before executing")
     seen = []
+    phases = []
+    rotation_client = None
+    trust = None
     with tempfile.TemporaryDirectory(prefix="perfeng-pinned-keycloak-") as temporary:
         exported = Path(temporary)
         for relative in CLOSURE:
@@ -178,7 +155,38 @@ def execute(source: Path) -> dict:
             def observe(value):
                 seen.append(run_client(message(value), [node, str(HERE / "code-pair-cli.ts")]))
 
-            provider = fixture.execute(observe_code_pair=observe)
+            def observe_phase(value):
+                nonlocal rotation_client, trust
+                phase = value.phase.phase
+                if len(phases) >= 3 or phase != list(ROTATION_CHECKS)[len(phases)]:
+                    raise ValueError("Unexpected provider phase")
+                current_trust = (value.phase.issuer, value.tls_ca_pem)
+                if rotation_client is None:
+                    trust = current_trust
+                    rotation_client = PrivateSession(
+                        [node, str(HERE / "cache-rotation-cli.ts")], total_timeout=60
+                    )
+                elif current_trust != trust:
+                    raise ValueError("Provider trust changed")
+                rotation_client.write(json.dumps(rotation_message(value)).encode() + b"\n")
+                expected = {
+                    "profile": "perfeng-key-cache-rotation-v1",
+                    "phase": phase,
+                    "status": "PASS",
+                    "admission": "NOT_ADMITTED",
+                    "checks": ROTATION_CHECKS[phase],
+                }
+                if phase == "retired":
+                    expected["clockAdvancesMs"] = [1001, 300001]
+                if rotation_client.reply() != expected:
+                    raise ValueError("Cache phase did not qualify")
+                phases.append(phase)
+
+            provider = fixture.execute(observe_code_pair=observe, observe_key_phase=observe_phase)
+            if phases != list(ROTATION_CHECKS) or rotation_client is None:
+                raise ValueError("Incomplete cache qualification")
+            rotation_client.close_input()
+            rotation_client.finish()
             if len(seen) != 1 or provider["admission"] != "NOT_ADMITTED":
                 raise ValueError("Missing independent observation")
             if git(console, "rev-parse", "HEAD") != console_commit or git(
@@ -204,9 +212,16 @@ def execute(source: Path) -> dict:
                 "consoleQualificationSha256": digest.hexdigest(),
                 "provider": provider,
                 "console": PASSED,
+                "cacheRotation": {
+                    "status": "PASS",
+                    "phases": phases,
+                    "clockAdvancesMs": [1001, 300001],
+                },
                 "admission": "NOT_ADMITTED",
             }
         finally:
+            if rotation_client is not None:
+                rotation_client.close()
             sys.path.remove(str(exported))
 
 
