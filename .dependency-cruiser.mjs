@@ -5,13 +5,13 @@ export default {
     {
       name: 'identity-qualification-is-not-production',
       severity: 'error',
-      from: { pathNot: '^tools/qualification/(identity-jwt/|effect-node/(signing-key-source|code-pair-verifier)[.]ts$)' },
+      from: { pathNot: '^tools/qualification/(identity-jwt/|effect-node/(signing-key-source|code-pair-verifier|code-pair-cli)[.]ts$)' },
       to: { path: '^tools/qualification/identity-jwt/' },
     },
     {
       name: 'signing-key-composition-uses-public-entry-only',
       severity: 'error',
-      from: { path: '^tools/qualification/effect-node/(signing-key-source|code-pair-verifier)[.]ts$' },
+      from: { path: '^tools/qualification/effect-node/(signing-key-source|code-pair-verifier|code-pair-cli)[.]ts$' },
       to: { path: '^tools/qualification/identity-jwt/', pathNot: '^tools/qualification/identity-jwt/public-api[.]ts$' },
     },
     {

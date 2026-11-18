@@ -409,3 +409,68 @@ Keycloak token/rotation compatibility, root dependency/runtime admission, actual
 exchange/session composition and browser/shared-pilot gates remain separate work.
 Roll back operation/tests, narrow public-entry exports/permissions, compiler roots and
 joint gate together; preserve production authentication boundaries and pinned validators.
+
+## PR52p — real-provider private IPC qualification (issue #110)
+
+`keycloak-fixture.json` pins the reviewed environment repository/merge and independent
+fixture human subject. Preview verifies origin, exact HEAD, clean tracked source and
+absence of untracked scripts; it imports no fixture and creates no credentials:
+
+```sh
+python3 -B tools/qualification/effect-node/keycloak_runner.py
+```
+
+After explicit authorization for the same disposable fixture, execute using its
+locked Python 3.12 environment. Both isolated Node graphs must already be installed:
+
+```sh
+uv run --project ../perfeng-environment --locked --offline python -I -B \
+  tools/qualification/effect-node/keycloak_runner.py --execute
+```
+
+Execution exports only the exact pinned fixture Python/lock closure from Git into
+a temporary regular package, preventing ignored bytecode/untracked module shadowing.
+It checks the selected venv, Node 26.13.0 and the fixture's declared HUMAN expectation,
+then reuses `execute(observe_code_pair=...)`; bootstrap, human login/exchange, key
+rotation and owned cleanup remain environment responsibilities. Nothing is monkeypatched.
+The callback runs before replay and sends only CA, issuer, nonce, accepted-POST start
+and bounded unverified ID/access candidates to the Node process's private stdin.
+No password, refresh token, assertion or private key is forwarded. Credentials never
+enter argv, files, logs or receipts; the child receives only PATH, excluding Node
+injection/credential/proxy environment variables.
+
+`code-pair-cli.ts` has no options or credential environment. It accepts at most 64 KiB
+of UTF-8 input within 2 s, uses the shared duplicate-aware strict parser, rejects extra
+root/candidate fields, and restricts configuration to canonical HTTPS 127.0.0.1 with
+an explicit port and `/realms/perfeng-fixture`. Token content cannot choose an origin.
+The existing scoped verifier then applies its 3 s total operation bound. Success must
+match the independently pinned fixture subject; output is a constant check-list/profile
+receipt, never identity/claims/tokens or provider diagnostics. Failures have one constant
+FAIL receipt. The Python consumer multiplexes bounded pipes, caps combined output to
+4096 bytes, requires exact success/empty stderr and kills/reaps the child within its 8 s
+budget. Failures are scrubbed before reaching the fixture's safe observer boundary.
+
+`make signing-key-wire-qualification` now runs real-TLS process tests and stdlib-only
+Python process/source tests as well as all prior candidates. Identity CI pins Python 3.12
+for those offline tests. They need no sibling checkout or Docker; actual execution is
+never part of pull-request CI. Use `-B` throughout so bytecode cannot pollute guide
+provenance. No new package/root dependency or general production import permission
+is introduced; the CLI has one exact named strict-parser public-entry bridge.
+
+An executed receipt still says NOT_ADMITTED. The selected environment commit and
+`consoleQualificationSha256` identify its tested inputs. The latter uses domain
+`perfeng-keycloak-qualification-v1\0`, then sorted files in Effect Node and identity
+roots with `.ts`, `.py`, `.json` or `.yaml` suffixes, each framed as 8-byte big-endian
+UTF-8 relative-path length/path and 8-byte content length/content. The format is
+`sha256-length-framed-v1`; this hashes public code/config/locks, never credentials.
+Actual execution requires committed, unchanged qualification sources and records
+consoleCommit as well. Retain generated receipts outside Git. A synthetic process PASS alone is no real
+Keycloak receipt: the pinned runner and environment observation establish that provenance.
+
+The actual observation proves initial code-pair/provider compatibility, not a
+shared Console cache surviving real provider rotation. That real cache-rotation
+receipt remains pending. This gate does not create a Console session, consume the actual BFF single-use
+transaction, prove common-response binding without at_hash, enable identity serving,
+or qualify shared-pilot/browser behavior. Runtime/root dependency and actual exchange/
+session integration still need review. Roll back the runner/CLI/pin, exact parser
+bridge and offline gate additions together; preserve production trust boundaries.

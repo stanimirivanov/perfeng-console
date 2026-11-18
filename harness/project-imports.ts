@@ -57,7 +57,9 @@ export function inspectProjectImports(root: string, file: string, text: string):
         ? clause?.isTypeOnly ? ['SigningKeySnapshot'] : ['admitSigningKeys']
         : importer === 'tools/qualification/effect-node/code-pair-verifier.ts'
           ? clause?.isTypeOnly ? ['CodePairRequest', 'CodePairResult'] : ['codePairKeyIds', 'verifyCodePair']
-          : [];
+          : importer === 'tools/qualification/effect-node/code-pair-cli.ts' && !clause?.isTypeOnly
+            ? ['strictJsonObject']
+            : [];
       const allowed = bindings && ts.isNamedImports(bindings) && bindings.elements.length > 0 &&
         bindings.elements.every(member => permitted.includes((member.propertyName ?? member.name).text));
       if (!allowed) report(node, 'Identity qualification has exact static named bridges; no production, private or dynamic access.');

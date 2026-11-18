@@ -21,6 +21,9 @@ jobs:
         run: pnpm --dir tools/qualification/identity-jwt audit --audit-level high
       - name: Bootstrap isolated signing-key wire candidate
         run: pnpm --dir tools/qualification/effect-node install --ignore-workspace --frozen-lockfile --ignore-scripts
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
       - run: make signing-key-wire-qualification
       - name: Audit isolated Effect Node graph
         run: pnpm --dir tools/qualification/effect-node audit --audit-level high

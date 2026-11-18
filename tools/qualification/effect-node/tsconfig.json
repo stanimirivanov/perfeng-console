@@ -13,6 +13,8 @@
     "signing-key-resolver.ts",
     "signing-key-resolver.test.ts",
     "code-pair-verifier.ts",
-    "code-pair-verifier.test.ts"
+    "code-pair-verifier.test.ts",
+    "code-pair-cli.ts",
+    "code-pair-cli.test.ts"
   ]
 }
