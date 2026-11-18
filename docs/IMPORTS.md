@@ -138,7 +138,8 @@ from `../identity-jwt/public-api.ts`. Issue #108 additionally admits only
 `codePairKeyIds`/`verifyCodePair` values and declaration-level type-only
 `CodePairRequest`/`CodePairResult` from that same entry. Each importer has its own
 member allowlist; the pair verifier cannot import snapshot admission or vice versa.
-Issue #110 additionally admits only `tools/qualification/effect-node/code-pair-cli.ts`
+Issue #110 additionally admits only `tools/qualification/effect-node/code-pair-cli.ts` (and issue #115
+`tools/qualification/effect-node/cache-rotation-cli.ts`)
 importing the named `strictJsonObject` value from that entry; no other identity member
 is granted to the process entry. No other consumer, private target, namespace, dynamic import or re-export is admitted.
 This creates a one-way Effect Node -> identity qualification edge; reciprocal owner

@@ -8,6 +8,7 @@ import tempfile
 import unittest
 from pathlib import Path
 from types import SimpleNamespace
+from unittest.mock import patch
 
 spec = importlib.util.spec_from_file_location(
     "keycloak_runner", Path(__file__).with_name("keycloak_runner.py")
@@ -94,6 +95,102 @@ class RunnerTests(unittest.TestCase):
                 )
             self.assertEqual(str(caught.exception), "Private qualifier refused")
             self.assertIsNone(caught.exception.__cause__)
+
+    def test_private_session_keeps_one_child_and_checks_terminal_exit(self):
+        program = "import sys,json; count=0\nfor line in sys.stdin: count+=1; print(json.dumps({'count':count}),flush=True)"
+        with runner.PrivateSession(
+            [sys.executable, "-I", "-c", program], total_timeout=2
+        ) as session:
+            for count in (1, 2, 3):
+                session.write(json.dumps({"phase": count}).encode() + b"\n")
+                self.assertEqual(session.reply(), {"count": count})
+            session.close_input()
+            session.finish()
+        failed = "import sys; print('{\"count\":1}',flush=True); sys.stdin.read(); sys.exit(1)"
+        with (
+            self.assertRaises(ValueError),
+            runner.PrivateSession([sys.executable, "-I", "-c", failed], total_timeout=1) as session,
+        ):
+            session.write(b'{"phase":1}\n')
+            self.assertEqual(session.reply(), {"count": 1})
+            session.close_input()
+            session.finish()
+
+    def test_rotation_messages_bind_public_phase_without_private_fields(self):
+        for phase in ("initial", "overlap", "retired"):
+            value = SimpleNamespace(
+                tls_ca_pem="public-ca",
+                phase=SimpleNamespace(
+                    phase=phase,
+                    issuer="https://127.0.0.1:123/realms/perfeng-fixture",
+                    old_key_id="old",
+                    new_key_id=None if phase == "initial" else "new",
+                    token="NEVER",
+                ),
+            )
+            result = runner.rotation_message(value)
+            self.assertEqual(
+                set(result),
+                {
+                    "phase",
+                    "oldKeyId",
+                    "newKeyId",
+                    *({"issuer", "ca"} if phase == "initial" else set()),
+                },
+            )
+            self.assertNotIn("NEVER", json.dumps(result))
+
+    def test_isolated_preview_loads_only_the_literal_owned_helper(self):
+        result = subprocess.run(
+            [
+                sys.executable,
+                "-I",
+                "-B",
+                str(Path(__file__).with_name("keycloak_runner.py")),
+                "--environment-source",
+                "/missing-fixture-source",
+            ],
+            capture_output=True,
+            text=True,
+            timeout=5,
+        )
+        self.assertEqual(result.returncode, 1)
+        self.assertEqual(result.stderr, "")
+        self.assertEqual(json.loads(result.stdout), {"admission": "NOT_ADMITTED", "status": "FAIL"})
+
+    def test_session_setup_failure_cannot_leave_a_child(self):
+        with patch.object(runner._session.subprocess, "Popen") as start:
+            for timeout in (0, -1, float("nan"), float("inf"), 61, True):
+                with self.assertRaises(ValueError):
+                    runner.PrivateSession([], total_timeout=timeout)
+            start.assert_not_called()
+        created = []
+        original = subprocess.Popen
+
+        def start(*args, **kwargs):
+            value = original(*args, **kwargs)
+            created.append(value)
+            return value
+
+        try:
+            with (
+                patch.object(runner._session.subprocess, "Popen", side_effect=start),
+                patch.object(
+                    runner._session.selectors,
+                    "DefaultSelector",
+                    side_effect=OSError("setup failure"),
+                ),
+            ):
+                with self.assertRaises(ValueError):
+                    runner.PrivateSession(
+                        [sys.executable, "-I", "-c", "import time; time.sleep(10)"]
+                    )
+            self.assertIsNotNone(created[0].poll())
+        finally:
+            for value in created:
+                if value.poll() is None:
+                    value.kill()
+                value.wait()
 
 
 if __name__ == "__main__":

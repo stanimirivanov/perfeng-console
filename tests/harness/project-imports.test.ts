@@ -91,10 +91,12 @@ test('resolved pair verifier has only its exact named identity-qualification ent
 
 
 test('private qualifier CLI imports only its reviewed strict parser bridge', () => {
-  const file = root + '/tools/qualification/effect-node/code-pair-cli.ts';
-  const entry = '../identity-jwt/public-api.ts';
-  assert.deepEqual(inspectProjectImports(root, file, "import { strictJsonObject } from '" + entry + "';"), []);
-  for (const source of ["import { verifyCodePair } from '" + entry + "';", "import * as parser from '" + entry + "';", "import('" + entry + "');", "import { strictJsonObject } from '../identity-jwt/strict-json.ts';"])
-    assert.ok(inspectProjectImports(root, file, source).length, source);
+  for (const name of ['code-pair-cli.ts', 'cache-rotation-cli.ts']) {
+    const file = root + '/tools/qualification/effect-node/' + name;
+    const entry = '../identity-jwt/public-api.ts';
+    assert.deepEqual(inspectProjectImports(root, file, "import { strictJsonObject } from '" + entry + "';"), []);
+    for (const source of ["import { verifyCodePair } from '" + entry + "';", "import * as parser from '" + entry + "';", "import('" + entry + "');", "import { strictJsonObject } from '../identity-jwt/strict-json.ts';"])
+      assert.ok(inspectProjectImports(root, file, source).length, source);
+  }
   assert.ok(inspectProjectImports(root, root + '/src/bff/cli.ts', "import { strictJsonObject } from '../../tools/qualification/identity-jwt/public-api.ts';").length);
 });
