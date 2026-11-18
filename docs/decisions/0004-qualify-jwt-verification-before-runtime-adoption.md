@@ -180,3 +180,13 @@ the first private implementation and its current evidence in the
 [snapshot verifier guide](../development/snapshot-verifier.md). Subsequent gates above
 remain required. Rollback reverts the private implementation/dependency/bridge changes
 together; preserve local pairing, validators and the remaining activation restrictions.
+
+## Implementation extension — 2026-11-18, issue #121
+
+PR52u adopts the existing qualified fixed-origin key wire, strict JWKS admission,
+source and scoped cache/resolver into the BFF identity owner, using named feature
+ports. Qualification delegates to the adopted implementation and retires the old
+source-to-fixture bridge; no new dependencies or serving activation. The
+[key-source guide](../development/signing-key-source.md) records exact authority,
+freshness/refusal/rotation boundaries and repeat-provider gates. Subsequent consumed
+exchange/session/browser/shared-pilot slices above remain separate and required.

@@ -54,6 +54,14 @@ export const roles: Readonly<Record<string, Role>> = {
   'src/bff/login/identity/snapshot-contracts.ts': 'port',
   'src/bff/login/identity/snapshot-verifier.ts': 'adapter',
   'src/bff/login/identity/qualification-api.ts': 'entry',
+  'src/bff/login/identity/signing-key-contracts.ts': 'port',
+  'src/bff/login/identity/signing-key-get.ts': 'adapter',
+  'src/bff/login/identity/jwks-admission.ts': 'adapter',
+  'src/bff/login/identity/signing-key-source.ts': 'adapter',
+  'src/bff/login/identity/signing-key-store.ts': 'adapter',
+  'src/bff/login/identity/signing-key-cache.ts': 'adapter',
+  'src/bff/login/identity/signing-key-resolver.ts': 'adapter',
+  'src/bff/login/identity/key-qualification-api.ts': 'entry',
 
   'apps/console/src/runs/detail/run-detail.ts': 'component',
   'apps/console/src/runs/run.store.ts': 'store',
@@ -156,17 +164,19 @@ export function checkOwnership(root: string, registry: Readonly<Record<string, R
         const entryOwner = name === 'tools/public-api.ts' ? 'tools/console-server.ts' :
           name === 'src/bff/public-api.ts' ? 'src/bff/transport.ts' : 'src/bff/config.ts';
         const identityEntry = name === 'src/bff/login/identity/qualification-api.ts' && ['strict-json', 'signing-key', 'token-profile', 'code-pair', 'snapshot-verifier', 'snapshot-contracts'].some(file => targetName === 'src/bff/login/identity/' + file + '.ts');
-        if (role === 'entry' && targetName !== entryOwner && !identityEntry)
+        const keyEntry = name === 'src/bff/login/identity/key-qualification-api.ts' && ['signing-key-get', 'signing-key-source', 'signing-key-store', 'signing-key-cache', 'signing-key-resolver', 'signing-key-contracts', 'jwks-admission'].some(file => targetName === 'src/bff/login/identity/' + file + '.ts');
+        if (role === 'entry' && targetName !== entryOwner && !identityEntry && !keyEntry)
           report(node, 'OWN-01', 'Public entry must re-export only its reviewed owner.');
         if (targetRole === 'contract' && !(ts.isImportDeclaration(node) && node.importClause?.isTypeOnly === true) &&
             !(role === 'contract' && ts.isExportDeclaration(node) && node.isTypeOnly))
           report(node, 'OWN-04', 'Consume shared contracts through declaration-level import type.');
         if (targetName.startsWith('src/generated/')) return;
-        if ((!targetRole || !edges[role].includes(targetRole)) && !providerEdge && !admittedToolImport) {
+        const keyContractExport = keyEntry && targetName === 'src/bff/login/identity/signing-key-contracts.ts' && ts.isExportDeclaration(node) && node.isTypeOnly;
+        if ((!targetRole || !edges[role].includes(targetRole)) && !providerEdge && !admittedToolImport && !keyContractExport) {
           report(node, 'OWN-01', `${role} cannot depend on ${targetRole ?? 'unregistered module'} ${targetName}. Use a port.`);
         }
       }
-      const headerConstant = name === 'src/bff/login/token-post.ts' && spec === 'node:http' && ts.isImportDeclaration(node) &&
+      const headerConstant = ['src/bff/login/token-post.ts', 'src/bff/login/identity/signing-key-get.ts'].includes(name) && spec === 'node:http' && ts.isImportDeclaration(node) &&
         !node.importClause?.name && !node.importClause?.isTypeOnly && node.importClause?.namedBindings && ts.isNamedImports(node.importClause.namedBindings) &&
         node.importClause.namedBindings.elements.length === 1 && node.importClause.namedBindings.elements.every(binding => !binding.isTypeOnly && (binding.propertyName ?? binding.name).text === 'maxHeaderSize');
       if (['node:http', 'node:https', 'http', 'https'].includes(spec) && !admittedToolImport && !headerConstant) report(node, 'OWN-03', 'Native dispatch needs explicit platform admission, not just an adapter role.');

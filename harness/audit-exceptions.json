@@ -1,17 +1,4 @@
 {
   "schemaVersion": 1,
-  "exceptions": [
-    {
-      "advisory": "GHSA-fc5q-39xc-vjpf",
-      "package": "picomatch",
-      "version": "4.0.7",
-      "severity": "high",
-      "scope": "root-development-only",
-      "validFrom": "2026-11-18T00:00:00.000Z",
-      "expiresAt": "2026-12-02T00:00:00.000Z",
-      "trackingIssue": "https://github.com/stanimirivanov/perfeng-console/issues/111",
-      "reason": "No upstream patched release is listed. Exposure remains in development and CI glob tooling; isolated credential graphs and the product package exclude picomatch. This accepts residual development/CI denial-of-service risk, not a fix.",
-      "review": "human-review-and-merge-required"
-    }
-  ]
+  "exceptions": []
 }

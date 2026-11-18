@@ -1,13 +1,7 @@
 /** Private/secret JWK member names are forbidden even in ignored sibling metadata. */
 export const PRIVATE_KEY_MEMBERS = ['d', 'p', 'q', 'dp', 'dq', 'qi', 'oth', 'k'] as const;
-export type PublicSigningKey = Readonly<{
-  kid: string;
-  kty: 'RSA';
-  use: 'sig';
-  alg: 'RS256';
-  n: string;
-  e: 'AQAB';
-}>;
+import type { PublicSigningKey } from './snapshot-contracts.ts';
+export type { PublicSigningKey } from './snapshot-contracts.ts';
 
 /** Validate the existing RS256 public-key profile and project only its operative fields. */
 export function publicSigningKey(value: unknown): PublicSigningKey | undefined {

@@ -87,6 +87,9 @@
       ],
       "#perfeng/bff-snapshot-verifier": [
         "./src/bff/login/identity/snapshot-verifier.ts"
+      ],
+      "#perfeng/bff-key-resolver": [
+        "./src/bff/login/identity/signing-key-resolver.ts"
       ]
     }
   }

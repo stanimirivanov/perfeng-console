@@ -137,3 +137,18 @@ test('private identity helpers do not inherit general BFF filesystem, network or
   }
   assert.match(diagnostics({ 'src/bff/login/identity/code-pair.ts': "import * as crypto from 'node:crypto';" }), /package/);
 });
+
+test('the key wire admits exact platform members without giving its source or cache I/O authority', () => {
+  const wire = 'src/bff/login/identity/signing-key-get.ts';
+  for (const source of [
+    "import { maxHeaderSize } from 'node:http';",
+    "import { X509Certificate } from 'node:crypto';",
+    "import { HttpClient, withScope } from 'effect/http/HttpClient';",
+    "import { layerNodeHttpOptions } from '@effect/platform-node/NodeHttpClient';",
+  ]) assert.equal(diagnostics({ [wire]: source }), '');
+  for (const file of [wire, 'src/bff/login/identity/signing-key-source.ts', 'src/bff/login/identity/signing-key-store.ts', 'src/bff/login/identity/signing-key-resolver.ts']) {
+    for (const source of ["import { request } from 'node:https';", "import { request } from 'node:http';", "import * as http from '@effect/platform-node/NodeHttpClient';", "import { readFile } from 'node:fs';"]) {
+      assert.match(diagnostics({ [file]: source }), /package/);
+    }
+  }
+});

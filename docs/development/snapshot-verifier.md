@@ -12,7 +12,7 @@ makeSnapshotVerifier({issuer, now?}) requires an Effect scope. The returned veri
 accepts nonce, requestStartedAtMs, unverified ID/access candidates/expiresIn and a
 caller-trusted snapshot (original fetchedAtMs and public keys). The configured issuer
 comes from composition, never from a credential. Types do not establish key provenance;
-future production composition must use its reviewed fixed-origin source/admission path.
+production key composition uses the [reviewed source/admission path](signing-key-source.md).
 
 The factory acquires one lifetime, 32 active-operation permits, a monotonic high-water
 observation and a closed-owner fence. Each call captures caller input before returning
@@ -40,7 +40,8 @@ custody from one consumed authenticated POST remains a later integration obligat
 
 The old fixture primitive files are named re-export shims, not duplicate implementations.
 The resolved-key fixture invokes this actual scoped adapter after its qualified key
-lookup. Its source/cache/resolver remain isolated pending the next implementation slice.
+lookup. Issue #121 also adopts its [source/cache/resolver](signing-key-source.md); actual
+consumed exchange/session integration remains gated.
 Only the exact qualification-api entry/member bridges are admitted; production has no
 fixture imports. Runtime helper inputs/outputs remain private to the login feature.
 
@@ -62,7 +63,8 @@ adversarial profile/pair/JWKS tests now exercise the moved primitives.
 Run make verify, make identity-jwt-qualification, make signing-key-wire-qualification,
 make supply-chain, and make console-isolation-check. The last gate proves the existing
 product still builds/installs/starts independently; it is not browser-login admission.
-The approved existing picomatch exception remains scoped and time-limited, not a fix.
+Issue #121 retires the dormant picomatch waiver after advisory withdrawal; this is
+not proof of a package fix. The fail-closed audit policy and #111 tracking remain.
 
 The opt-in provider runner now refuses uncommitted adopted identity sources/root
 manifest/lock as well as fixtures. Its length-framed-v2 digest includes those actual
@@ -71,7 +73,7 @@ provider receipt is still NOT_ADMITTED for shared-user activation. Repeat provid
 qualification on committed sources before relying on this admission; record its
 redacted result in the PR, not credentials or generated receipts in Git.
 
-Remaining: production key-source/cache ownership, actual consumed exchange custody,
+Remaining: actual consumed exchange custody,
 delegated token/session/current policy, browser and shared-pilot gates. No service
 permission or HUMAN/CI enrollment is derived from token role claims. Revert this
 coherent dependency/implementation/fixture bridge change to retire the slice; preserve

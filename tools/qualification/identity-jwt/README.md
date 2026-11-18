@@ -293,3 +293,12 @@ activated browser/session. A present at_hash is now verified; absence still carr
 no cryptographic common-response guarantee. Nested crypto dependencies also remain
 for the independent raw-library contrast tests; root-resolved imports require the
 root lock/audit, not only this nested graph.
+
+## PR52u — strict JWKS owner (issue #121)
+
+jwks-candidate.ts is now an exact named bridge to the adopted private BFF JWKS
+admission and feature-owned snapshot contracts. Original JWKS tests exercise that
+same implementation. The old effect-node source-to-this-fixture permission is
+retired; production imports no qualification module. Earlier receipts remain
+historical and the [key-source guide](../../../docs/development/signing-key-source.md)
+records current scope and the remaining activation gates.

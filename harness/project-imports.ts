@@ -50,6 +50,24 @@ export function inspectProjectImports(root: string, file: string, text: string):
     if (/[\\%?#]/u.test(spec)) { report(node, 'Use a canonical module specifier without encoding, query or fragment.'); return; }
     if (!spec.startsWith('.')) return;
     const target = relative(root, resolve(dirname(file), spec));
+    if (target === 'src/bff/login/identity/key-qualification-api.ts') {
+      const bridges: Record<string, {
+        values: readonly string[];
+        types: readonly string[];
+      }> = {
+        'effect-node/signing-key-get.ts': { values: ['createSigningKeyGet'], types: ['SigningKeyGetConfig', 'SigningKeyResult'] },
+        'effect-node/signing-key-source.ts': { values: ['createSigningKeySource'], types: ['SigningKeySourceConfig'] },
+        'effect-node/signing-key-cache.ts': { values: ['makeSigningKeyCache'], types: [] },
+        'effect-node/signing-key-resolver.ts': { values: ['makeSigningKeyResolver'], types: ['SigningKeyResolution'] },
+        'identity-jwt/jwks-candidate.ts': { values: ['admitSigningKeys'], types: ['SigningKeysInput', 'SigningKeySnapshot'] },
+      };
+      const entry = Object.entries(bridges).find(([file]) => importer === 'tools/qualification/' + file)?.[1];
+      const clause = ts.isExportDeclaration(node) && node.exportClause;
+      const allowed = entry && clause && ts.isNamedExports(clause) && clause.elements.length > 0 && clause.elements.every(member =>
+        (node.isTypeOnly || member.isTypeOnly ? entry.types : entry.values).includes((member.propertyName ?? member.name).text));
+      if (!allowed) report(node, 'Private key entry has exact static qualification re-exports only.');
+      return;
+    }
     if (target === 'src/bff/login/identity/qualification-api.ts') {
       const bridges: Record<string, {
         values: readonly string[];
@@ -71,13 +89,11 @@ export function inspectProjectImports(root: string, file: string, text: string):
     if (target === 'tools/qualification/identity-jwt/public-api.ts') {
       const clause = ts.isImportDeclaration(node) ? node.importClause : undefined;
       const bindings = clause && !clause.name && clause.namedBindings;
-      const permitted = importer === 'tools/qualification/effect-node/signing-key-source.ts'
-        ? clause?.isTypeOnly ? ['SigningKeySnapshot'] : ['admitSigningKeys']
-        : importer === 'tools/qualification/effect-node/code-pair-verifier.ts'
-          ? clause?.isTypeOnly ? ['CodePairRequest', 'CodePairResult'] : ['codePairKeyIds', 'makeSnapshotVerifier']
-          : ['tools/qualification/effect-node/code-pair-cli.ts', 'tools/qualification/effect-node/cache-rotation-cli.ts'].includes(importer) && !clause?.isTypeOnly
-            ? ['strictJsonObject']
-            : [];
+      const permitted = importer === 'tools/qualification/effect-node/code-pair-verifier.ts'
+        ? clause?.isTypeOnly ? ['CodePairRequest', 'CodePairResult'] : ['codePairKeyIds', 'makeSnapshotVerifier']
+        : ['tools/qualification/effect-node/code-pair-cli.ts', 'tools/qualification/effect-node/cache-rotation-cli.ts'].includes(importer) && !clause?.isTypeOnly
+          ? ['strictJsonObject']
+          : [];
       const allowed = bindings && ts.isNamedImports(bindings) && bindings.elements.length > 0 &&
         bindings.elements.every(member => permitted.includes((member.propertyName ?? member.name).text));
       if (!allowed) report(node, 'Identity qualification has exact static named bridges; no production, private or dynamic access.');

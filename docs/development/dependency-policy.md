@@ -103,7 +103,17 @@ matured release date and replacement tests are recorded in the
 [JavaScript documentation guide](javascript-documentation.md). No age exception,
 implicit recommended configuration or runtime dependency admission.
 
-## Proposed picomatch risk exception — issue #113
+## Historical picomatch risk exception — issue #113; retired in #121
+
+Retired 2026-11-18: [GitHub withdrew GHSA-fc5q-39xc-vjpf](https://github.com/advisories/GHSA-fc5q-39xc-vjpf)
+at 15:38:56Z and the raw audit stopped reporting it. The unchanged unused-entry rule
+then blocked delivery, as designed. Issue #121 removes the dormant JSON record;
+the evaluator, thresholds, negative tests and fail-closed behavior remain unchanged.
+Withdrawal is not proof of a package fix; #111 stays open for upstream investigation.
+The raw audit still reports lower findings. The original acceptance terms below
+are historical evidence, not a currently active waiver.
+
+### Original proposal — issue #113
 
 This is a **review proposal**, not a remediation or an already approved waiver.
 Human review and merge of its separate PR record acceptance; no approver/signature

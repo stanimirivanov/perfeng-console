@@ -48,3 +48,12 @@ export interface SnapshotVerifierConfig {
 export interface SnapshotVerifier {
   readonly verify: (input: SnapshotVerificationInput) => Effect.Effect<SnapshotVerificationResult>;
 }
+
+export type PublicSigningKey = Readonly<{
+  kid: string;
+  kty: 'RSA';
+  use: 'sig';
+  alg: 'RS256';
+  n: string;
+  e: 'AQAB';
+}>;
