@@ -315,3 +315,11 @@ test('private snapshot adapters cannot acquire ambient network or scheduling aut
     assert.match(inspect({ [file]: code }, { [file]: 'adapter' }), /OWN-03/);
   }
 });
+
+test('key qualification entry may re-export its reviewed contract types without runtime port authority', () => {
+  const entry = 'src/bff/login/identity/key-qualification-api.ts';
+  const contract = 'src/bff/login/identity/signing-key-contracts.ts';
+  const files = { [entry]: "export type { SigningKeySourceConfig } from './signing-key-contracts.ts';", [contract]: 'export interface SigningKeySourceConfig { readonly issuer: string; }' };
+  assert.equal(inspect(files, { [entry]: 'entry', [contract]: 'port' }), '');
+  assert.match(inspect({ ...files, [entry]: "export { SigningKeySourceConfig } from './signing-key-contracts.ts';" }, { [entry]: 'entry', [contract]: 'port' }), /OWN-01/);
+});

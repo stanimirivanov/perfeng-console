@@ -61,11 +61,11 @@ test('scanner includes handwritten generated directories, all module types and s
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
 
-test('isolated signing-key composition has one static named snapshot-admission bridge', () => {
+test('the retired source-to-fixture snapshot-admission bridge refuses every old form', () => {
   const file = root + '/tools/qualification/effect-node/signing-key-source.ts';
   const entry = '../identity-jwt/public-api.ts';
-  assert.deepEqual(inspectProjectImports(root, file, "import { admitSigningKeys } from '" + entry + "';"), []);
-  assert.deepEqual(inspectProjectImports(root, file, "import type { SigningKeySnapshot } from '" + entry + "';"), []);
+  assert.ok(inspectProjectImports(root, file, "import { admitSigningKeys } from '" + entry + "';").length);
+  assert.ok(inspectProjectImports(root, file, "import type { SigningKeySnapshot } from '" + entry + "';").length);
   for (const source of ["import * as snapshot from '" + entry + "';", "import('" + entry + "');", "export { admitSigningKeys } from '" + entry + "';", "import { verifyCandidate } from '" + entry + "';", "import { SigningKeySnapshot } from '" + entry + "';", "import { admitSigningKeys } from '../identity-jwt/jwks-candidate.ts';"])
     assert.ok(inspectProjectImports(root, file, source).length, source);
   for (const file of ['src/bff/key-source.ts', 'src/scenarios/probe.ts', 'tools/qualification/orval-fetch/probe.ts', 'tools/qualification/effect-node/generated/probe.ts', 'tools/qualification/other/probe.ts']) {
@@ -113,4 +113,15 @@ test('identity fixture delegates only exact static members to the private BFF qu
     "export { verifyCandidate } from '../../../src/bff/login/identity/token-profile.ts';",
   ]) assert.ok(inspectProjectImports(root, file, source).length);
   assert.ok(inspectProjectImports(root, root + '/tools/qualification/identity-jwt/other.ts', `export { verifyCandidate } from '${bridge}';`).length);
+});
+
+test('key qualification bridges delegate only exact static names and retire source-to-fixture admission', () => {
+  const wire = root + '/tools/qualification/effect-node/signing-key-get.ts';
+  const entry = '../../../src/bff/login/identity/key-qualification-api.ts';
+  assert.deepEqual(inspectProjectImports(root, wire, `export { createSigningKeyGet } from '${entry}';`), []);
+  for (const source of [`export * from '${entry}';`, `import('${entry}');`, `export { makeSigningKeyResolver } from '${entry}';`, "export { createSigningKeyGet } from '../../../src/bff/login/identity/signing-key-get.ts';"]) {
+    assert.ok(inspectProjectImports(root, wire, source).length);
+  }
+  assert.ok(inspectProjectImports(root, root + '/tools/qualification/effect-node/signing-key-source.ts', "import { admitSigningKeys } from '../identity-jwt/public-api.ts';").length);
+  assert.ok(inspectProjectImports(root, root + '/src/bff/login/identity/signing-key-source.ts', "import { admitSigningKeys } from '../../../../tools/qualification/identity-jwt/public-api.ts';").length);
 });

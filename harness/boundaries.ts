@@ -59,14 +59,36 @@ function inspectFile(root: string, file: string, owner: string): string[] {
     }
     if (relative(root, file).startsWith('src/bff/login/identity/') && !name.startsWith('.') && !name.startsWith('#')) {
       const fileName = relative(root, file);
-      const allowedValues = fileName === 'src/bff/login/identity/snapshot-verifier.ts' && name === 'effect'
-        ? ['Effect', 'Option', 'Semaphore'] : fileName === 'src/bff/login/identity/code-pair.ts' && name === 'node:crypto' ? ['createHash'] : [];
-      const allowedTypes = fileName === 'src/bff/login/identity/snapshot-contracts.ts' && name === 'effect' ? ['Effect'] : [];
+      const modules: Record<string, Record<string, {
+        values: readonly string[];
+        types?: readonly string[];
+      }>> = {
+        'snapshot-verifier.ts': { effect: { values: ['Effect', 'Option', 'Semaphore'] } },
+        'code-pair.ts': { 'node:crypto': { values: ['createHash'] } },
+        'snapshot-contracts.ts': { effect: { values: [], types: ['Effect'] } },
+        'signing-key-contracts.ts': { effect: { values: [], types: ['Effect'] } },
+        'signing-key-get.ts': {
+          'node:http': { values: ['maxHeaderSize'] },
+          'node:crypto': { values: ['X509Certificate'] },
+          effect: { values: ['Data', 'Effect', 'Stream'] },
+          'effect/http/HttpClient': { values: ['HttpClient', 'withScope'] },
+          'effect/http/HttpClientRequest': { values: ['get', 'setHeader'] },
+          '@effect/platform-node/NodeHttpClient': { values: ['layerNodeHttpOptions'] },
+          '@effect/platform-node/NodeHttpIncomingMessage': { values: ['NodeHttpIncomingMessage'] },
+        },
+        'signing-key-source.ts': { effect: { values: ['Effect'] } },
+        'signing-key-store.ts': { effect: { values: ['Effect', 'Exit', 'Fiber', 'Option', 'ScopedCache', 'Semaphore'], types: ['Scope'] } },
+        'signing-key-cache.ts': { effect: { values: ['Effect'] } },
+        'signing-key-resolver.ts': { effect: { values: ['Effect', 'Fiber', 'Option', 'ScopedCache', 'Semaphore'], types: ['Scope'] } },
+      };
+      const admission = modules[fileName.slice('src/bff/login/identity/'.length)]?.[name];
+      const allowedValues = admission?.values ?? [];
+      const allowedTypes = admission?.types ?? [];
       const clause = ts.isImportDeclaration(node) ? node.importClause : undefined;
       const bindings = clause && !clause.name && clause.namedBindings;
       if (!bindings || !ts.isNamedImports(bindings) || !bindings.elements.length || !bindings.elements.every(member =>
         (clause?.isTypeOnly || member.isTypeOnly ? allowedTypes : allowedValues).includes((member.propertyName ?? member.name).text)))
-        report(node, 'package', 'Private identity modules admit only reviewed crypto/parser/Effect members, no general BFF I/O.');
+        report(node, 'package', 'Private identity modules admit only their reviewed named members; key-network authority belongs solely to the wire adapter.');
       return;
     }
     const rules = policy[owner]!;

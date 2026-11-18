@@ -60,8 +60,13 @@ test('resolved signing-key bridge permits only the exact composition through its
     write('src/probe.ts', 'export {};');
     write('tools/qualification/identity-jwt/jwks-candidate.ts', 'export function admitSigningKeys() {}');
     write('tools/qualification/identity-jwt/public-api.ts', "export { admitSigningKeys } from './jwks-candidate.ts';");
-    write('tools/qualification/effect-node/signing-key-source.ts', "import { admitSigningKeys } from '../identity-jwt/public-api.ts'; admitSigningKeys();");
+    write('src/bff/login/identity/signing-key-source.ts', 'export function createSigningKeySource() {}');
+    write('src/bff/login/identity/key-qualification-api.ts', "export { createSigningKeySource } from './signing-key-source.ts';");
+    write('tools/qualification/effect-node/signing-key-source.ts', "export { createSigningKeySource } from '../../../src/bff/login/identity/key-qualification-api.ts';");
     assert.match(run(), /no dependency violations/);
+    write('tools/qualification/effect-node/signing-key-source.ts', "import { admitSigningKeys } from '../identity-jwt/public-api.ts'; admitSigningKeys();");
+    assert.throws(run, error => String((error as { stdout?: string; }).stdout).includes('identity-qualification-is-not-production'));
+    write('tools/qualification/effect-node/signing-key-source.ts', 'export {};');
     write('tools/qualification/identity-jwt/pair-candidate.ts', 'export function verifyCodePair() {}');
     write('tools/qualification/identity-jwt/public-api.ts', "export { admitSigningKeys } from './jwks-candidate.ts'; export { verifyCodePair } from './pair-candidate.ts';");
     write('tools/qualification/effect-node/code-pair-verifier.ts', "import { verifyCodePair } from '../identity-jwt/public-api.ts'; verifyCodePair();");
@@ -77,7 +82,7 @@ test('resolved signing-key bridge permits only the exact composition through its
     assert.throws(run, error => String((error as { stdout?: string; }).stdout).includes('signing-key-composition-uses-public-entry-only'));
     write('tools/qualification/effect-node/code-pair-cli.ts', 'export {};');
     write('tools/qualification/effect-node/signing-key-source.ts', "import { admitSigningKeys } from '../identity-jwt/jwks-candidate.ts'; admitSigningKeys();");
-    assert.throws(run, error => String((error as { stdout?: string; }).stdout).includes('signing-key-composition-uses-public-entry-only'));
+    assert.throws(run, error => String((error as { stdout?: string; }).stdout).includes('identity-qualification-is-not-production'));
     write('tools/qualification/effect-node/signing-key-source.ts', 'export {};');
     write('src/probe.ts', "import { admitSigningKeys } from '../tools/qualification/identity-jwt/public-api.ts'; admitSigningKeys();");
     assert.throws(run, error => String((error as { stdout?: string; }).stdout).includes('identity-qualification-is-not-production'));

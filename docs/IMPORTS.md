@@ -34,6 +34,7 @@ parenthesized note may follow the target. Code review still governs permission c
 
 | Alias | Target |
 |---|---|
+| `#perfeng/bff-key-resolver` | `./src/bff/login/identity/signing-key-resolver.ts` |
 | `#perfeng/bff-snapshot-verifier` | `./src/bff/login/identity/snapshot-verifier.ts` |
 | `#perfeng/contracts` | `./src/shared/contracts/public-api.ts` |
 | `#perfeng/bff` | `./src/bff/public-api.ts` |
@@ -159,3 +160,9 @@ signing-key.ts and public-api.ts. This one-way bridge is checked by project-impo
 other fixture modules, wildcard/dynamic exports and private targets are forbidden.
 The resolved-key fixture uses makeSnapshotVerifier, replacing its old direct pair
 primitive permission. Production imports no qualification module.
+
+Key qualification modules use exact named re-exports through
+src/bff/login/identity/key-qualification-api.ts: the four effect-node wire/source/
+cache/resolver shims and identity-jwt/jwks-candidate.ts. The unused fixture store
+and old source-to-identity-fixture admission are retired. This does not admit
+production-to-fixture imports, wildcard/dynamic bridges or direct private targets.

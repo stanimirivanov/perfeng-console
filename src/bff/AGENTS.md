@@ -11,8 +11,8 @@ per-request lifetimes separate. Expected internal failures are tagged and projec
 to safe public outcomes; retain generated types and Ajv. Native HTTP/abort interop
 belongs only in qualified platform adapters. [run-reader.ts](run-reader.ts) is the
 qualified lazy Effect reader; [transport.ts](transport.ts) owns execution and public
-failure projection. Keep Node adapter imports local to the reader and the separately
-[qualified token POST adapter](../../docs/development/token-post-transport.md). No native HTTP
+failure projection. Keep Node adapter imports local to the reader, the qualified signing-key GET below,
+and the separately [qualified token POST adapter](../../docs/development/token-post-transport.md). No native HTTP
 dispatch or transport legacy allowance remains. Preserve the real TLS, raw-header,
 byte/deadline, identity and lifecycle tests in tests/integration/transport.test.ts.
 
@@ -63,3 +63,10 @@ public snapshots; read [its custody, Effect and remaining gates](../../docs/deve
 Only token-profile.ts may import the reviewed jose members, and strict-json.ts the
 reviewed parser members. Qualification delegates through its exact entry; production
 never imports fixtures. A verified observation is not a session, enrollment or grant.
+
+`login/identity/signing-key-get.ts` alone owns the newly admitted fixed-origin key
+network transport; source/cache/resolver and strict admission remain separate modules.
+Read [their ports, lifetime, freshness and qualification guide](../../docs/development/signing-key-source.md).
+Use named feature contracts, not factory-derived types. Exact named platform imports
+and the read-only maxHeaderSize guard grant no native dispatch, proxy or discovery.
+Keep keys/observations private; fresh cached authority is bounded, never stale-on-error.

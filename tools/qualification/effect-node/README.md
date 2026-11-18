@@ -541,3 +541,14 @@ session serving is unchanged. [The admission guide](../../../docs/development/sn
 records the boundaries. The provider runner now guards and hashes actual adopted
 identity sources plus root manifest/lock, with sha256-length-framed-v2 framing and
 a new domain separator. Earlier v1 receipts certify only their historical inputs.
+
+## PR52u — production key source/cache composition (issue #121)
+
+The wire/source/cache/resolver now delegate through exact named bridges to the
+private BFF identity owner; the unused fixture store is removed. Original receipts
+above remain historical. The actual current implementation uses named feature-owned
+ports, preserving all qualified policies and TLS/wire guarantees. No source module
+imports the identity fixture; strict JWKS admission is adopted too. [Current
+ownership and gates](../../../docs/development/signing-key-source.md). The existing
+v2 committed-source digest already covers these adopted identity modules. No session
+or shared-pilot activation follows from a passing provider receipt.

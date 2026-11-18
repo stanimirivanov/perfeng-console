@@ -1,15 +1,13 @@
-import { Effect, Exit, Fiber, Option, Scope, ScopedCache, Semaphore } from 'effect';
+import { Effect, Exit, Fiber, Option, ScopedCache, Semaphore } from 'effect';
+import type { Scope } from 'effect';
 import { createSigningKeySource } from './signing-key-source.ts';
-import type { SigningKeySourceConfig } from './signing-key-source.ts';
+import type { SigningKeySourceConfig, SourceResult, SnapshotStore, SnapshotLoadGate } from './signing-key-contracts.ts';
 
-export type SourceResult = Effect.Success<ReturnType<ReturnType<typeof createSigningKeySource>['load']>>;
 const MAX_AGE_MS = 300000;
 const MAX_READERS = 32;
 
-type LoadGate = (load: Effect.Effect<SourceResult, unknown>, observe: () => number | undefined) => Effect.Effect<SourceResult, unknown>;
-
 /** Owner-local immutable snapshot storage; only the source constructs network authority. */
-export function makeSnapshotStore(config: SigningKeySourceConfig, gate: LoadGate = load => load) {
+export function makeSnapshotStore(config: SigningKeySourceConfig, gate: SnapshotLoadGate = load => load): Effect.Effect<SnapshotStore, never, Scope.Scope> {
   // Capture caller-owned configuration before any asynchronous construction.
   const { issuer, ca, deadlineMs, maxResponseBytes, now = Date.now } = config;
   return Effect.gen(function* () {
