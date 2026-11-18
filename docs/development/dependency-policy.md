@@ -25,7 +25,9 @@ lockfile supply-chain checks and store integrity enabled. See the
 [qualification and cache boundary](ci-efficiency.md). Cache hits still perform a
 frozen script-disabled install; they are not proof of admission or verification.
 
-High-severity audit findings block delivery; scanner failure is an unavailable check.
+High/critical audit findings block delivery unless the root-only high finding matches
+an explicitly reviewed, exact, time-limited risk exception described below. Critical
+findings have no exception. Scanner failure remains an unavailable, failing check.
 Retain lower-severity findings and optional native/WASM peer warnings for review.
 
 Reviewed major GitHub Action tags are permitted. Keep artifact digests, contract
@@ -95,3 +97,57 @@ selected JavaScript boundary documentation checks. Its exact Node/ESLint peers,
 matured release date and replacement tests are recorded in the
 [JavaScript documentation guide](javascript-documentation.md). No age exception,
 implicit recommended configuration or runtime dependency admission.
+
+## Proposed picomatch risk exception — issue #113
+
+This is a **review proposal**, not a remediation or an already approved waiver.
+Human review and merge of its separate PR record acceptance; no approver/signature
+is fabricated in configuration. Branch checks exercise the proposed policy, but it
+does not change main or unblock PR #112 before that review/merge. Upstream remediation
+[issue #111](https://github.com/stanimirivanov/perfeng-console/issues/111) stays open.
+
+| Bound | Proposed acceptance |
+|---|---|
+| Advisory | [GHSA-fc5q-39xc-vjpf](https://github.com/advisories/GHSA-fc5q-39xc-vjpf) |
+| Package/version/severity | picomatch **4.0.7**, exactly; **high**, never critical |
+| Scope | Root development findings only: every finding dev=true and bundled=false |
+| Start | 2026-11-18T00:00:00.000Z, inclusive |
+| Expiry | 2026-12-02T00:00:00.000Z, exclusive; no automatic renewal |
+| Follow-up/owner | #111; repository owner reviews remediation/retirement |
+
+No patched version was listed when prepared. This accepts residual denial-of-service
+risk in development/CI glob tooling; it does not remove the vulnerability or assert
+zero exposure. Repository-controlled patterns and bounded CI jobs reduce exposure,
+but a hostile or newly introduced pattern can still consume development resources.
+The existing product dependency allowlist/isolated package gate excludes picomatch.
+The isolated credential-verification graphs do not depend on it and keep their own
+raw audits without this exception. Production/bundled report flags or another
+version/severity fail the audit exception. Native dev=true alone does not prove
+absence from shipped code: runtime picomatch imports are independently forbidden
+by the product closure and isolated-package gates, which must remain active.
+Their passing receipt substantiates this proposal's current product boundary.
+
+`make supply-chain` invokes `harness/supply-chain.ts` from the canonical repository
+root. It executes unchanged `pnpm audit --json`, with bounded scanner time/output,
+then validates the complete current pnpm report, finding flags/paths/versions,
+severity counts and exit-status consistency. Network/API errors, malformed or
+incomplete data, unknown severities and unexpected scanner exits fail closed.
+Raw `pnpm audit --audit-level high` still fails on the vulnerability. The policy
+check instead prints every advisory and an explicit **RISK ACCEPTED**, path count,
+expiry and #111 link when this exact exception applies; it never prints a clean audit.
+
+The JSON record [audit-exceptions.json](../../harness/audit-exceptions.json) has one
+exact version/advisory, reason, review marker, tracking issue and canonical UTC window.
+The evaluator caps windows at 14 days, refuses before start and at/after expiry, and
+rejects unused entries. It accepts no CLI policy/clock overrides and refuses foreign
+working directories before scanner dispatch. A native advisory-ignore setting cannot
+express version, scope, expiry and retirement, so no ignore flag/config or threshold
+reduction is used. Lower findings remain visible; any unrelated high/critical blocks.
+
+Retire the record as soon as an upstream fix is admitted through normal license/peer,
+release-age, frozen-lock and conformance checks and the advisory clears. Its now-unused
+entry deliberately fails until removed. At expiry, investigate #111 and either fix/
+remove it or bring a separately reviewed new proposal; never extend automatically.
+Revert the proposal to restore the previous raw high-severity gate if acceptance is
+declined. No dependency, lockfile, release-age exception or production code changes
+are part of this proposal.
