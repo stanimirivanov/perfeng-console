@@ -152,3 +152,40 @@ These are synthetic issuer tests, not actual-Keycloak delegated composition, ori
 credential custody, CP enrollment/grants or session/browser/shared-pilot admission.
 Rollback removes new operation/composition/contracts/alias/admissions/tests together;
 no persistent resource, public API or local-pairing migration exists.
+
+
+## Private verified delegation — PR52ac, issue #135
+
+makeVerifiedDelegation joins the existing scoped delegate wire owner and resolved
+verifier through named operation ports. The caller must already own a verified
+initial login for this configured issuer. InitialDelegationContext is a private
+server contract, never a browser DTO or proof supplied by arbitrary claims. Its
+issuer is checked against configuration before dispatch; subject, initial access
+bytes and usable expiry are captured before lazy work and retained privately through
+one consumed attempt. No refresh token or persistent credential store is added.
+
+The actual separately configured delegate key signs the fixed-origin POST; decoded
+API candidates then undergo the existing signed issuer/audience/caller/original-human
+and response-time checks through admitted key resolution. The combined owner bounds
+active caller Effects at 32 without queueing. The existing three-second POST and
+three-second resolved-verification budgets are separate sequential bounds, not a
+new claim of a three-second whole-login budget. Source validity and a non-regressing
+clock are checked before dispatch and after asynchronous stages. Owner/scope closure
+or caller interruption prevents late publication; stop retires signing and fences
+results but does not claim physical abortion of foreign crypto or dispatched I/O.
+
+Success releases only stage=verified-delegated-observation, configured issuer,
+original human subject and min(original-login expiry, delegated usable expiry).
+Neither initial nor delegated bearer, assertions, keys, raw claims or decoded
+candidates escape. No session, HUMAN enrollment, current service grant or baseline
+permission is inferred. Failure cannot restore a consumed attempt or retry uncertain
+exchange. Incoming adapters still own request interruption and safe terminal errors.
+
+Real synthetic TLS tests exercise the actual signer/wire/decoder/resolver/crypto
+composition, context mutation, replay, issuer/subject substitution, original-expiry
+clamping, cancellation/retirement/expiry during exchange and closed scope. Existing
+lower-level gates retain detailed wire, cache and native-work policies. This is not
+an actual-Keycloak full-flow, consumed-code custody or browser/session receipt.
+Those integrations and current CP policy remain gated. Roll back new factory,
+operation/contracts/alias/admissions/tests together; no public or stored-state
+migration, local pairing change or serving activation is introduced.

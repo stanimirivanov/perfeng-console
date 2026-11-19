@@ -335,3 +335,15 @@ test('verified exchange composes only the two reviewed factories without a gener
     assert.match(inspect({ ...files, [file]: source }, roles), /OWN-01/);
   }
 });
+
+test('verified delegation composes only the two reviewed factories without a general composition edge', () => {
+  const file = 'src/bff/login/verified-delegation.ts';
+  const raw = 'src/bff/login/delegated-exchange.ts';
+  const verifier = 'src/bff/login/identity/resolved-delegated-verifier.ts';
+  const roles = { [file]: 'composition', [raw]: 'composition', [verifier]: 'composition' } as const;
+  const files = { [raw]: 'export function makeDelegatedExchange() {}', [verifier]: 'export function makeDelegatedVerifier() {}' };
+  assert.equal(inspect({ ...files, [file]: "import { makeDelegatedExchange } from './delegated-exchange.ts'; import { makeDelegatedVerifier } from './identity/resolved-delegated-verifier.ts';" }, roles), '');
+  for (const source of ["import * as raw from './delegated-exchange.ts';", "import('./delegated-exchange.ts');", "export { makeDelegatedExchange } from './delegated-exchange.ts';", "import { unknownFactory } from './delegated-exchange.ts';"]) {
+    assert.match(inspect({ ...files, [file]: source }, roles), /OWN-01/);
+  }
+});
