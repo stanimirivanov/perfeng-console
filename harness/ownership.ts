@@ -48,6 +48,7 @@ export const roles: Readonly<Record<string, Role>> = {
   'src/bff/login/code-exchange.operation.ts': 'operation',
   'src/bff/login/code-exchange.ts': 'composition',
   'src/bff/login/verified-code-exchange.ts': 'composition',
+  'src/bff/login/delegated-exchange.ts': 'composition',
   'src/bff/login/verified-exchange.operation.ts': 'operation',
   'src/bff/login/delegated-exchange.operation.ts': 'operation',
   'src/bff/login/verified-exchange-contracts.ts': 'port',
