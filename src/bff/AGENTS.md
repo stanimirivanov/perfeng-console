@@ -84,3 +84,9 @@ delegate caller and API audience, consumes before POST and never retries uncerta
 work. Its output remains an unverified credential candidate: no session, enrolled
 identity, service grant or browser DTO may be created from it. Transport/signature
 composition and signed delegated-profile admission remain separate gates.
+
+The private token adapter's delegated profile fixes API audience and delegate azp.
+`verifyDelegatedToken` additionally binds the independently verified original human
+and response-relative lifetime. It takes trusted snapshot/context, does no network
+and returns no credentials or grants. A future scoped owner must fence cancellation,
+retirement and wall time after its crypto await before publishing authority.

@@ -97,7 +97,7 @@ contracts-restore-check:
 identity-jwt-qualification: doctor
 	pnpm --dir tools/qualification/identity-jwt install --ignore-workspace --frozen-lockfile --ignore-scripts --offline
 	node_modules/.bin/tsc --project tools/qualification/identity-jwt/tsconfig.json
-	node --test --test-isolation=none --test-reporter=tap tools/qualification/identity-jwt/qualification.test.ts tools/qualification/identity-jwt/pair.test.ts tools/qualification/identity-jwt/jwks.test.ts
+	node --test --test-isolation=none --test-reporter=tap tools/qualification/identity-jwt/qualification.test.ts tools/qualification/identity-jwt/delegated.test.ts tools/qualification/identity-jwt/pair.test.ts tools/qualification/identity-jwt/jwks.test.ts
 
 .PHONY: signing-key-wire-qualification
 signing-key-wire-qualification: doctor
