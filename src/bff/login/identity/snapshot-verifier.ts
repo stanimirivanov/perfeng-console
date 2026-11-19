@@ -12,8 +12,10 @@ const KEY_FRESHNESS_MS = 300000;
 export function makeSnapshotVerifier(config: SnapshotVerifierConfig) {
   const { issuer, now = Date.now } = config;
   return Effect.gen(function* () {
+    const ownerScope = yield* Effect.scope;
     const limit = Semaphore.makeUnsafe(MAX_ACTIVE_VERIFICATIONS);
     let closed = false;
+    const isClosed = () => closed || ownerScope.state._tag === 'Closed';
     let outstandingCrypto = 0;
     let highWater = -1;
     yield* Effect.addFinalizer(() => Effect.sync(() => { closed = true; }));
@@ -32,7 +34,7 @@ export function makeSnapshotVerifier(config: SnapshotVerifierConfig) {
         try { captured = structuredClone(input); } catch { /* Refuse without logging credentials. */ }
         const request = captured;
         const operation = Effect.gen(function* () {
-          if (closed) return yield* Effect.interrupt;
+          if (isClosed()) return yield* Effect.interrupt;
           if (!request) return { ok: false as const, reason: 'invalid_pair' as const };
           const before = clock();
           if (before === undefined) return { ok: false as const, reason: 'unavailable' as const };
@@ -51,7 +53,7 @@ export function makeSnapshotVerifier(config: SnapshotVerifierConfig) {
             catch: () => ({ ok: false as const, reason: 'unavailable' as const }),
           }).pipe(Effect.catch(() => Effect.succeed({ ok: false as const, reason: 'unavailable' as const })));
           yield* Effect.yieldNow;
-          if (closed) return yield* Effect.interrupt;
+          if (isClosed()) return yield* Effect.interrupt;
           const finished = clock();
           if (finished === undefined || (request.snapshot && finished - request.snapshot.fetchedAtMs > KEY_FRESHNESS_MS))
             return { ok: false as const, reason: 'unavailable' as const };

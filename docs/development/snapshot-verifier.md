@@ -21,7 +21,11 @@ Plain TypeScript owns bounded parsing/projections; token-profile.ts owns importJ
 jwtVerify. Effect wraps the foreign crypto promise; only callers/composition execute
 Effects. Native crypto keeps its admission slot until settlement even after Effect interruption;
 cancelled callers cannot bypass the cap. Crypto may finish after interruption, but cannot publish an observation from
-an interrupted or retired owner. Expiration and 300000 ms retrieval-start freshness
+an interrupted or retired owner. Check the owning scope before crypto dispatch and
+after crypto completion: a later asynchronous finalizer can delay the local closed
+flag after scope closure begins. The delayed-finalizer regressions in
+`tests/integration/snapshot-verifier.test.ts` cover escaped calls and in-flight crypto
+(issue #139). Expiration and 300000 ms retrieval-start freshness
 are rechecked after crypto; rollback/unsafe clock values refuse. Results expose only
 issuer, subject and conservative validUntilMs, or invalid_pair/unavailable/deadline.
 Interruption remains interruption. No token, diagnostic, role or permission escapes.
