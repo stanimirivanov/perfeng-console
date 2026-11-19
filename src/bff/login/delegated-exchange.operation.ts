@@ -30,7 +30,8 @@ export function delegateOnce(deps: DelegatedExchangeDependencies, sourceToken: s
     yield* Effect.yieldNow;
     let finished: number;
     try { finished = deps.now(); } catch { return refused('unavailable'); }
-    if (!deps.active() || !instant(finished) || finished < started || finished >= sourceValidUntilMs) return refused('unavailable');
+    // Dispatch is the latest accepted clock observation; start remains the response lifetime anchor.
+    if (!deps.active() || !instant(finished) || finished < dispatch || finished >= sourceValidUntilMs) return refused('unavailable');
     if (!response.ok) return refused(response.reason);
     const decoded = deps.decode(response.body);
     if (!decoded.ok) return refused(decoded.reason);
