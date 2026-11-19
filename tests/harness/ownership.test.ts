@@ -347,3 +347,15 @@ test('verified delegation composes only the two reviewed factories without a gen
     assert.match(inspect({ ...files, [file]: source }, roles), /OWN-01/);
   }
 });
+
+
+test('login delegation admits only its three exact constructors', () => {
+  const file = 'src/bff/login/login-delegation.ts';
+  const raw = 'src/bff/login/code-exchange.ts';
+  const pair = 'src/bff/login/identity/resolved-pair-verifier.ts';
+  const delegated = 'src/bff/login/verified-delegation.ts';
+  const roles = { [file]: 'composition', [raw]: 'composition', [pair]: 'composition', [delegated]: 'composition' } as const;
+  const files = { [raw]: 'export function createCodeExchange() {}', [pair]: 'export function makeCodePairVerifier() {}', [delegated]: 'export function makeVerifiedDelegation() {}' };
+  assert.equal(inspect({ ...files, [file]: "import { createCodeExchange } from './code-exchange.ts'; import { makeCodePairVerifier } from './identity/resolved-pair-verifier.ts'; import { makeVerifiedDelegation } from './verified-delegation.ts';" }, roles), '');
+  for (const source of ["import * as raw from './code-exchange.ts';", "import('./verified-delegation.ts');", "export { makeVerifiedDelegation } from './verified-delegation.ts';", "import { unknownFactory } from './code-exchange.ts';"]) assert.match(inspect({ ...files, [file]: source }, roles), /OWN-01/);
+});

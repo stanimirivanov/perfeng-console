@@ -101,6 +101,7 @@
     "#perfeng/bff-delegate-owner": "./src/bff/login/delegated-exchange.ts",
     "#perfeng/bff-delegated-snapshot": "./src/bff/login/identity/delegated-snapshot-verifier.ts",
     "#perfeng/bff-resolved-delegated": "./src/bff/login/identity/resolved-delegated-verifier.ts",
-    "#perfeng/bff-verified-delegation": "./src/bff/login/verified-delegation.ts"
+    "#perfeng/bff-verified-delegation": "./src/bff/login/verified-delegation.ts",
+    "#perfeng/bff-login-delegation": "./src/bff/login/login-delegation.ts"
   }
 }

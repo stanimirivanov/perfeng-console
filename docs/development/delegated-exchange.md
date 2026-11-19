@@ -189,3 +189,43 @@ an actual-Keycloak full-flow, consumed-code custody or browser/session receipt.
 Those integrations and current CP policy remain gated. Roll back new factory,
 operation/contracts/alias/admissions/tests together; no public or stored-state
 migration, local pairing change or serving activation is introduced.
+
+
+## Consumed-login custody — PR52ad, issue #137
+
+makeLoginDelegation consumes the existing raw code exchange, verifies its signed
+original pair through the configured key owner and only then invokes verified
+delegation. It accepts raw callback/cookie inputs, not a caller assertion of the
+original human. Separate login/delegate key fields are supplied only to their own
+signer composition; keyless resolver configuration does not inherit either secret.
+No refresh credential or persistent credential store is retained.
+
+The operation captures original ID/access bytes, expected nonce, POST-start,
+expires_in, Run return intent and cookie deletion before verifier awaits. Only the
+exact retained initial access bytes and verified original issuer/human/usable expiry
+reach delegation. Returned identity cannot change navigation. Both present-at_hash
+and accepted absent-at_hash paths preserve this authenticated-response custody;
+absence does not prove arbitrary same-subject tokens originated in one response.
+The existing signed hash check is neither removed nor made universally mandatory.
+
+The joined scope admits at most 32 caller Effects. Interruption remains interruption;
+retirement/closed scope, non-regressing clock, original expiry and signed delegated
+issuer/subject/expiry fences prevent late success. Existing code/delegate POST and
+verification stages keep their separate budgets; this is not a new three-second
+whole-login promise. Consumed attempts cannot retry uncertain POSTs or restore state.
+Cookie deletion accompanies post-admission refusals, without partial credentials.
+
+Success returns only verified-login-delegation, issuer, original subject, bounded
+validUntilMs, original return intent and cookie deletion. No token, assertion,
+expected nonce, verifier or key escapes. This is an observation, not a session,
+HUMAN enrollment or service/baseline permission. Both existing standalone verified
+owners remain unchanged. Exact constructor admissions do not permit general
+composition imports or another runtime.
+
+Synthetic TLS tests exercise actual PKCE, signed client assertions for separate
+keys, original pair and delegated signatures/JWKS, exact source-token custody,
+Run intent, replay, invalid original/foreign delegated identity, missing at_hash,
+interruption/retirement/expiry. Actual-Keycloak full-flow/provider hash-profile
+receipts, session-bound credential retention, browser/session/current-policy and
+shared-pilot admission remain gated. Rollback removes new owner/operation/contracts,
+alias/admissions/tests together; no public, stored-state or local-pairing migration.

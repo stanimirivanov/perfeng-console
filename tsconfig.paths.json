@@ -108,6 +108,9 @@
       ],
       "#perfeng/bff-verified-delegation": [
         "./src/bff/login/verified-delegation.ts"
+      ],
+      "#perfeng/bff-login-delegation": [
+        "./src/bff/login/login-delegation.ts"
       ]
     }
   }
