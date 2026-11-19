@@ -11,6 +11,7 @@ export const publicImports: Readonly<Record<string, string>> = {
   "#perfeng/bff-key-resolver": "src/bff/login/identity/signing-key-resolver.ts",
   "#perfeng/bff-resolved-delegated": "src/bff/login/identity/resolved-delegated-verifier.ts",
   "#perfeng/bff-delegated-snapshot": "src/bff/login/identity/delegated-snapshot-verifier.ts",
+  "#perfeng/bff-epoch": "src/bff/login/identity/epoch.ts",
   "#perfeng/bff-snapshot-verifier": "src/bff/login/identity/snapshot-verifier.ts",
   "#perfeng/run-transitions": "src/generated/transitions.ts",
   "#perfeng/run-types": "src/generated/run.ts",

@@ -102,3 +102,17 @@ test('scope closure during native crypto refuses its late result', async t => {
     assert.equal((await pending)._tag, 'Failure');
   } finally { release(); t.mock.restoreAll(); await Effect.runPromise(Scope.close(scope, Exit.succeed(undefined))); }
 });
+
+
+test('independent acquisitions of one snapshot factory retain separate clock history', async () => {
+  let observed = nowMs + 1;
+  const acquisition = makeDelegatedSnapshotVerifier({ issuer, now: () => observed });
+  await Effect.runPromise(Effect.scoped(Effect.gen(function* () {
+    const first = yield* acquisition;
+    const second = yield* acquisition;
+    assert.equal((yield* first.verify(input())).ok, true);
+    observed = nowMs;
+    assert.equal((yield* second.verify(input())).ok, true);
+    assert.deepEqual(yield* first.verify(input()), { ok: false, reason: 'unavailable' });
+  })));
+});

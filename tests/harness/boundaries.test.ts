@@ -162,3 +162,13 @@ test('verified exchange ports and operations gain only their reviewed Effect mem
   assert.equal(diagnostics({ 'src/bff/login/identity/resolved-pair.operation.ts': "import { Effect, Option, Semaphore } from 'effect';" }), '');
   assert.match(diagnostics({ 'src/bff/login/identity/resolved-pair.operation.ts': "import { HttpClient } from 'effect/http/HttpClient';" }), /package/);
 });
+
+
+test('epoch helper admits plain TypeScript without external runtime or native packages', () => {
+  const epoch = 'src/bff/login/identity/epoch.ts';
+  assert.equal(diagnostics({ [epoch]: 'export const isEpochInstant = (value: number) => Number.isSafeInteger(value);' }), '');
+  for (const source of [
+    "import { Effect } from 'effect'; Effect.sync(() => 1);",
+    "import { request } from 'node:https'; request('https://example.com');",
+  ]) assert.match(diagnostics({ [epoch]: source }), /package/);
+});

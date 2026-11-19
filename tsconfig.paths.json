@@ -85,6 +85,9 @@
       "#perfeng/harness/supply-chain": [
         "./harness/supply-chain.ts"
       ],
+      "#perfeng/bff-epoch": [
+        "./src/bff/login/identity/epoch.ts"
+      ],
       "#perfeng/bff-snapshot-verifier": [
         "./src/bff/login/identity/snapshot-verifier.ts"
       ],
