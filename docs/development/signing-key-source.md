@@ -37,7 +37,8 @@ resolver port. Adapters construct lazy Effects; callers/composition alone execut
 them. There is one scoped source/cache lifetime per acquisition, not per request.
 
 - A snapshot is usable only through 300000 ms after retrieval start, inclusive;
-  completion-relative cache TTL is an additional bound. No stale-while-error fallback.
+  the store and resolver share this bound through private `key-policy.ts`
+  (issue #148). Completion-relative cache TTL is an additional bound. No stale-while-error fallback.
 - Snapshot and refresh work are scoped single-flight. Closing the owner interrupts
   actual pending wire work; escaped handles cannot start new work. One caller's
   cancellation does not retire another admitted waiter's load.
@@ -45,9 +46,13 @@ them. There is one scoped source/cache lifetime per acquisition, not per request
   Retrieval starts are at least 1000 ms apart, including errors/interruption.
 - An unknown key gets at most one bounded shared refresh per resolution. Only a
   completed authoritative miss enters the 32-entry, 30000 ms negative cache; known
-  fresh keys take precedence. Failed refresh retains an existing fresh snapshot.
+  fresh keys take precedence. Negative TTL equality remains a hit; one millisecond
+  beyond expires it. Failed refresh retains an existing fresh snapshot.
 - A resolve has a 3000 ms whole-operation deadline. Invalid/rollback clocks clear
-  stale authority; safe refusal stays distinct from authoritative unknown_key.
+  stale authority and negative knowledge; safe refusal stays distinct from
+  authoritative unknown_key. Resolver-local `refuseInvalidClock` names the
+  clear-and-refuse policy, and `recordNegative` owns pruning and capacity eviction
+  only after an authoritative admitted miss. Neither helper owns refresh admission.
 
 Provider retirement is not instantaneous cache revocation. Old keys can remain
 usable within their already-admitted freshness interval; after expiry an outage

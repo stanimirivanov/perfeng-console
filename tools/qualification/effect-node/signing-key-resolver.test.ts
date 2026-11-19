@@ -119,3 +119,50 @@ test('stale primary reads cannot overlap miss refresh and clock rollback never r
   const before = f.state.hits; f.state.throwClock = true;
   assert.deepEqual(await Effect.runPromise(f.keys.resolveKey('old')), { ok: false, reason: 'invalid_clock' }); assert.equal(f.state.hits, before);
 });
+
+test('negative knowledge includes TTL equality and expires one millisecond later', { timeout: 10000 }, async t => {
+  const f = await resolver(t);
+  assert.ok((await Effect.runPromise(f.keys.resolveKey('old'))).ok);
+  f.state.now += 1000;
+  assert.deepEqual(await Effect.runPromise(f.keys.resolveKey('missing')), { ok: false, reason: 'unknown_key' });
+  assert.equal(f.state.hits, 2);
+  f.state.kids.push('missing');
+  f.state.now += 30000;
+  assert.deepEqual(await Effect.runPromise(f.keys.resolveKey('missing')), { ok: false, reason: 'unknown_key' });
+  assert.equal(f.state.hits, 2);
+  f.state.now++;
+  assert.ok((await Effect.runPromise(f.keys.resolveKey('missing'))).ok);
+  assert.equal(f.state.hits, 3);
+});
+
+test('clock failure clears negative knowledge before recovery admits a new generation', { timeout: 10000 }, async t => {
+  const f = await resolver(t);
+  assert.ok((await Effect.runPromise(f.keys.resolveKey('old'))).ok);
+  f.state.now += 1000;
+  assert.deepEqual(await Effect.runPromise(f.keys.resolveKey('missing')), { ok: false, reason: 'unknown_key' });
+  assert.equal(f.state.hits, 2);
+  f.state.throwClock = true;
+  assert.deepEqual(await Effect.runPromise(f.keys.resolveKey('old')), { ok: false, reason: 'invalid_clock' });
+  assert.equal(f.state.hits, 2);
+  f.state.throwClock = false;
+  f.state.now += 1000;
+  assert.ok((await Effect.runPromise(f.keys.resolveKey('old'))).ok);
+  assert.equal(f.state.hits, 3);
+  f.state.now += 1000;
+  f.state.kids.push('missing');
+  assert.ok((await Effect.runPromise(f.keys.resolveKey('missing'))).ok);
+  assert.equal(f.state.hits, 4);
+});
+
+test('resolver keeps key freshness equality but refuses older authority on outage', { timeout: 10000 }, async t => {
+  const f = await resolver(t);
+  const first = await Effect.runPromise(f.keys.resolveKey('old'));
+  assert.ok(first.ok);
+  f.state.now += 300000;
+  assert.deepEqual(await Effect.runPromise(f.keys.resolveKey('old')), first);
+  assert.equal(f.state.hits, 1);
+  f.state.now++;
+  f.state.mode = 'outage';
+  assert.deepEqual(await Effect.runPromise(f.keys.resolveKey('old')), { ok: false, reason: 'unavailable' });
+  assert.equal(f.state.hits, 2);
+});

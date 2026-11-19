@@ -1,5 +1,6 @@
 import { Effect, Fiber, Option, ScopedCache, Semaphore } from 'effect';
 import { makeSnapshotStore } from './signing-key-store.ts';
+import { KEY_SNAPSHOT_MAX_AGE_MS } from './key-policy.ts';
 import type { Scope } from 'effect';
 import type { SourceResult, SigningKeySourceConfig, SigningKeyResolution, SigningKeyResolver } from './signing-key-contracts.ts';
 
@@ -16,6 +17,22 @@ export function makeSigningKeyResolver(config: SigningKeySourceConfig): Effect.E
     let lastStart = -Infinity;
     let closed = false;
     const negative = new Map<string, number>();
+    function refuseInvalidClock() {
+      // Negative knowledge is trustworthy only while clock observations remain valid.
+      negative.clear();
+      return { ok: false as const, reason: 'invalid_clock' as const };
+    }
+    function recordNegative(kid: string, now: number): void {
+      for (const [name, missedAt] of negative) {
+        if (now - missedAt > NEGATIVE_AGE_MS) negative.delete(name);
+      }
+      negative.delete(kid);
+      if (negative.size >= NEGATIVE_CAPACITY) {
+        const oldest = negative.keys().next().value;
+        if (oldest !== undefined) negative.delete(oldest);
+      }
+      negative.set(kid, now);
+    }
     const wire = Semaphore.makeUnsafe(1);
     const readers = Semaphore.makeUnsafe(32);
     const store = yield* makeSnapshotStore(captured, (load, observe) => {
@@ -34,17 +51,23 @@ export function makeSigningKeyResolver(config: SigningKeySourceConfig): Effect.E
       capacity: 1,
       timeToLive: () => 0,
     });
-    yield* Effect.addFinalizer(() => Effect.sync(() => { closed = true; negative.clear(); }));
+    yield* Effect.addFinalizer(() => Effect.sync(() => {
+      closed = true;
+      negative.clear();
+    }));
     return {
       resolveKey(kid: unknown): Effect.Effect<SigningKeyResolution, unknown> {
         const operation = Effect.gen(function* () {
           if (closed) return yield* Effect.interrupt;
           if (typeof kid !== 'string' || kid.length < 1 || kid.length > 128) return { ok: false as const, reason: 'invalid_key_id' as const };
           const result = yield* store.readSnapshot();
-          if (!result.ok) { if (result.reason === 'invalid_clock') negative.clear(); return result; }
+          if (!result.ok) {
+            if (result.reason === 'invalid_clock') return refuseInvalidClock();
+            return result;
+          }
           let now = yield* store.readTime;
-          if (now === undefined) { negative.clear(); return { ok: false as const, reason: 'invalid_clock' as const }; }
-          if (now - result.snapshot.fetchedAtMs > 300000) return { ok: false as const, reason: 'unavailable' as const };
+          if (now === undefined) return refuseInvalidClock();
+          if (now - result.snapshot.fetchedAtMs > KEY_SNAPSHOT_MAX_AGE_MS) return { ok: false as const, reason: 'unavailable' as const };
           const known = result.snapshot.keys.find(key => key.kid === kid);
           if (known) return { ok: true as const, issuer: result.snapshot.issuer, fetchedAtMs: result.snapshot.fetchedAtMs, key: known };
           const missedAt = negative.get(kid);
@@ -52,18 +75,18 @@ export function makeSigningKeyResolver(config: SigningKeySourceConfig): Effect.E
           // All callers use the same refresh entry; the load gate reserves rate/wire
           // authority once, and publication occurs only after successful admission.
           const refreshed = yield* ScopedCache.get(refresh, 'issuer').pipe(Effect.catchIf(error => error instanceof RefreshRateLimited, () => Effect.succeed({ ok: false as const, reason: 'unknown_key' as const })));
-          if (!refreshed.ok) { if (refreshed.reason === 'invalid_clock') negative.clear(); return refreshed; }
+          if (!refreshed.ok) {
+            if (refreshed.reason === 'invalid_clock') return refuseInvalidClock();
+            return refreshed;
+          }
           yield* Effect.yieldNow;
           if (closed) return yield* Effect.interrupt;
           now = yield* store.readTime;
-          if (now === undefined) { negative.clear(); return { ok: false as const, reason: 'invalid_clock' as const }; }
-          if (now - refreshed.snapshot.fetchedAtMs > 300000) return { ok: false as const, reason: 'unavailable' as const };
+          if (now === undefined) return refuseInvalidClock();
+          if (now - refreshed.snapshot.fetchedAtMs > KEY_SNAPSHOT_MAX_AGE_MS) return { ok: false as const, reason: 'unavailable' as const };
           const found = refreshed.snapshot.keys.find(key => key.kid === kid);
           if (found) return { ok: true as const, issuer: refreshed.snapshot.issuer, fetchedAtMs: refreshed.snapshot.fetchedAtMs, key: found };
-          for (const [name, instant] of negative) if (now - instant > NEGATIVE_AGE_MS) negative.delete(name);
-          negative.delete(kid);
-          if (negative.size >= NEGATIVE_CAPACITY) { const oldest = negative.keys().next().value; if (oldest !== undefined) negative.delete(oldest); }
-          negative.set(kid, now);
+          recordNegative(kid, now);
           return { ok: false as const, reason: 'unknown_key' as const };
         }).pipe(Effect.catchIf(error => error instanceof RefreshRateLimited, () => Effect.succeed({ ok: false as const, reason: 'unavailable' as const })), Effect.timeoutOption(3000), Effect.map(result => Option.getOrElse(result, (): SigningKeyResolution => ({ ok: false, reason: 'deadline' }))));
         return Effect.map(readers.withPermitsIfAvailable(1)(operation), result => Option.getOrElse(result, (): SigningKeyResolution => ({ ok: false, reason: 'unavailable' })));
