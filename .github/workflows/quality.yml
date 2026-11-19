@@ -28,6 +28,15 @@ jobs:
       - run: make browser-test
       - run: make console-isolation-check
       - run: make stack-admission
+  harness-self-test:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/bootstrap
+      - run: node_modules/.bin/playwright install --with-deps chromium
       - run: make harness-self-test
   supply-chain:
     runs-on: ubuntu-24.04

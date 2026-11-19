@@ -94,7 +94,7 @@ and integration tests live under `tests/`. Follow the
 | Guide artifact | `make guide` | Tagged journey/capture/provenance fails; output stays outside Git |
 | Supply chain | `make supply-chain` | Raw audit evidence is incomplete/unavailable, high/critical risk is unaccepted, or an exact reviewed exception is invalid/expired/unused |
 | Pre-commit | `make hooks` once per checkout | Verifies the staged snapshot with the installed modules. Unstaged edits cannot mask a bad staged source |
-| Hosted CI | `quality.yml` jobs `verify`, `browser`, `supply-chain` | Frozen bootstrap; aggregate, browser/installation/stack/self-test and audit respectively; read-only contents permission and ten-minute job limits |
+| Hosted CI | `quality.yml` jobs `verify`, `browser`, `harness-self-test`, `supply-chain` | Frozen bootstrap; aggregate, browser/installation/stack, harness fault probes and audit respectively; read-only contents permission and ten-minute job limits |
 
 When a release-build harness module gains a local import, update the explicit input
 manifest in scripts/check-console-isolation.ts and run this installation gate.
