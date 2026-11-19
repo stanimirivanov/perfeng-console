@@ -90,3 +90,10 @@ The private token adapter's delegated profile fixes API audience and delegate az
 and response-relative lifetime. It takes trusted snapshot/context, does no network
 and returns no credentials or grants. A future scoped owner must fence cancellation,
 retirement and wall time after its crypto await before publishing authority.
+
+`login/delegated-exchange.ts` is the private scoped wire composition. It owns only
+the separate delegate signer, qualified token POST and unverified response decoder.
+Never treat its candidate as identity, session or CP permission. Incoming composition
+owns request interruption; stop/closed scope fence publication and retire the signer
+but do not promise to abort dispatched HTTP. Preserve the fixed issuer/CA/client,
+32 caller bound and one-dispatch attempt; no automatic retry after uncertainty.

@@ -54,3 +54,36 @@ not actual-Keycloak delegated composition, lifecycle or browser/session admissio
 The existing real-provider receipt remains tied to its prior source revisions.
 Rollback reverts the new delegated profile/helper and its qualification exports/tests
 together; no public API, local-pairing or stored-state migration is involved.
+
+
+## Scoped wire composition — PR52z, issue #129
+
+makeDelegatedExchange owns a separate configured delegate-client signer and reuses
+createTokenPost and decodeDelegatedTokens through delegateOnce. Its config is trusted
+server composition, not browser/claim input. The private exact public alias permits
+server integration/testing; it is not a browser-facing API. There is no new network
+adapter or permission to override issuer, audience, client or destination per attempt.
+
+Effects remain lazy. Each constructed attempt dispatches at most once, with at most
+32 active caller Effects; excess callers receive unavailable without queuing. The
+qualified POST retains explicit CA, TLS, raw-header/cache/content checks, byte bounds,
+no redirects/proxies/retries and its maximum three-second wire deadline. No token or
+assertion is serialized to public responses. A successful result remains explicitly
+unverified-delegated and private; signature/subject verification is not skipped merely
+because the candidate decoded successfully.
+
+Scope acquisition owns signer cleanup even if wire configuration fails. stop retires
+signing and result publication; the scope's closed state also fences late results
+before asynchronous finalizers finish. Retirement does not physically abort an
+already-dispatched caller-owned POST. Incoming composition must interrupt request
+fibers on disconnect/shutdown; the wire deadline remains enforced independently.
+
+Real loopback TLS tests verify delegate assertion signature/endpoint/client binding,
+fixed audience/source form, private result/invalid envelope, one-attempt replay,
+closed/retired owners, cancellation/late response and deadline refusal. These use a
+synthetic HTTPS token endpoint, not a fresh real-Keycloak delegation receipt. Trusted
+initial credential custody, original-human binding through the signed verifier,
+scoped delegated verification, current CP policy and session/browser/shared-pilot
+activation remain separate gates. Local pairing and public API contracts are unchanged.
+Rollback removes this private factory, contracts/entry/admissions and tests together;
+no persisted credential or deployment migration is introduced.

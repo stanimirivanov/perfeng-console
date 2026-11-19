@@ -96,6 +96,9 @@
       ],
       "#perfeng/bff-delegated-exchange": [
         "./src/bff/login/delegated-exchange.operation.ts"
+      ],
+      "#perfeng/bff-delegate-owner": [
+        "./src/bff/login/delegated-exchange.ts"
       ]
     }
   }

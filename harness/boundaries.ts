@@ -98,6 +98,7 @@ function inspectFile(root: string, file: string, owner: string): string[] {
       types: readonly string[];
     }> = {
       'src/bff/login/verified-code-exchange.ts': { values: ['Effect', 'Option', 'Semaphore'], types: ['Scope'] },
+      'src/bff/login/delegated-exchange.ts': { values: ['Effect', 'Option', 'Semaphore'], types: ['Scope'] },
       'src/bff/login/verified-exchange.operation.ts': { values: ['Effect'], types: [] },
       'src/bff/login/delegated-exchange.operation.ts': { values: ['Effect'], types: [] },
       'src/bff/login/verified-exchange-contracts.ts': { values: [], types: ['Effect'] },

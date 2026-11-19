@@ -36,6 +36,7 @@ parenthesized note may follow the target. Code review still governs permission c
 |---|---|
 | `#perfeng/bff-verified-exchange` | `./src/bff/login/verified-code-exchange.ts` |
 | `#perfeng/bff-delegated-exchange` | `./src/bff/login/delegated-exchange.operation.ts` |
+| `#perfeng/bff-delegate-owner` | `./src/bff/login/delegated-exchange.ts` |
 | `#perfeng/bff-key-resolver` | `./src/bff/login/identity/signing-key-resolver.ts` |
 | `#perfeng/bff-snapshot-verifier` | `./src/bff/login/identity/snapshot-verifier.ts` |
 | `#perfeng/contracts` | `./src/shared/contracts/public-api.ts` |

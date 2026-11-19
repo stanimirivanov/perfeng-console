@@ -21,3 +21,16 @@ export type DelegatedExchangeResult = {
   readonly candidates: UnverifiedDelegatedTokens;
   readonly requestStartedAtMs: number;
 };
+
+/** Configured separately from the login client; never supplied by a request. */
+export interface DelegatedExchangeConfig {
+  readonly issuer: string;
+  readonly ca: string;
+  readonly privateKeyPem: string;
+  readonly deadlineMs?: number;
+  readonly maxResponseBytes?: number;
+}
+export interface DelegatedExchange {
+  readonly exchange: (sourceToken: string, sourceValidUntilMs: number) => Effect.Effect<DelegatedExchangeResult, unknown>;
+  readonly stop: () => void;
+}
