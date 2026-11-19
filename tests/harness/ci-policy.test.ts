@@ -59,3 +59,19 @@ test('the real staged hook rejects staged bad work hidden by unstaged good work 
     assert.equal(readFileSync(join(root, 'state.txt'), 'utf8'), 'invalid');
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
+
+
+test('harness self-tests have a separate bounded job from browser qualification', () => {
+  const quality = readFileSync('.github/workflows/quality.yml', 'utf8');
+  const jobs = quality.split(/^  (?=[a-z][a-z-]*:\s*$)/m);
+  const browser = jobs.find(job => job.startsWith('browser:'))!;
+  const harness = jobs.find(job => job.startsWith('harness-self-test:'));
+  assert.ok(harness, 'Self-tests need their own job budget after browser qualification');
+  assert.doesNotMatch(browser, /run: make harness-self-test/);
+  for (const job of [browser, harness]) {
+    assert.match(job, /timeout-minutes: 10/);
+    assert.match(job, /uses: \.\/\.github\/actions\/bootstrap/);
+  }
+  assert.match(harness, /playwright install --with-deps chromium/);
+  assert.match(harness, /run: make harness-self-test/);
+});

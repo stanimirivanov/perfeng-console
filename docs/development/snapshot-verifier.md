@@ -15,7 +15,14 @@ comes from composition, never from a credential. Types do not establish key prov
 production key composition uses the [reviewed source/admission path](signing-key-source.md).
 
 The factory acquires one lifetime, 32 active-operation permits, a monotonic high-water
-observation and a closed-owner fence. Each call captures caller input before returning
+observation and a closed-owner fence. Both snapshot owners construct their
+private `epoch.ts` reader inside each Effect acquisition (issue #143). The reader
+starts below epoch zero, accepts equality and retains the last accepted value
+after invalid, throwing or regressing reads; those reads return undefined so
+the owner can project unavailable. It performs no scope, expiry or crypto
+accounting. Elapsed transaction clocks and signer retirement remain separate
+policies. Independent-acquisition regressions prevent moving this state to
+factory construction or module scope. Each call captures caller input before returning
 lazy work, uses a 3000 ms Effect deadline and refuses excess callers without queuing.
 Plain TypeScript owns bounded parsing/projections; token-profile.ts owns importJWK and
 jwtVerify. Effect wraps the foreign crypto promise; only callers/composition execute

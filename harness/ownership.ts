@@ -65,6 +65,7 @@ export const roles: Readonly<Record<string, Role>> = {
   'src/bff/login/identity/resolved-delegated.operation.ts': 'operation',
   'src/bff/login/identity/strict-json.ts': 'adapter',
   'src/bff/login/identity/signing-key.ts': 'adapter',
+  'src/bff/login/identity/epoch.ts': 'adapter',
   'src/bff/login/identity/token-profile.ts': 'adapter',
   'src/bff/login/identity/code-pair.ts': 'adapter',
   'src/bff/login/identity/snapshot-contracts.ts': 'port',

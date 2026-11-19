@@ -182,3 +182,17 @@ for (const inFlight of [false, true]) {
     }
   });
 }
+
+
+test('independent acquisitions of one snapshot factory retain separate clock history', async () => {
+  let observed = instant + 1;
+  const acquisition = makeSnapshotVerifier({ issuer, now: () => observed });
+  await Effect.runPromise(Effect.scoped(Effect.gen(function* () {
+    const first = yield* acquisition;
+    const second = yield* acquisition;
+    assert.equal((yield* first.verify(input())).ok, true);
+    observed = instant;
+    assert.equal((yield* second.verify(input())).ok, true);
+    assert.deepEqual(yield* first.verify(input()), { ok: false, reason: 'unavailable' });
+  })));
+});

@@ -1,4 +1,5 @@
 import { Effect, Option, Semaphore } from 'effect';
+import { makeEpochReader } from './epoch.ts';
 import { verifyDelegatedToken } from './token-profile.ts';
 import type { DelegatedSnapshotInput, DelegatedSnapshotResult, DelegatedSnapshotVerifier, SnapshotVerifierConfig } from './snapshot-contracts.ts';
 
@@ -17,16 +18,8 @@ export function makeDelegatedSnapshotVerifier(config: SnapshotVerifierConfig) {
     let closed = false;
     const isClosed = () => closed || ownerScope.state._tag === 'Closed';
     let outstandingCrypto = 0;
-    let highWater = -1;
+    const clock = makeEpochReader(now);
     yield* Effect.addFinalizer(() => Effect.sync(() => { closed = true; }));
-    function clock(): number | undefined {
-      try {
-        const value = now();
-        if (!Number.isSafeInteger(value) || value < 0 || Number.isNaN(new Date(value).getTime()) || value < highWater) return;
-        highWater = value;
-        return value;
-      } catch { return; }
-    }
     const verifier: DelegatedSnapshotVerifier = {
       verify(input) {
         // Snapshot before returning lazy work, so mutation cannot substitute its evidence.
