@@ -103,3 +103,9 @@ caller-trusted snapshots/context. Clone input before lazy work, retain native cr
 charges through cancellation until settlement, and fence scope/clock/freshness/expiry
 after crypto. No caller may infer key provenance, enrollment, session or service grants
 from this minimal observation. Key resolution/custody composition remains separate.
+
+`identity/resolved-delegated-verifier.ts` composes configured key resolution and
+scoped delegated crypto. Its operation consumes named ports, validates context before
+key I/O and fences late issuer/subject/expiry/freshness. Never accept a token-selected
+origin or a browser-provided snapshot. The minimal observation is not custody,
+session, enrollment or service permission; preserve the whole three-second budget.

@@ -120,3 +120,35 @@ composition and session/browser/current-policy admission remain pending. Future
 composition must retain those boundaries; a trusted snapshot type alone is no
 proof of provenance. Roll back this owner/contracts/alias/admissions/tests together;
 there is no public or persisted-state migration.
+
+
+## Resolved delegated verification — PR52ab, issue #133
+
+makeDelegatedVerifier composes the existing fixed-origin signing-key resolver/cache
+and scoped delegated snapshot verifier under one configured issuer and non-regressing
+clock. The operation owns named selector/resolver/crypto ports. It clones the original
+human/response context before returning lazy work and validates its bounded subject,
+request time, expires_in and strict response expiry before key I/O. Only a bounded
+untrusted kid may select a key; no token field can choose an issuer, URL or CA.
+
+Resolved issuer and key ID must match the configured owner/request. Verification
+uses the admitted key plus its original retrieval-start timestamp, never a caller
+snapshot. The full resolution-plus-crypto path has a three-second budget and at
+most 32 caller Effects without queueing. Completion rechecks owner lifetime, clock,
+key freshness and minimal signed issuer/subject/usable expiry. Closed/cancelled
+owners cannot publish late identity. Unknown keys, unavailable trust and deadline
+fail safely without credentials or diagnostic-bearing partial results.
+
+Existing CA/TLS/raw-header/response-size controls, cache freshness, single-flight,
+refresh-rate/miss limits, negative-state bounds and native crypto accounting remain
+owned by their existing modules. This adds no HTTP, crypto or dependency permission.
+The separately admitted code-pair resolver is unchanged; a shared lifecycle refactor
+is deliberately outside this behavior slice.
+
+Real loopback TLS tests exercise configured JWKS retrieval and fresh-cache reuse,
+actual delegated signatures and original-human/client binding, preflight refusals,
+wrong CA, cancellation/scope retirement during retrieval and whole-operation timeout.
+These are synthetic issuer tests, not actual-Keycloak delegated composition, original
+credential custody, CP enrollment/grants or session/browser/shared-pilot admission.
+Rollback removes new operation/composition/contracts/alias/admissions/tests together;
+no persistent resource, public API or local-pairing migration exists.

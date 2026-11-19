@@ -92,3 +92,9 @@ export type DelegatedSnapshotResult = {
 export interface DelegatedSnapshotVerifier {
   readonly verify: (input: DelegatedSnapshotInput) => Effect.Effect<DelegatedSnapshotResult>;
 }
+
+/** Private original-human/response context; no caller-provided key or destination. */
+export type DelegatedRequest = Omit<DelegatedSnapshotInput, 'snapshot'>;
+export interface DelegatedVerifier {
+  readonly verify: (input: DelegatedRequest) => Effect.Effect<DelegatedSnapshotResult, unknown>;
+}

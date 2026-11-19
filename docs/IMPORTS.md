@@ -40,6 +40,7 @@ parenthesized note may follow the target. Code review still governs permission c
 | `#perfeng/bff-key-resolver` | `./src/bff/login/identity/signing-key-resolver.ts` |
 | `#perfeng/bff-snapshot-verifier` | `./src/bff/login/identity/snapshot-verifier.ts` |
 | `#perfeng/bff-delegated-snapshot` | `./src/bff/login/identity/delegated-snapshot-verifier.ts` |
+| `#perfeng/bff-resolved-delegated` | `./src/bff/login/identity/resolved-delegated-verifier.ts` |
 | `#perfeng/contracts` | `./src/shared/contracts/public-api.ts` |
 | `#perfeng/bff` | `./src/bff/public-api.ts` |
 | `#perfeng/bff-config` | `./src/bff/config-public-api.ts` |
