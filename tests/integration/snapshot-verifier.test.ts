@@ -142,3 +142,43 @@ test('cancelled foreign crypto retains its admission slot until the native promi
     t.mock.restoreAll();
   }
 });
+
+for (const inFlight of [false, true]) {
+  test(`scope closure fences ${inFlight ? 'in-flight crypto' : 'escaped calls'} while later cleanup is delayed`, { timeout: 10000 }, async t => {
+    const cleanup = Promise.withResolvers<void>();
+    const cleanupStarted = Promise.withResolvers<void>();
+    const crypto = Promise.withResolvers<void>();
+    const cryptoStarted = Promise.withResolvers<void>();
+    const native = globalThis.crypto.subtle.verify.bind(globalThis.crypto.subtle);
+    let dispatches = 0;
+    t.mock.method(globalThis.crypto.subtle, 'verify', async (...args: Parameters<typeof native>) => {
+      dispatches++;
+      cryptoStarted.resolve();
+      await crypto.promise;
+      return native(...args);
+    });
+    const scope = Scope.makeUnsafe();
+    let closing: Promise<void> | undefined;
+    try {
+      const verifier = await Effect.runPromise(Scope.provide(makeSnapshotVerifier({ issuer, now: () => instant }), scope));
+      await Effect.runPromise(Scope.provide(Effect.addFinalizer(() => Effect.promise(() => {
+        cleanupStarted.resolve();
+        return cleanup.promise;
+      })), scope));
+      const request = input();
+      const pending = inFlight ? Effect.runPromiseExit(verifier.verify(request)) : undefined;
+      if (inFlight) await cryptoStarted.promise;
+      closing = Effect.runPromise(Scope.close(scope, Exit.succeed(undefined)));
+      await cleanupStarted.promise;
+      crypto.resolve();
+      const result = await (pending ?? Effect.runPromiseExit(verifier.verify(request)));
+      assert.equal(result._tag, 'Failure');
+      if (!inFlight) assert.equal(dispatches, 0);
+    } finally {
+      crypto.resolve();
+      cleanup.resolve();
+      await (closing ?? Effect.runPromise(Scope.close(scope, Exit.succeed(undefined))));
+      t.mock.restoreAll();
+    }
+  });
+}
