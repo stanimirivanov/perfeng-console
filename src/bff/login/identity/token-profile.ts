@@ -24,6 +24,17 @@ type VerifiedProfile = Refusal | (Extract<Result, { ok: true; }> & {
 const invalid = (): Refusal => ({ ok: false, reason: 'invalid_token' });
 const unavailable = (): Refusal => ({ ok: false, reason: 'unavailable' });
 
+// Fixed two-client trust profile: initial access targets the delegate, not the login client.
+const PROFILES = {
+  id: { audience: 'perfeng-console-login', authorizedParty: 'perfeng-console-login', claimType: 'ID' },
+  'initial-access': { audience: 'perfeng-console-delegate', authorizedParty: 'perfeng-console-login', claimType: 'Bearer' },
+  delegated: { audience: 'perfeng-control-plane', authorizedParty: 'perfeng-console-delegate', claimType: 'Bearer' },
+} satisfies Record<TokenVerificationInput['profile'], {
+  readonly audience: string;
+  readonly authorizedParty: string;
+  readonly claimType: 'ID' | 'Bearer';
+}>;
+
 function objectSegment(segment: string): Record<string, unknown> {
   if (!/^[A-Za-z0-9_-]+$/.test(segment)) throw new Error('Noncanonical segment');
   const bytes = Buffer.from(segment, 'base64url');
@@ -60,15 +71,15 @@ export async function verifyTokenProfile(token: unknown, input: TokenVerificatio
     const origin = new URL(issuer);
     if (origin.protocol !== 'https:' || origin.href !== issuer || origin.username || origin.password || origin.search || origin.hash ||
         !/^\/realms\/[A-Za-z0-9_-]{1,128}$/.test(origin.pathname)) return unavailable();
-    if (typeof token !== 'string' || token.length > 16384 || !['id', 'initial-access', 'delegated'].includes(profile)) return invalid();
+    if (typeof token !== 'string' || token.length > 16384 || typeof profile !== 'string' || !Object.hasOwn(PROFILES, profile)) return invalid();
     const { kid, claims } = compactToken(token);
     if (new Set(snapshot.keys.map(key => key.kid)).size !== snapshot.keys.length) return unavailable();
     const selected = snapshot.keys.filter(key => key.kid === kid);
     if (selected.length !== 1) return invalid();
     const key = publicSigningKey(selected[0]);
     if (!key) return unavailable();
-    const audience = profile === 'id' ? 'perfeng-console-login' : profile === 'delegated' ? 'perfeng-control-plane' : 'perfeng-console-delegate';
-    if (claims.aud !== audience || claims.azp !== (profile === 'delegated' ? 'perfeng-console-delegate' : 'perfeng-console-login') || claims.typ !== (profile === 'id' ? 'ID' : 'Bearer') ||
+    const { audience, authorizedParty, claimType } = PROFILES[profile];
+    if (claims.aud !== audience || claims.azp !== authorizedParty || claims.typ !== claimType ||
         typeof claims.sub !== 'string' || !claims.sub || claims.sub.length > 256 || /[\x00-\x20\x7f]/.test(claims.sub) ||
         typeof claims.iat !== 'number' || !Number.isSafeInteger(claims.iat) || typeof claims.exp !== 'number' || !Number.isSafeInteger(claims.exp) ||
         claims.exp <= claims.iat || claims.exp - claims.iat > 300 ||

@@ -89,3 +89,32 @@ test('an actual weak RSA snapshot is unavailable before it can become verificati
   const key = { ...weak.publicKey.export({ format: 'jwk' }), kid: 'reviewed-key', use: 'sig', alg: 'RS256' };
   assert.deepEqual(await verifyCandidate(token(claims(), undefined, weak.privateKey), { ...options(), snapshot: { fetchedAtMs: now * 1000, keys: [key] } }), { ok: false, reason: 'unavailable' });
 });
+
+test('every signed profile keeps its exact audience, authorized party and claim type', async () => {
+  const bindings = [
+    { profile: 'id', aud: 'perfeng-console-login', azp: 'perfeng-console-login', typ: 'ID' },
+    { profile: 'initial-access', aud: 'perfeng-console-delegate', azp: 'perfeng-console-login', typ: 'Bearer' },
+    { profile: 'delegated', aud: 'perfeng-control-plane', azp: 'perfeng-console-delegate', typ: 'Bearer' },
+  ] as const;
+  for (const { profile, aud, azp, typ } of bindings) {
+    const input = { ...options(), profile };
+    const body = { ...claims(), aud, azp, typ };
+    assert.deepEqual(await verifyCandidate(token(body), input), { ok: true, issuer, subject: 'fixture-subject', profile });
+    const wrongAudiences = ['perfeng-console-login', 'perfeng-console-delegate', 'perfeng-control-plane'].filter(value => value !== aud);
+    const substitutions = [
+      ...wrongAudiences.map(value => ({ aud: value })),
+      { aud: [aud] },
+      { azp: azp === 'perfeng-console-login' ? 'perfeng-console-delegate' : 'perfeng-console-login' },
+      { typ: typ === 'ID' ? 'Bearer' : 'ID' },
+    ];
+    for (const changed of substitutions) {
+      assert.deepEqual(await verifyCandidate(token({ ...body, ...changed }), input), { ok: false, reason: 'invalid_token' });
+    }
+  }
+});
+
+test('unsupported runtime profiles refuse before any profile default or inherited lookup', async () => {
+  for (const profile of ['unknown', '', '__proto__', 'constructor', 'toString', undefined, null, 1, {}]) {
+    assert.deepEqual(await verifyCandidate(token(), { ...options(), profile: profile as never }), { ok: false, reason: 'invalid_token' });
+  }
+});

@@ -47,6 +47,17 @@ ASCII bytes; malformed/mismatch refuses. Absence is allowed in this code-flow pr
 Matching subject/times without at_hash does not prove a common response; immutable
 custody from one consumed authenticated POST remains a later integration obligation.
 
+## Fixed token-profile bindings — issue #146
+
+`token-profile.ts` keeps an exhaustive private table for audience, authorized party
+(azp) and claim type. ID tokens bind login/login/ID; initial access binds
+delegate/login/Bearer; delegated access binds control-plane/delegate/Bearer, using
+the existing full Perfeng client identifiers. Unsupported runtime profile names,
+including inherited object property names, are rejected before lookup. A compiler
+probe extends the profile union in memory and requires a missing-binding diagnostic;
+signed qualification fixtures independently pin each profile and its substitutions.
+Nonce, strict parsing, signature and time checks remain separate obligations.
+
 ## Qualification and dependency boundary
 
 The old fixture primitive files are named re-export shims, not duplicate implementations.
