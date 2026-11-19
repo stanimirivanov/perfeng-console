@@ -77,3 +77,10 @@ Operations consume named ports and never import concrete HTTP/crypto adapters. I
 result is a minimal verified observation, not a session or service grant. Preserve
 once-only consumption, response/return-intent custody, caller interruption and late
 retirement/expiry fences. begin's cookie instructions remain server-only.
+
+`login/delegated-exchange.operation.ts` constructs one private, lazy delegate attempt.
+Use only server-owned initial-token custody and its verified expiry. It fixes the
+delegate caller and API audience, consumes before POST and never retries uncertain
+work. Its output remains an unverified credential candidate: no session, enrolled
+identity, service grant or browser DTO may be created from it. Transport/signature
+composition and signed delegated-profile admission remain separate gates.

@@ -93,6 +93,9 @@
       ],
       "#perfeng/bff-verified-exchange": [
         "./src/bff/login/verified-code-exchange.ts"
+      ],
+      "#perfeng/bff-delegated-exchange": [
+        "./src/bff/login/delegated-exchange.operation.ts"
       ]
     }
   }
