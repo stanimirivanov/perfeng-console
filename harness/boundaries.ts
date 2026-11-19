@@ -64,7 +64,9 @@ function inspectFile(root: string, file: string, owner: string): string[] {
         types?: readonly string[];
       }>> = {
         'resolved-pair.operation.ts': { effect: { values: ['Effect', 'Option', 'Semaphore'] } },
+        'resolved-delegated.operation.ts': { effect: { values: ['Effect', 'Option', 'Semaphore'] } },
         'resolved-pair-verifier.ts': { effect: { values: ['Effect'], types: ['Scope'] } },
+        'resolved-delegated-verifier.ts': { effect: { values: ['Effect'], types: ['Scope'] } },
         'snapshot-verifier.ts': { effect: { values: ['Effect', 'Option', 'Semaphore'] } },
         'delegated-snapshot-verifier.ts': { effect: { values: ['Effect', 'Option', 'Semaphore'] } },
         'code-pair.ts': { 'node:crypto': { values: ['createHash'] } },

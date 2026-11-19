@@ -102,6 +102,9 @@
       ],
       "#perfeng/bff-delegated-snapshot": [
         "./src/bff/login/identity/delegated-snapshot-verifier.ts"
+      ],
+      "#perfeng/bff-resolved-delegated": [
+        "./src/bff/login/identity/resolved-delegated-verifier.ts"
       ]
     }
   }
