@@ -88,3 +88,47 @@ test('source expiry while signing refuses before dispatch', async () => {
   assert.equal((await Effect.runPromise(delegateOnce(f.deps, 'initial.access.token', 10000))).ok, false);
   assert.equal(f.posts(), 0);
 });
+
+test('completion rollback after dispatch refuses before decoding and cannot replay', async () => {
+  const f = fixture();
+  const times = [1000, 1100, 1050];
+  let decodes = 0;
+  const deps = { ...f.deps, now: () => times.shift()!, decode: () => { decodes++; return f.deps.decode(); } };
+  const attempt = delegateOnce(deps, 'initial.access.token', 10000);
+  assert.deepEqual(await Effect.runPromise(attempt), { ok: false, reason: 'unavailable' });
+  assert.equal(decodes, 0);
+  assert.deepEqual(await Effect.runPromise(attempt), { ok: false, reason: 'unavailable' });
+  assert.equal(f.posts(), 1);
+});
+
+test('equal or increasing completion retains the original response lifetime anchor', async () => {
+  for (const finished of [1100, 1150]) {
+    const f = fixture();
+    const times = [1000, 1100, finished];
+    const result = await Effect.runPromise(delegateOnce({ ...f.deps, now: () => times.shift()! }, 'initial.access.token', 10000));
+    assert.deepEqual(result, { ok: true, candidates: { stage: 'unverified-delegated', accessToken: 'candidate', expiresIn: 120 }, requestStartedAtMs: 1000 });
+    assert.equal(f.posts(), 1);
+  }
+});
+
+test('invalid or throwing clocks refuse at every observation', async () => {
+  for (const failedRead of [0, 1, 2]) {
+    for (const badTime of [NaN, Infinity, -1, 1000.5, 'throw'] as const) {
+      const f = fixture();
+      let reads = 0;
+      let decodes = 0;
+      const deps = {
+        ...f.deps,
+        now: () => {
+          if (reads++ !== failedRead) return 1000;
+          if (badTime === 'throw') throw new Error('private-clock-failure');
+          return badTime;
+        },
+        decode: () => { decodes++; return f.deps.decode(); },
+      };
+      assert.deepEqual(await Effect.runPromise(delegateOnce(deps, 'initial.access.token', 10000)), { ok: false, reason: 'unavailable' });
+      assert.equal(decodes, 0);
+      assert.equal(f.posts(), failedRead === 2 ? 1 : 0);
+    }
+  }
+});
