@@ -109,3 +109,10 @@ scoped delegated crypto. Its operation consumes named ports, validates context b
 key I/O and fences late issuer/subject/expiry/freshness. Never accept a token-selected
 origin or a browser-provided snapshot. The minimal observation is not custody,
 session, enrollment or service permission; preserve the whole three-second budget.
+
+`login/verified-delegation.ts` joins private delegate exchange and signed resolved
+verification. Only trusted initial-login custody may provide its context; bind the
+original issuer/human, retain credentials inside the operation, clamp validity by
+both lifetimes and fence late results. Its minimal observation creates neither a
+session nor current CP authority. Source proof/custody and route activation remain
+separate; never serialize the input or raw candidate into browser DTOs.

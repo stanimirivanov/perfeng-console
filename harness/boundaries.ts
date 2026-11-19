@@ -101,10 +101,13 @@ function inspectFile(root: string, file: string, owner: string): string[] {
       types: readonly string[];
     }> = {
       'src/bff/login/verified-code-exchange.ts': { values: ['Effect', 'Option', 'Semaphore'], types: ['Scope'] },
+      'src/bff/login/verified-delegation.ts': { values: ['Effect', 'Option', 'Semaphore'], types: ['Scope'] },
       'src/bff/login/delegated-exchange.ts': { values: ['Effect', 'Option', 'Semaphore'], types: ['Scope'] },
       'src/bff/login/verified-exchange.operation.ts': { values: ['Effect'], types: [] },
+      'src/bff/login/verified-delegation.operation.ts': { values: ['Effect'], types: [] },
       'src/bff/login/delegated-exchange.operation.ts': { values: ['Effect'], types: [] },
       'src/bff/login/verified-exchange-contracts.ts': { values: [], types: ['Effect'] },
+      'src/bff/login/verified-delegation-contracts.ts': { values: [], types: ['Effect'] },
       'src/bff/login/delegated-exchange-contracts.ts': { values: [], types: ['Effect'] },
     };
     const verifiedAdmission = verifiedExchangeEffect[relative(root, file)];

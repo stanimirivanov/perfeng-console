@@ -105,6 +105,9 @@
       ],
       "#perfeng/bff-resolved-delegated": [
         "./src/bff/login/identity/resolved-delegated-verifier.ts"
+      ],
+      "#perfeng/bff-verified-delegation": [
+        "./src/bff/login/verified-delegation.ts"
       ]
     }
   }

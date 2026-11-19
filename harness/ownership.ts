@@ -48,10 +48,13 @@ export const roles: Readonly<Record<string, Role>> = {
   'src/bff/login/code-exchange.operation.ts': 'operation',
   'src/bff/login/code-exchange.ts': 'composition',
   'src/bff/login/verified-code-exchange.ts': 'composition',
+  'src/bff/login/verified-delegation.ts': 'composition',
   'src/bff/login/delegated-exchange.ts': 'composition',
   'src/bff/login/verified-exchange.operation.ts': 'operation',
+  'src/bff/login/verified-delegation.operation.ts': 'operation',
   'src/bff/login/delegated-exchange.operation.ts': 'operation',
   'src/bff/login/verified-exchange-contracts.ts': 'port',
+  'src/bff/login/verified-delegation-contracts.ts': 'port',
   'src/bff/login/delegated-exchange-contracts.ts': 'port',
   'src/bff/login/identity/resolved-pair-verifier.ts': 'composition',
   'src/bff/login/identity/resolved-delegated-verifier.ts': 'composition',
@@ -183,10 +186,14 @@ export function checkOwnership(root: string, registry: Readonly<Record<string, R
           report(node, 'OWN-04', 'Consume shared contracts through declaration-level import type.');
         if (targetName.startsWith('src/generated/')) return;
         const keyContractExport = keyEntry && targetName === 'src/bff/login/identity/signing-key-contracts.ts' && ts.isExportDeclaration(node) && node.isTypeOnly;
-        // PR52v composes constructors, never another runtime; keep this exception exact.
-        const factoryMember = name === 'src/bff/login/verified-code-exchange.ts' && targetRole === 'composition'
+        // Reviewed login/delegation assembly imports exact constructors, never another runtime.
+        const loginFactoryMember = name === 'src/bff/login/verified-code-exchange.ts' && targetRole === 'composition'
           ? targetName === 'src/bff/login/code-exchange.ts' ? 'createCodeExchange'
             : targetName === 'src/bff/login/identity/resolved-pair-verifier.ts' ? 'makeCodePairVerifier' : undefined : undefined;
+        const delegationFactoryMember = name === 'src/bff/login/verified-delegation.ts' && targetRole === 'composition'
+          ? targetName === 'src/bff/login/delegated-exchange.ts' ? 'makeDelegatedExchange'
+            : targetName === 'src/bff/login/identity/resolved-delegated-verifier.ts' ? 'makeDelegatedVerifier' : undefined : undefined;
+        const factoryMember = loginFactoryMember ?? delegationFactoryMember;
         const factoryClause = ts.isImportDeclaration(node) ? node.importClause : undefined;
         const factoryBindings = factoryClause && !factoryClause.name && factoryClause.namedBindings;
         const factoryImport = factoryMember && !factoryClause?.isTypeOnly && factoryBindings && ts.isNamedImports(factoryBindings) &&
