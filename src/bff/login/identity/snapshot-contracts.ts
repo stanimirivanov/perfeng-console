@@ -76,3 +76,19 @@ export interface DelegatedVerificationInput extends Omit<TokenVerificationInput,
   readonly requestStartedAtMs: number;
   readonly expiresIn: number;
 }
+
+export interface DelegatedSnapshotInput extends Omit<DelegatedVerificationInput, 'issuer' | 'nowMs'> {
+  readonly token: string;
+}
+export type DelegatedSnapshotResult = {
+  readonly ok: true;
+  readonly issuer: string;
+  readonly subject: string;
+  readonly validUntilMs: number;
+} | {
+  readonly ok: false;
+  readonly reason: 'invalid_token' | 'unavailable' | 'deadline';
+};
+export interface DelegatedSnapshotVerifier {
+  readonly verify: (input: DelegatedSnapshotInput) => Effect.Effect<DelegatedSnapshotResult>;
+}

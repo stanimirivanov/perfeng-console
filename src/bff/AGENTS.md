@@ -97,3 +97,9 @@ Never treat its candidate as identity, session or CP permission. Incoming compos
 owns request interruption; stop/closed scope fence publication and retire the signer
 but do not promise to abort dispatched HTTP. Preserve the fixed issuer/CA/client,
 32 caller bound and one-dispatch attempt; no automatic retry after uncertainty.
+
+`identity/delegated-snapshot-verifier.ts` owns scoped delegated crypto admission over
+caller-trusted snapshots/context. Clone input before lazy work, retain native crypto
+charges through cancellation until settlement, and fence scope/clock/freshness/expiry
+after crypto. No caller may infer key provenance, enrollment, session or service grants
+from this minimal observation. Key resolution/custody composition remains separate.
