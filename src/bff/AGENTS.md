@@ -116,3 +116,10 @@ original issuer/human, retain credentials inside the operation, clamp validity b
 both lifetimes and fence late results. Its minimal observation creates neither a
 session nor current CP authority. Source proof/custody and route activation remain
 separate; never serialize the input or raw candidate into browser DTOs.
+
+`login/login-delegation.ts` owns consumed-login response custody through verified
+delegation, using separate login/delegate key configuration. Only signed original
+pair proof may supply the original human; retain exact initial access primitives
+before awaits. Keep callback navigation/cookie deletion independent of claims and
+return only minimal observation. Missing at_hash keeps its accepted custody limits;
+no session, stored credential or service permission is activated by this owner.

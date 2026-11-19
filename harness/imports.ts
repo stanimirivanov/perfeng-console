@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 export const publicImports: Readonly<Record<string, string>> = {
+  "#perfeng/bff-login-delegation": "src/bff/login/login-delegation.ts",
   "#perfeng/bff-verified-delegation": "src/bff/login/verified-delegation.ts",
   "#perfeng/bff-delegate-owner": "src/bff/login/delegated-exchange.ts",
   "#perfeng/bff-delegated-exchange": "src/bff/login/delegated-exchange.operation.ts",

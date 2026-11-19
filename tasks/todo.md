@@ -29,6 +29,7 @@ Scenario Lab lives inside the Console under Verification, with a distinct Materi
 - [ ] [M05-PR48 — Serve service-authorized comparisons by native Run ID](plan.md#m05-pr48-serve-service-authorized-comparisons-by-native-run-id) · perfeng-control-plane · depends on PR45, PR46, PR47, PR27 · G6
 - [ ] [M05-PR52 — Sign in to the console with a service-scoped identity](plan.md#m05-pr52-sign-in-to-the-console-with-a-service-scoped-identity) · perfeng-console · depends on PR5, PR43, PR58 · G6
   - PR52v: [accepted scoped runtime-admission decision](../docs/decisions/0004-qualify-jwt-verification-before-runtime-adoption.md) admits the private verifier, key-source/cache and consumed-exchange composition; provider-driven BFF transaction qualified in Environment PR #400; shared-user/session activation remains pending.
+  - PR52ad: consumed-login custody feeds verified delegation without caller-supplied original identity; actual-provider full-flow/session admission remain pending.
   - PR52ac: private verified delegation joins actual wire and resolved crypto, with original context/expiry fences; consumed-login custody, real-provider and session admission remain pending.
   - PR52ab: private key-resolved delegated verification; actual-provider custody/composition and session admission remain pending.
   - PR52aa: scoped delegated snapshot crypto admission with deadline/native-work and late-result fences; key resolution/custody and session admission remain pending.
