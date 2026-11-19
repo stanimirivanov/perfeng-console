@@ -73,7 +73,7 @@ export function inspectProjectImports(root: string, file: string, text: string):
         values: readonly string[];
         types: readonly string[];
       }> = {
-        'identity-jwt/candidate.ts': { values: ['verifyCandidate', 'verifyTokenProfile', 'tokenKeyId'], types: ['QualificationInput'] },
+        'identity-jwt/candidate.ts': { values: ['verifyCandidate', 'verifyTokenProfile', 'tokenKeyId', 'verifyDelegatedToken'], types: ['QualificationInput'] },
         'identity-jwt/pair-candidate.ts': { values: ['codePairKeyIds', 'verifyCodePair'], types: ['CodePairRequest', 'CodePairResult'] },
         'identity-jwt/strict-json.ts': { values: ['strictJsonObject'], types: [] },
         'identity-jwt/signing-key.ts': { values: ['PRIVATE_KEY_MEMBERS', 'publicSigningKey'], types: ['PublicSigningKey'] },

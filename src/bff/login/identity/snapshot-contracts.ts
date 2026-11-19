@@ -2,7 +2,7 @@ import type { Effect } from 'effect';
 
 export interface TokenVerificationInput {
   readonly issuer: string;
-  readonly profile: 'id' | 'initial-access';
+  readonly profile: 'id' | 'initial-access' | 'delegated';
   readonly nonce?: string | undefined;
   readonly nowMs: number;
   readonly snapshot: {
@@ -68,4 +68,11 @@ export type CodePairKeySelection = {
 };
 export interface CodePairVerifier {
   readonly verify: (input: CodePairRequest) => Effect.Effect<SnapshotVerificationResult, unknown>;
+}
+
+/** Trusted original human and response context, supplied only by the server custody owner. */
+export interface DelegatedVerificationInput extends Omit<TokenVerificationInput, 'profile' | 'nonce'> {
+  readonly subject: string;
+  readonly requestStartedAtMs: number;
+  readonly expiresIn: number;
 }

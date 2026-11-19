@@ -25,3 +25,32 @@ does not extend that receipt. Later work must compose server-only credential cus
 repeat real-provider delegation and verify same-subject/client/audience/time before
 any authenticated session or CP dispatch. Revert operation/contracts/alias/tests
 together; no persistent state or public contract migration is required.
+
+
+## Signed delegated binding — PR52y, issue #127
+
+The existing private JWT adapter now admits a separate delegated profile: exact
+configured issuer, single perfeng-control-plane audience, perfeng-console-delegate
+azp and Bearer claim type. ID and initial-access profiles retain their original
+audience/caller rules. The same strict compact/duplicate/header/RSA/snapshot and
+jose signature checks apply; no new crypto implementation or dependency is added.
+
+verifyDelegatedToken binds the signed subject to the original verified human supplied
+by a trusted custody owner, not a claim-derived expectation. It captures subject,
+issuer, observation time and POST-start/expiry primitives before awaits. Issuance
+cannot precede that request by more than the accepted 30-second skew. Usable expiry
+is the minimum of signed exp and POST-start plus expires_in (1..300 seconds);
+expiry equality refuses, and skew never extends that usable expiry.
+
+This helper verifies one observation at its supplied instant and snapshot. It has no
+network, session, grant or token-storage authority. The later scoped owner must
+recheck activity/current time after async verification, bound crypto work and keep
+credentials server-only. Original-login lifetime/session policy remains that owner's
+obligation. It must not use role claims as HUMAN enrollment or service permission.
+
+The isolated identity-jwt-qualification target includes independently signed positive
+and substitution/expiry/stale-key/forgery tests. This is synthetic profile evidence,
+not actual-Keycloak delegated composition, lifecycle or browser/session admission.
+The existing real-provider receipt remains tied to its prior source revisions.
+Rollback reverts the new delegated profile/helper and its qualification exports/tests
+together; no public API, local-pairing or stored-state migration is involved.

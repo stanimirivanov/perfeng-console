@@ -302,3 +302,12 @@ same implementation. The old effect-node source-to-this-fixture permission is
 retired; production imports no qualification module. Earlier receipts remain
 historical and the [key-source guide](../../../docs/development/signing-key-source.md)
 records current scope and the remaining activation gates.
+
+## PR52y — delegated profile binding (issue #127)
+
+The gate now includes delegated.test.ts (26 cases total). Its independent signed
+fixtures bind the original verified human to the exact delegated API audience/client
+and bound usable validity by signed expiration and exchange-response time. See
+[the private binding contract](../../../docs/development/delegated-exchange.md).
+This is synthetic signature/profile evidence, not provider/session admission. Earlier
+receipts and case counts describe their historical source selections.

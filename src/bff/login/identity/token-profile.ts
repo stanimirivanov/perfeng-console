@@ -2,7 +2,7 @@ import { importJWK, jwtVerify } from 'jose';
 import { strictJsonObject } from './strict-json.ts';
 import { publicSigningKey } from './signing-key.ts';
 
-import type { TokenVerificationInput } from './snapshot-contracts.ts';
+import type { TokenVerificationInput, DelegatedVerificationInput } from './snapshot-contracts.ts';
 export type { TokenVerificationInput as QualificationInput } from './snapshot-contracts.ts';
 type Result = {
   readonly ok: true;
@@ -60,15 +60,15 @@ export async function verifyTokenProfile(token: unknown, input: TokenVerificatio
     const origin = new URL(issuer);
     if (origin.protocol !== 'https:' || origin.href !== issuer || origin.username || origin.password || origin.search || origin.hash ||
         !/^\/realms\/[A-Za-z0-9_-]{1,128}$/.test(origin.pathname)) return unavailable();
-    if (typeof token !== 'string' || token.length > 16384 || !['id', 'initial-access'].includes(profile)) return invalid();
+    if (typeof token !== 'string' || token.length > 16384 || !['id', 'initial-access', 'delegated'].includes(profile)) return invalid();
     const { kid, claims } = compactToken(token);
     if (new Set(snapshot.keys.map(key => key.kid)).size !== snapshot.keys.length) return unavailable();
     const selected = snapshot.keys.filter(key => key.kid === kid);
     if (selected.length !== 1) return invalid();
     const key = publicSigningKey(selected[0]);
     if (!key) return unavailable();
-    const audience = profile === 'id' ? 'perfeng-console-login' : 'perfeng-console-delegate';
-    if (claims.aud !== audience || claims.azp !== 'perfeng-console-login' || claims.typ !== (profile === 'id' ? 'ID' : 'Bearer') ||
+    const audience = profile === 'id' ? 'perfeng-console-login' : profile === 'delegated' ? 'perfeng-control-plane' : 'perfeng-console-delegate';
+    if (claims.aud !== audience || claims.azp !== (profile === 'delegated' ? 'perfeng-console-delegate' : 'perfeng-console-login') || claims.typ !== (profile === 'id' ? 'ID' : 'Bearer') ||
         typeof claims.sub !== 'string' || !claims.sub || claims.sub.length > 256 || /[\x00-\x20\x7f]/.test(claims.sub) ||
         typeof claims.iat !== 'number' || !Number.isSafeInteger(claims.iat) || typeof claims.exp !== 'number' || !Number.isSafeInteger(claims.exp) ||
         claims.exp <= claims.iat || claims.exp - claims.iat > 300 ||
@@ -84,4 +84,27 @@ export async function verifyTokenProfile(token: unknown, input: TokenVerificatio
 export async function verifyCandidate(token: unknown, input: TokenVerificationInput): Promise<Result> {
   const verified = await verifyTokenProfile(token, input);
   return verified.ok ? { ok: true, issuer: verified.issuer, subject: verified.subject, profile: verified.profile } : verified;
+}
+
+/** Verify private delegated response binding; never infer enrollment, session or grants. */
+export async function verifyDelegatedToken(token: unknown, input: DelegatedVerificationInput): Promise<{
+  readonly ok: true;
+  readonly issuer: string;
+  readonly subject: string;
+  readonly validUntilMs: number;
+} | Refusal> {
+  const { subject, nowMs, requestStartedAtMs, expiresIn, issuer } = input;
+  if (typeof subject !== 'string' || !subject || subject.length > 256 ||
+      !Number.isSafeInteger(requestStartedAtMs) || requestStartedAtMs < 0 || requestStartedAtMs > nowMs ||
+      !Number.isSafeInteger(expiresIn) || expiresIn < 1 || expiresIn > 300) return invalid();
+  const responseEnd = requestStartedAtMs + expiresIn * 1000;
+  if (!Number.isSafeInteger(responseEnd) || responseEnd <= nowMs) return invalid();
+  // Capture owned context before crypto awaits; caller mutation must not rebind the human.
+  const verified = await verifyTokenProfile(token, { ...input, profile: 'delegated' });
+  if (!verified.ok) return verified;
+  const validUntilMs = Math.min(verified.expiresAtMs, responseEnd);
+  if (verified.subject !== subject || verified.issuedAtMs < requestStartedAtMs - 30000 ||
+      verified.issuedAtMs > nowMs + 30000 || (verified.notBeforeMs !== undefined && verified.notBeforeMs > nowMs + 30000) ||
+      validUntilMs <= nowMs) return invalid();
+  return { ok: true, issuer, subject, validUntilMs };
 }
