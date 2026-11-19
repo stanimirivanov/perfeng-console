@@ -61,6 +61,7 @@ export const roles: Readonly<Record<string, Role>> = {
   'src/bff/login/identity/code-pair.ts': 'adapter',
   'src/bff/login/identity/snapshot-contracts.ts': 'port',
   'src/bff/login/identity/snapshot-verifier.ts': 'adapter',
+  'src/bff/login/identity/delegated-snapshot-verifier.ts': 'adapter',
   'src/bff/login/identity/qualification-api.ts': 'entry',
   'src/bff/login/identity/signing-key-contracts.ts': 'port',
   'src/bff/login/identity/signing-key-get.ts': 'adapter',

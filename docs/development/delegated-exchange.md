@@ -87,3 +87,36 @@ scoped delegated verification, current CP policy and session/browser/shared-pilo
 activation remain separate gates. Local pairing and public API contracts are unchanged.
 Rollback removes this private factory, contracts/entry/admissions and tests together;
 no persisted credential or deployment migration is introduced.
+
+
+## Scoped snapshot verification — PR52aa, issue #131
+
+makeDelegatedSnapshotVerifier wraps the admitted delegated profile in a private
+Effect lifetime. It accepts only explicit trusted snapshots and original-human/
+response context; it does no key resolution, HTTP, token storage or session work.
+Inputs are cloned when verify is called, before the lazy operation is returned.
+The original code-pair snapshot owner is unchanged. Lifecycle guards are local to
+this separately admitted delegated owner; a shared lifecycle refactor is deliberately
+not mixed into this behavior change.
+
+The caller cap and outstanding-native-crypto cap are both 32, with no wait queue.
+Foreign WebCrypto is not assumed abortable: interruption may release the Effect
+permit, but native work stays charged until its promise settles. A three-second
+budget returns a safe deadline refusal. Crypto errors are projected to unavailable,
+not diagnostic-bearing response bodies. Scope closure interrupts observation even
+if cleanup finalizers have not finished; neither late crypto nor cancellation can
+publish identity after retirement.
+
+The owner checks a non-regressing wall clock before and after crypto, key freshness
+at completion and strict usable expiration. Caller/context mutation cannot replace
+the captured subject, key or response-time bounds. Results contain only minimal
+issuer/subject/validUntilMs or safe refusal, never raw credentials or grants.
+
+Tests exercise real signed delegated JWTs, mutation, clock regression, expiry/trust
+ageing after crypto, closed/closing scope, native cancellation accounting, overload
+and a stalled-crypto deadline. This is synthetic scoped verification evidence only.
+Key-resolved delegated verification, original credential custody, actual-provider
+composition and session/browser/current-policy admission remain pending. Future
+composition must retain those boundaries; a trusted snapshot type alone is no
+proof of provenance. Roll back this owner/contracts/alias/admissions/tests together;
+there is no public or persisted-state migration.

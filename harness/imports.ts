@@ -7,6 +7,7 @@ export const publicImports: Readonly<Record<string, string>> = {
   "#perfeng/bff-delegated-exchange": "src/bff/login/delegated-exchange.operation.ts",
   "#perfeng/bff-verified-exchange": "src/bff/login/verified-code-exchange.ts",
   "#perfeng/bff-key-resolver": "src/bff/login/identity/signing-key-resolver.ts",
+  "#perfeng/bff-delegated-snapshot": "src/bff/login/identity/delegated-snapshot-verifier.ts",
   "#perfeng/bff-snapshot-verifier": "src/bff/login/identity/snapshot-verifier.ts",
   "#perfeng/run-transitions": "src/generated/transitions.ts",
   "#perfeng/run-types": "src/generated/run.ts",
