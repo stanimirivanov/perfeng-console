@@ -6,6 +6,7 @@ const corrections: Readonly<Record<string, string>> = {
   'OWN-11': 'Use the owning feature public port; keep its private store/facade local.',
   'OWN-12': 'Use the reviewed provider only in Component.providers metadata.',
   'OWN-13': 'Use the exact tool entry and named members; review new permissions instead of widening an allowlist.',
+  'OWN-14': 'Keep flow orchestration in its owner; use only reviewed shared token-endpoint foundations.',
   'public-import': 'Use the exact public alias for the owning boundary; keep relative imports within their owner.',
   'owner-cycle': 'Break the cross-owner dependency cycle through an inward public contract; do not suppress the cycle.',
   'dependency-graph': 'Correct the named dependency rule at its source; do not add a violation baseline.',

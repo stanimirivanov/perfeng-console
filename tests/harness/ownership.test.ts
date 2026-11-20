@@ -365,3 +365,24 @@ test('bounded body reader cannot acquire ambient dispatch, abort or timer author
     assert.match(inspect({ 'src/bff/transport/bounded-body.ts': source }), /OWN-03/);
   }
 });
+
+test('shared token-endpoint modules reject flow-specific adapters and ports', () => {
+  for (const name of ['token-post.ts', 'token-response.ts', 'token-envelope.ts']) {
+    const findings = inspect({
+      ['src/bff/login/' + name]: "import './protocol.ts'; import type { T } from './verified-exchange-contracts.ts';",
+      'src/bff/login/protocol.ts': 'export {};',
+      'src/bff/login/verified-exchange-contracts.ts': 'export type T = string;',
+    });
+    assert.equal(findings.match(/OWN-14/g)?.length ?? 0, 2, findings);
+  }
+});
+
+test('shared token-endpoint modules retain their reviewed neutral foundations', () => {
+  assert.equal(inspect({
+    'src/bff/login/token-post.ts': "import { readBoundedUtf8 } from '../transport/bounded-body.ts'; import type { T } from './login-contracts.ts';",
+    'src/bff/login/token-response.ts': "import { decodeTokenEnvelope } from './token-envelope.ts'; import type { T } from './login-contracts.ts';",
+    'src/bff/login/token-envelope.ts': 'export const decodeTokenEnvelope = () => undefined;',
+    'src/bff/login/login-contracts.ts': 'export type T = string;',
+    'src/bff/transport/bounded-body.ts': 'export const readBoundedUtf8 = () => undefined;',
+  }), '');
+});

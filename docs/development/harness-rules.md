@@ -104,6 +104,7 @@ No new Make commands are proposed; extend the existing gates.
 | OWN-11 | Feature implementations remain private; cross-feature dependencies use reviewed entries | Type-only, lazy or barrel access to another feature's private store/facade/reader | make architecture; feature-edge negative fixtures |
 | OWN-12 | Components assemble providers only through reviewed Component.providers calls | Provider function invoked in a method/field, namespace import or unreviewed factory | make architecture; metadata-scope negative fixtures |
 | OWN-13 | Exact tool import/member admission; reviewed incoming listeners and CLI composition | Native upstream request/get, namespace/lazy imports, undeclared helpers or native loaders | make architecture; tools-ownership.ts and negative fixtures |
+| OWN-14 | Shared token-endpoint modules depend only on reviewed neutral foundations | Runtime or type import of flow-specific protocol/context, including lazy imports/re-exports | make architecture; shared-token ownership fixtures |
 
 Resolve aliases/re-exports to owners, inspect literal dynamic and type-only imports,
 and reject computed module loading as today. Do not rely on filename substrings or
