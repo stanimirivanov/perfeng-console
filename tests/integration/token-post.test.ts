@@ -38,6 +38,12 @@ test('token POST qualifies fixed endpoint, TLS, headers, payload and scoped clea
       case 'denied': response.writeHead(400).end('private-provider-detail'); break;
       case 'unavailable': response.writeHead(503).end('private-provider-detail'); break;
       case 'duplicate': response.setHeader('Content-Type', ['application/json', 'application/json']); response.end('{}'); break;
+      case 'malformed-length': response.setHeader('Content-Length', 'not-a-number'); response.end('{}'); break;
+      case 'peer-close': response.write('{'); response.flushHeaders(); setImmediate(() => response.destroy()); break;
+      case 'chunked-exact': response.write('x'.repeat(512)); response.end('x'.repeat(512)); break;
+      case 'overflow-stall': response.write('x'.repeat(1025)); started(); break;
+      case 'duplicate-length': response.setHeader('Content-Length', ['2', '2']); response.end('{}'); break;
+      case 'exact-limit': response.end('x'.repeat(1024)); break;
       case 'media': response.setHeader('Content-Type', 'text/plain'); response.end('{}'); break;
       case 'cache-duplicate': response.setHeader('Cache-Control', ['no-store', 'no-store']); response.end('{}'); break;
       case 'pragma': response.removeHeader('Pragma'); response.end('{}'); break;
@@ -66,13 +72,25 @@ test('token POST qualifies fixed endpoint, TLS, headers, payload and scoped clea
   const lazy = transport.post(form); assert.equal(hits, 0);
   assert.deepEqual(await Effect.runPromise(lazy), { ok: true, body: '{"access_token":"fixture-response-secret"}' });
   assert.equal(hits, 1);
-  for (const [value, reason] of [['redirect', 'invalid_response'], ['denied', 'denied'], ['unavailable', 'unavailable'],['duplicate', 'invalid_response'], ['media', 'invalid_response'], ['cache-duplicate', 'invalid_response'], ['pragma', 'invalid_response'], ['chunked-large', 'invalid_response'], ['empty', 'invalid_response'], ['cache', 'invalid_response'], ['encoding', 'invalid_response'], ['utf8', 'invalid_response'],['large', 'invalid_response'], ['many-headers', 'invalid_response'], ['headers', 'unavailable']] as const) {
+  for (const [value, reason] of [['redirect', 'invalid_response'], ['denied', 'denied'], ['unavailable', 'unavailable'],['duplicate', 'invalid_response'], ['duplicate-length', 'unavailable'], ['malformed-length', 'unavailable'], ['peer-close', 'unavailable'], ['media', 'invalid_response'], ['cache-duplicate', 'invalid_response'], ['pragma', 'invalid_response'], ['chunked-large', 'invalid_response'], ['empty', 'invalid_response'], ['cache', 'invalid_response'], ['encoding', 'invalid_response'], ['utf8', 'invalid_response'],['large', 'invalid_response'], ['many-headers', 'invalid_response'], ['headers', 'unavailable']] as const) {
     mode = value; const priorHits: number = hits;
     const result = await Effect.runPromise(transport.post(form));
     assert.deepEqual(result, { ok: false, reason }); assert.equal(hits, priorHits + 1);
     assert.doesNotMatch(JSON.stringify(result), /private-provider-detail|fixture-secret/);
   }
   assert.equal(redirects, 0);
+  mode = 'valid';
+  for (const exact of ['exact-limit', 'chunked-exact']) {
+    mode = exact;
+    assert.deepEqual(await Effect.runPromise(transport.post(form)), { ok: true, body: 'x'.repeat(1024) });
+  }
+  mode = 'overflow-stall';
+  const overflowStarted = new Promise<void>(resolve => { started = resolve; });
+  const overflowClosed = new Promise<void>(resolve => { closed = resolve; });
+  const overflow = Effect.runPromise(transport.post(form));
+  await overflowStarted;
+  assert.deepEqual(await overflow, { ok: false, reason: 'invalid_response' });
+  await Promise.race([overflowClosed, new Promise<never>((_, reject) => { const timer = setTimeout(() => reject(new Error('overflow response not closed')), 2000); timer.unref(); })]);
   mode = 'valid';
   let proxyHits = 0;
   const proxy = createProxy((_request, response) => { proxyHits++; response.writeHead(500).end(); });
