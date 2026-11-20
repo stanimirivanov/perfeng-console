@@ -13,7 +13,14 @@ export function runObservation(result: RunResult): {
       case 'forbidden':
       case 'not_found': return { status: 404, body: { reason: 'not_found' } };
       case 'deadline': return { status: 504, body: { reason: 'unavailable' } };
-      default: return { status: 503, body: { reason: 'unavailable' } };
+      case 'unavailable':
+      case 'invalid_response':
+      case 'aborted': return { status: 503, body: { reason: 'unavailable' } };
+      default: {
+        // New Failure members require an explicit safe projection.
+        result.reason satisfies never;
+        throw new Error('Unexpected Run failure');
+      }
     }
   }
   const { id, state, revision, updatedAt, createdAt, finishedAt, failure } = result.run;
