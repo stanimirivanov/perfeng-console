@@ -6,7 +6,13 @@ import { verifyConsumedExchange } from './verified-exchange.operation.ts';
 import type { VerifiedCodeExchange, VerifiedCodeExchangeConfig, VerifiedCodeExchangeResult } from './verified-exchange-contracts.ts';
 export type { VerifiedCodeExchange, VerifiedCodeExchangeConfig, VerifiedCodeExchangeResult } from './verified-exchange-contracts.ts';
 
-/** Acquire an unmounted private login owner; callers own request execution/interruption. */
+/** Acquire an unmounted private login owner; callers own request execution/interruption.
+ *
+ * @param config - Trusted login key, fixed protocol/transport and key-source configuration, captured at factory call.
+ * @param now - Epoch milliseconds for signing and verified observations; protocol elapsed time stays separate.
+ * @returns A scoped acquisition Effect. Code-exchange construction errors enter its Error channel on execution;
+ * complete builds lazy exchange/verification work and returns minimal observations plus server-only cookie instructions.
+ */
 export function makeVerifiedCodeExchange(config: VerifiedCodeExchangeConfig, now = Date.now): Effect.Effect<VerifiedCodeExchange, Error, Scope.Scope> {
   const captured = { ...config };
   return Effect.gen(function* () {
