@@ -2,7 +2,7 @@
 
 ## Decision and evidence
 
-T8 admits only a private streamed-body reader shared by `login/token-post.ts` and
+T8 admits only a private streamed-body reader shared by `login/token-endpoint/token-post.ts` and
 `login/identity/signing-key-get.ts`. Each adapter repeats the same byte accumulator,
 pre-retention overflow refusal, nonempty-body check and fatal UTF-8 decode. The
 shared implementation makes that admission sequence auditable in one place. This

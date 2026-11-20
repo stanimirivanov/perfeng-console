@@ -4,10 +4,14 @@
 
 [Issue #75](https://github.com/stanimirivanov/perfeng-console/issues/75) extends the
 pinned Effect 4.1.2 / platform-node 4.1.2 admission to the single concrete BFF
-`login/token-post.ts` adapter. It is shared by the later code and delegated
+`login/token-endpoint/token-post.ts` adapter. It is shared by the later code and delegated
 exchange operations under accepted control-plane ADR 0046. No OAuth grant,
 client authentication, token parsing, session or browser flow is admitted here.
-The existing Run reader and its qualification remain unchanged.
+The existing Run reader and its qualification remain unchanged. Issue #157
+moves the adapter to the shared token-endpoint directory and transfers its exact
+admission without changing this transport profile; the former source location is
+retired. See [the module layout](token-endpoint-module.md).
+
 
 ## Destination, trust and request ownership
 

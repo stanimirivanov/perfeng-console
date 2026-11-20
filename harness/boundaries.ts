@@ -137,7 +137,7 @@ function inspectFile(root: string, file: string, owner: string): string[] {
       'src/bff/login/identity/snapshot-verifier.ts': ['effect'],
       'src/bff/login/identity/snapshot-contracts.ts': ['effect'],
       'src/bff/login/code-exchange.operation.ts': ['effect'],
-      'src/bff/login/token-post.ts': ['node:http', 'effect', 'effect/http/HttpClient', 'effect/http/HttpClientRequest', '@effect/platform-node/NodeHttpClient', '@effect/platform-node/NodeHttpIncomingMessage'],
+      'src/bff/login/token-endpoint/token-post.ts': ['node:http', 'effect', 'effect/http/HttpClient', 'effect/http/HttpClientRequest', '@effect/platform-node/NodeHttpClient', '@effect/platform-node/NodeHttpIncomingMessage'],
       'src/bff/run-reader.ts': ['effect', 'effect/http/HttpClient', '@effect/platform-node/NodeHttpClient', '@effect/platform-node/NodeHttpIncomingMessage'],
     };
     const localPackages = admitted[relative(root, file)] ?? [];

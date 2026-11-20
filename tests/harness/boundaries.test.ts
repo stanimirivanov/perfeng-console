@@ -109,10 +109,10 @@ test('aliases preserve layer authority and type-only DTO admission', () => {
 
 test('token POST platform admission belongs only to its concrete BFF adapter', () => {
   const code = "import * as NodeHttpClient from '@effect/platform-node/NodeHttpClient'; import * as Request from 'effect/http/HttpClientRequest';";
-  assert.equal(diagnostics({ 'src/bff/login/token-post.ts': code }), '');
+  assert.equal(diagnostics({ 'src/bff/login/token-endpoint/token-post.ts': code }), '');
   assert.match(diagnostics({ 'src/bff/login/copied-post.ts': code }), /package/);
   assert.match(diagnostics({ 'src/browser/token-post.ts': code }), /package/);
-  assert.match(diagnostics({ 'src/bff/login/token-post.ts': "import { request } from 'node:https';" }), /package/);
+  assert.match(diagnostics({ 'src/bff/login/token-endpoint/token-post.ts': "import { request } from 'node:https';" }), /package/);
 });
 
 test('identity dependencies admit exact named members in their reviewed private adapters only', () => {
@@ -195,4 +195,8 @@ test('bounded body reader admits only its exact Effect stream primitives', () =>
     "import { HttpClient } from 'effect/http/HttpClient';",
     "import { NodeHttpIncomingMessage } from '@effect/platform-node/NodeHttpIncomingMessage';",
   ]) assert.match(diagnostics({ [reader]: source }), /package/);
+});
+
+test('retired token POST location does not retain native header authority', () => {
+  assert.match(diagnostics({ 'src/bff/login/token-post.ts': "import { maxHeaderSize } from 'node:http';" }), /package/);
 });

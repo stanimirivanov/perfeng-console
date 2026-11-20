@@ -1,7 +1,7 @@
 import { decodeTokenEnvelope, isJwtShapedToken } from './token-envelope.ts';
 
-import type { DecodeResult, InvalidResponse, UnverifiedCodeTokens, UnverifiedDelegatedTokens } from './login-contracts.ts';
-export type { DecodeResult, InvalidResponse, UnverifiedCodeTokens, UnverifiedDelegatedTokens } from './login-contracts.ts';
+import type { DecodeResult, InvalidResponse, UnverifiedCodeTokens, UnverifiedDelegatedTokens } from '../login-contracts.ts';
+export type { DecodeResult, InvalidResponse, UnverifiedCodeTokens, UnverifiedDelegatedTokens } from '../login-contracts.ts';
 
 const invalid = (): InvalidResponse => ({ ok: false, reason: 'invalid_response' });
 

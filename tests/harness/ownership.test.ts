@@ -286,7 +286,7 @@ test('tool native loaders cannot hide behind computed names or assigned process 
 });
 
 test('token POST may read the effective header limit without acquiring native dispatch', () => {
-  const file = 'src/bff/login/token-post.ts';
+  const file = 'src/bff/login/token-endpoint/token-post.ts';
   assert.equal(inspect({ [file]: "import { maxHeaderSize } from 'node:http'; void maxHeaderSize;" }), '');
   for (const source of [
     "import { request } from 'node:http';",
@@ -369,7 +369,7 @@ test('bounded body reader cannot acquire ambient dispatch, abort or timer author
 test('shared token-endpoint modules reject flow-specific adapters and ports', () => {
   for (const name of ['token-post.ts', 'token-response.ts', 'token-envelope.ts']) {
     const findings = inspect({
-      ['src/bff/login/' + name]: "import './protocol.ts'; import type { T } from './verified-exchange-contracts.ts';",
+      ['src/bff/login/token-endpoint/' + name]: "import '../protocol.ts'; import type { T } from '../verified-exchange-contracts.ts';",
       'src/bff/login/protocol.ts': 'export {};',
       'src/bff/login/verified-exchange-contracts.ts': 'export type T = string;',
     });
@@ -379,9 +379,9 @@ test('shared token-endpoint modules reject flow-specific adapters and ports', ()
 
 test('shared token-endpoint modules retain their reviewed neutral foundations', () => {
   assert.equal(inspect({
-    'src/bff/login/token-post.ts': "import { readBoundedUtf8 } from '../transport/bounded-body.ts'; import type { T } from './login-contracts.ts';",
-    'src/bff/login/token-response.ts': "import { decodeTokenEnvelope } from './token-envelope.ts'; import type { T } from './login-contracts.ts';",
-    'src/bff/login/token-envelope.ts': 'export const decodeTokenEnvelope = () => undefined;',
+    'src/bff/login/token-endpoint/token-post.ts': "import { readBoundedUtf8 } from '../../transport/bounded-body.ts'; import type { T } from '../login-contracts.ts';",
+    'src/bff/login/token-endpoint/token-response.ts': "import { decodeTokenEnvelope } from './token-envelope.ts'; import type { T } from '../login-contracts.ts';",
+    'src/bff/login/token-endpoint/token-envelope.ts': 'export const decodeTokenEnvelope = () => undefined;',
     'src/bff/login/login-contracts.ts': 'export type T = string;',
     'src/bff/transport/bounded-body.ts': 'export const readBoundedUtf8 = () => undefined;',
   }), '');

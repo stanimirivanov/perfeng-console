@@ -1,9 +1,9 @@
 import { createLoginProtocol } from './protocol.ts';
 import type { LoginProtocolConfig } from './protocol.ts';
 import { createClientAssertion } from './client-assertion.ts';
-import { createTokenPost } from './token-post.ts';
-import type { TokenPostConfig } from './token-post.ts';
-import { decodeCodeTokens } from './token-response.ts';
+import { createTokenPost } from './token-endpoint/token-post.ts';
+import type { TokenPostConfig } from './token-endpoint/token-post.ts';
+import { decodeCodeTokens } from './token-endpoint/token-response.ts';
 import { exchangeCode } from './code-exchange.operation.ts';
 export type { CodeExchangeResult } from './login-contracts.ts';
 
