@@ -36,11 +36,15 @@ Use separate configured owners/keys for login and delegation. Form fields are
 credentials, not response DTOs. Fresh jti values do not authorize retries of an
 uncertain code exchange. No token endpoint transport is admitted by this signer.
 
-`login/token-post.ts` is a private scoped wire primitive, not validated OAuth
+`login/token-endpoint/token-post.ts` is a private scoped wire primitive, not validated OAuth
 tokens or login success. Keep its response text and submitted form server-only.
 Its native HTTP permission is solely the named effective header-size constant;
 no request/get, namespace or copied adapter authority is admitted. Repeat TLS,
 raw-header, deadline and peer-closure tests before extending transport use.
+When changing shared token admission or its dependencies, read the
+[token-endpoint layout](../../docs/development/token-endpoint-module.md).
+OWN-14 keeps its three exact modules independent of flow adapters and context ports.
+
 
 `transport/bounded-body.ts` shares only bounded UTF-8 stream consumption between
 that POST and the qualified signing-key GET. It takes an existing byte stream,
@@ -49,11 +53,11 @@ the adapters; the helper has no native/platform HTTP, filesystem or ambient
 dispatch/abort/timer authority. See [the focused decision](../../docs/development/bounded-response-body.md).
 
 
-`login/token-response.ts` admits only private unverified credential envelopes;
+`login/token-endpoint/token-response.ts` admits only private unverified credential envelopes;
 see [the phase and authority limits](../../docs/development/token-response-admission.md).
 Never treat its success as signed identity or serialize candidates to the browser.
 JWT type/signature/issuer/audience/nonce/time checks and current policy are later
-obligations. `token-envelope.ts` owns common native JSON/decoded-name duplicate
+obligations. `token-endpoint/token-envelope.ts` owns common native JSON/decoded-name duplicate
 checks; keep its flat, syntax-validated scan precondition and standalone tests.
 Public decoder results/candidates use named readonly types; readonly does not
 replace server-side custody or JWT verification.

@@ -1,14 +1,14 @@
 import { maxHeaderSize } from 'node:http';
 import { X509Certificate } from 'node:crypto';
 import { Data, Effect } from 'effect';
-import { readBoundedUtf8 } from '../transport/bounded-body.ts';
+import { readBoundedUtf8 } from '../../transport/bounded-body.ts';
 import * as HttpClient from 'effect/http/HttpClient';
 import * as Request from 'effect/http/HttpClientRequest';
 import * as NodeHttpClient from '@effect/platform-node/NodeHttpClient';
 import { NodeHttpIncomingMessage } from '@effect/platform-node/NodeHttpIncomingMessage';
 
-import type { TokenPostReason, TokenPostResult } from './login-contracts.ts';
-export type { TokenPostReason, TokenPostResult } from './login-contracts.ts';
+import type { TokenPostReason, TokenPostResult } from '../login-contracts.ts';
+export type { TokenPostReason, TokenPostResult } from '../login-contracts.ts';
 
 class TokenPostFailure extends Data.TaggedError('TokenPostFailure')<{ readonly reason: TokenPostReason; }> {}
 const fail = (reason: TokenPostFailure['reason']) => Effect.fail(new TokenPostFailure({ reason }));

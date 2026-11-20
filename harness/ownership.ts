@@ -41,10 +41,10 @@ export const roles: Readonly<Record<string, Role>> = {
   'src/bff/login/transactions.ts': 'adapter',
   'src/bff/login/protocol.ts': 'adapter',
   'src/bff/login/client-assertion.ts': 'adapter',
-  'src/bff/login/token-post.ts': 'adapter',
+  'src/bff/login/token-endpoint/token-post.ts': 'adapter',
   'src/bff/transport/bounded-body.ts': 'adapter',
-  'src/bff/login/token-response.ts': 'adapter',
-  'src/bff/login/token-envelope.ts': 'adapter',
+  'src/bff/login/token-endpoint/token-response.ts': 'adapter',
+  'src/bff/login/token-endpoint/token-envelope.ts': 'adapter',
   'src/bff/login/login-contracts.ts': 'port',
   'src/bff/login/code-exchange.operation.ts': 'operation',
   'src/bff/login/code-exchange.ts': 'composition',
@@ -95,6 +95,12 @@ export const roles: Readonly<Record<string, Role>> = {
   'src/bff/transport.ts': 'composition',
   'src/bff/run-reader.ts': 'adapter',
   'src/bff/transport-result.ts': 'port',
+};
+// Shared token admission must not acquire either flow's lifecycle or context (issue #157).
+const tokenEndpointDependencies: Readonly<Record<string, readonly string[]>> = {
+  'src/bff/login/token-endpoint/token-post.ts': ['src/bff/login/login-contracts.ts', 'src/bff/transport/bounded-body.ts'],
+  'src/bff/login/token-endpoint/token-response.ts': ['src/bff/login/login-contracts.ts', 'src/bff/login/token-endpoint/token-envelope.ts'],
+  'src/bff/login/token-endpoint/token-envelope.ts': [],
 };
 const edges: Record<Role, readonly Role[]> = {
   component: ['component', 'store', 'port', 'presentation', 'contract'],
@@ -168,6 +174,9 @@ export function checkOwnership(root: string, registry: Readonly<Record<string, R
       if (target && !target.isExternalLibraryImport) {
         const targetName = relative(root, target.resolvedFileName);
         const targetRole = registry[targetName];
+        const tokenDependencies = tokenEndpointDependencies[name];
+        if (tokenDependencies && !tokenDependencies.includes(targetName))
+          report(node, 'OWN-14', 'Shared token-endpoint modules may import only their reviewed neutral foundations.');
         if (!featureImportAllowed(name, targetName)) report(node, 'OWN-11', 'Cross-feature import must use a reviewed feature entry; private feature implementations stay local.');
         const providerEdge = role === 'component' && targetRole === 'provider';
         if (providerEdge) {
@@ -213,7 +222,7 @@ export function checkOwnership(root: string, registry: Readonly<Record<string, R
           report(node, 'OWN-01', `${role} cannot depend on ${targetRole ?? 'unregistered module'} ${targetName}. Use a port.`);
         }
       }
-      const headerConstant = ['src/bff/login/token-post.ts', 'src/bff/login/identity/signing-key-get.ts'].includes(name) && spec === 'node:http' && ts.isImportDeclaration(node) &&
+      const headerConstant = ['src/bff/login/token-endpoint/token-post.ts', 'src/bff/login/identity/signing-key-get.ts'].includes(name) && spec === 'node:http' && ts.isImportDeclaration(node) &&
         !node.importClause?.name && !node.importClause?.isTypeOnly && node.importClause?.namedBindings && ts.isNamedImports(node.importClause.namedBindings) &&
         node.importClause.namedBindings.elements.length === 1 && node.importClause.namedBindings.elements.every(binding => !binding.isTypeOnly && (binding.propertyName ?? binding.name).text === 'maxHeaderSize');
       if (['node:http', 'node:https', 'http', 'https'].includes(spec) && !admittedToolImport && !headerConstant) report(node, 'OWN-03', 'Native dispatch needs explicit platform admission, not just an adapter role.');

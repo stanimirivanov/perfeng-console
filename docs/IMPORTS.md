@@ -50,9 +50,9 @@ parenthesized note may follow the target. Code review still governs permission c
 | `#perfeng/bff-config` | `./src/bff/config-public-api.ts` |
 | `#perfeng/bff-login-protocol` | `./src/bff/login/protocol.ts` |
 | `#perfeng/bff-client-assertion` | `./src/bff/login/client-assertion.ts` |
-| `#perfeng/bff-token-post` | `./src/bff/login/token-post.ts` |
-| `#perfeng/bff-token-envelope` | `./src/bff/login/token-envelope.ts` |
-| `#perfeng/bff-token-response` | `./src/bff/login/token-response.ts` |
+| `#perfeng/bff-token-post` | `./src/bff/login/token-endpoint/token-post.ts` |
+| `#perfeng/bff-token-envelope` | `./src/bff/login/token-endpoint/token-envelope.ts` |
+| `#perfeng/bff-token-response` | `./src/bff/login/token-endpoint/token-response.ts` |
 | `#perfeng/bff-code-exchange` | `./src/bff/login/code-exchange.ts` |
 | `#perfeng/bff-login` | `./src/bff/login/transactions.ts` |
 | `#perfeng/bff-session` | `./src/bff/session.ts` |

@@ -1,8 +1,8 @@
 import { Effect, Option, Semaphore } from 'effect';
 import type { Scope } from 'effect';
 import { createClientAssertion } from './client-assertion.ts';
-import { createTokenPost } from './token-post.ts';
-import { decodeDelegatedTokens } from './token-response.ts';
+import { createTokenPost } from './token-endpoint/token-post.ts';
+import { decodeDelegatedTokens } from './token-endpoint/token-response.ts';
 import { delegateOnce } from './delegated-exchange.operation.ts';
 import type { DelegatedExchange, DelegatedExchangeConfig, DelegatedExchangeResult } from './delegated-exchange-contracts.ts';
 
