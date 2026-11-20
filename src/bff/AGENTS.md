@@ -42,6 +42,13 @@ Its native HTTP permission is solely the named effective header-size constant;
 no request/get, namespace or copied adapter authority is admitted. Repeat TLS,
 raw-header, deadline and peer-closure tests before extending transport use.
 
+`transport/bounded-body.ts` shares only bounded UTF-8 stream consumption between
+that POST and the qualified signing-key GET. It takes an existing byte stream,
+not a client/response/URL. Keep status/header/TLS policy, scope and deadlines in
+the adapters; the helper has no native/platform HTTP, filesystem or ambient
+dispatch/abort/timer authority. See [the focused decision](../../docs/development/bounded-response-body.md).
+
+
 `login/token-response.ts` admits only private unverified credential envelopes;
 see [the phase and authority limits](../../docs/development/token-response-admission.md).
 Never treat its success as signed identity or serialize candidates to the browser.

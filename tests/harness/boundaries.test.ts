@@ -182,3 +182,17 @@ test('key freshness policy admits constants without external package authority',
     "import { request } from 'node:https';",
   ]) assert.match(diagnostics({ [policy]: source }), /package/);
 });
+
+test('bounded body reader admits only its exact Effect stream primitives', () => {
+  const reader = 'src/bff/transport/bounded-body.ts';
+  assert.equal(diagnostics({ [reader]: "import { Data, Effect, Stream } from 'effect';" }), '');
+  for (const source of [
+    "import * as Effect from 'effect';",
+    "import { ManagedRuntime } from 'effect';",
+    "import { readFileSync } from 'node:fs';",
+    "import { maxHeaderSize } from 'node:http';",
+    "import { request } from 'node:https';",
+    "import { HttpClient } from 'effect/http/HttpClient';",
+    "import { NodeHttpIncomingMessage } from '@effect/platform-node/NodeHttpIncomingMessage';",
+  ]) assert.match(diagnostics({ [reader]: source }), /package/);
+});

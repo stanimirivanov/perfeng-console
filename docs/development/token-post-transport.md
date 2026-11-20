@@ -55,6 +55,10 @@ requirements follow [RFC 6749 §5.1](https://www.rfc-editor.org/rfc/rfc6749.html
 Refuse more than 128 raw header fields before relying on duplicate cardinality
 from the pinned Node source; excessive counts cannot hide later duplicate fields.
 Content-Length, when present, must be a single numeric value within the byte cap.
+The [shared bounded-body reader](bounded-response-body.md) owns byte accumulation,
+nonempty admission and fatal UTF-8 decoding inside this adapter's existing scope
+and total timeout. It receives no HTTP/header/configuration authority.
+
 Retained streamed bytes are independently bounded (default/max 65536, configurable
 256–65536); require nonempty strict UTF-8. No body is read on refused status or
 invalid response metadata.

@@ -40,6 +40,14 @@ function inspectFile(root: string, file: string, owner: string): string[] {
       report(node, 'specifier', 'Use a canonical module path without encoding, query or fragment.');
       return;
     }
+    if (relative(root, file) === 'src/bff/transport/bounded-body.ts') {
+      const clause = ts.isImportDeclaration(node) ? node.importClause : undefined;
+      const bindings = clause && !clause.name && clause.namedBindings;
+      if (name !== 'effect' || clause?.isTypeOnly || !bindings || !ts.isNamedImports(bindings) || !bindings.elements.length ||
+          !bindings.elements.every(member => !member.isTypeOnly && ['Data', 'Effect', 'Stream'].includes((member.propertyName ?? member.name).text)))
+        report(node, 'package', 'Bounded body reader admits only named Data/Effect/Stream primitives, never HTTP or filesystem authority.');
+      return;
+    }
     const identityPackages: Record<string, {
       file: string;
       values: readonly string[];
@@ -75,7 +83,7 @@ function inspectFile(root: string, file: string, owner: string): string[] {
         'signing-key-get.ts': {
           'node:http': { values: ['maxHeaderSize'] },
           'node:crypto': { values: ['X509Certificate'] },
-          effect: { values: ['Data', 'Effect', 'Stream'] },
+          effect: { values: ['Data', 'Effect'] },
           'effect/http/HttpClient': { values: ['HttpClient', 'withScope'] },
           'effect/http/HttpClientRequest': { values: ['get', 'setHeader'] },
           '@effect/platform-node/NodeHttpClient': { values: ['layerNodeHttpOptions'] },
