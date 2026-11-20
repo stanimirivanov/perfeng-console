@@ -22,22 +22,30 @@ class RunnerTests(unittest.TestCase):
     def test_adopted_sources_and_root_lock_are_in_versioned_provenance(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
-            for name in ["package.json", "pnpm-lock.yaml", "src/bff/login/identity/token-profile.ts", "src/bff/login/code-exchange.operation.ts", "tools/qualification/identity-jwt/candidate.ts", "tools/qualification/effect-node/keycloak_runner.py"]:
+            for name in ["package.json", "pnpm-lock.yaml", "src/bff/login/identity/token-profile.ts", "src/bff/login/code-exchange.operation.ts", "src/bff/transport/bounded-body.ts", "tools/qualification/identity-jwt/candidate.ts", "tools/qualification/effect-node/keycloak_runner.py"]:
                 file = root / name
                 file.parent.mkdir(parents=True, exist_ok=True)
                 file.write_text(name)
             original = runner.qualification_digest(root)
-            for name in ["package.json", "pnpm-lock.yaml", "src/bff/login/identity/token-profile.ts", "src/bff/login/code-exchange.operation.ts"]:
+            for name in ["package.json", "pnpm-lock.yaml", "src/bff/login/identity/token-profile.ts", "src/bff/login/code-exchange.operation.ts", "src/bff/transport/bounded-body.ts"]:
                 file = root / name
                 old = file.read_text()
                 file.write_text(old + "changed")
                 self.assertNotEqual(runner.qualification_digest(root), original)
                 file.write_text(old)
             self.assertEqual(runner.qualification_digest(root), original)
-            (root / "src/bff/login/identity/token-profile.ts").unlink()
-            (root / "src/bff/login/identity/token-profile.ts").symlink_to(root / "package.json")
-            with self.assertRaises(ValueError):
-                runner.qualification_digest(root)
+            for name in ["src/bff/login/identity/token-profile.ts", "src/bff/transport/bounded-body.ts"]:
+                file = root / name
+                original_source = file.read_text()
+                file.unlink()
+                if name == "src/bff/transport/bounded-body.ts":
+                    with self.assertRaises(ValueError):
+                        runner.qualification_digest(root)
+                file.symlink_to(root / "package.json")
+                with self.assertRaises(ValueError):
+                    runner.qualification_digest(root)
+                file.unlink()
+                file.write_text(original_source)
 
     def test_selection_refuses_stale_dirty_and_shadowed_source_without_import(self):
         with tempfile.TemporaryDirectory() as temporary:

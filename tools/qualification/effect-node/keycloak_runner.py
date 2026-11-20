@@ -38,7 +38,7 @@ CLOSURE = (
 # A moved implementation is covered by root source and resolution inputs, not fixture-only hashes.
 QUALIFICATION_PATHS = (
     "tools/qualification/effect-node", "tools/qualification/identity-jwt",
-    "src/bff/login", "package.json", "pnpm-lock.yaml",
+    "src/bff/login", "src/bff/transport/bounded-body.ts", "package.json", "pnpm-lock.yaml",
 )
 
 
