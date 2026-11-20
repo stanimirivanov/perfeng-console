@@ -30,6 +30,18 @@ public RSA signing keys. Private key members are refused even in ignored metadat
 Issuer/time fields in JSON cannot establish provenance. Snapshots/keys are frozen;
 retrieval start, never cache completion time, controls freshness.
 
+## Acquisition failures — issue #152
+
+`createSigningKeySource` constructs its validated GET adapter synchronously and
+can throw before returning lazy load work. In contrast, the store/cache/resolver
+and resolved-verifier make factories acquire that source when their scoped Effects
+execute. Those lower-level acquisitions do not map construction exceptions to a
+typed error: their expected-error channel is `never`, but invalid transport
+configuration can still cause an Effect defect during acquisition. Do not interpret
+`never` as proof that execution cannot fail, or document these deferred configuration
+failures as eager factory throws. Operational clock refusals and expected wire/admission
+failures use the existing result unions; caller interruption remains interruption.
+
 ## Cache lifetime and policy
 
 makeSigningKeyResolver requires a caller-owned Effect scope and returns a named

@@ -38,6 +38,11 @@ function browserBinding(headers: readonly string[]): string | undefined {
  * Future incoming adapters must check Host/method/Origin/CSRF before begin and
  * pass the unnormalized request target and all Cookie headers to callback.
  * The successful handoff is server-only input to later scoped exchange work.
+ *
+ * @param config - Trusted HTTPS issuer and Console origin; validated immediately.
+ * @param now - Optional nondecreasing elapsed milliseconds for pending transactions; defaults to performance.now.
+ * @returns Synchronous begin/callback/stop capabilities. Cookie instructions and consumed handoffs stay server-only.
+ * @throws Error synchronously when the fixed issuer/origin profile fails admission.
  */
 export function createLoginProtocol(config: LoginProtocolConfig, now?: () => number) {
   const profile = fixedProfile(config);

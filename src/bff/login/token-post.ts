@@ -39,6 +39,10 @@ function admitted(config: TokenPostConfig) {
 /** Lazy scoped POST primitive, not an OAuth grant or token-validation operation.
  * Form and returned text are server-only secrets. The caller owns Effect
  * execution/cancellation and must never automatically replay an uncertain POST.
+ *
+ * @param config - Trusted fixed issuer, CA and optional byte/deadline bounds; validated immediately.
+ * @returns A server-only adapter whose post method builds lazy, caller-executed scoped work.
+ * @throws Error synchronously when transport configuration fails admission, before any POST Effect exists.
  */
 export function createTokenPost(config: TokenPostConfig) {
   const { endpoint, ca, deadlineMs, maxResponseBytes } = admitted(config);

@@ -17,6 +17,29 @@ and transaction type exports are preserved. Token POST now explicitly exposes a
 named result and an unknown Effect failure channel, not an inferred any or a
 promise of infallibility. Unexpected failures remain failed Effects.
 
+## Factory execution boundaries — issue #152
+
+`createLoginProtocol`, `createClientAssertion`, `createTokenPost`,
+`createSigningKeyGet` and `createCodeExchange` validate their trusted configuration
+synchronously. Invalid configuration throws during the factory call even though
+returned POST/GET/completion operations are lazy. The assertion signer and protocol
+methods are synchronous; a lazy transport does not make their construction lazy.
+Code-exchange construction retires any partially acquired protocol/signer on failure.
+
+The scoped `makeDelegatedExchange`, `makeVerifiedCodeExchange`,
+`makeVerifiedDelegation` and `makeLoginDelegation` capture configuration and return
+acquisition Effects. Their explicit signer/transport construction wrappers map
+configuration exceptions into the Effect Error channel when acquisition executes,
+rather than throwing those exceptions eagerly from the factory. Other nested
+defects remain defects; this is not a promise that every failure is a typed Error.
+The acquired owners still return lazy operation Effects for caller execution and
+interruption. Scope closure and stop fence publication independently of wire abort.
+
+Injected signing and verification clocks use epoch milliseconds. Pending-login
+transactions keep their separate elapsed clock: `createCodeExchange` does not pass
+its wall clock to `createLoginProtocol`. Cookie instructions and consumed credentials
+remain server-only, including when returned alongside a verified observation.
+
 ## Sequence and private result
 
 Creating `complete` snapshots the incoming cookie-header array and returns an
