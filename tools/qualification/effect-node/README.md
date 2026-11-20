@@ -563,3 +563,14 @@ transaction. [Current evidence boundaries](../../../docs/development/verified-co
 The v2 framing stays unchanged, with source guard/digest coverage extended to all
 login modules (including raw exchange/protocol/transport dependencies). Old receipt
 input sets and claims remain historical, never retroactively expanded.
+
+
+### Shared response-body provenance — issue #154
+
+The token POST and signing-key GET now consume the private bounded UTF-8 reader at
+`src/bff/transport/bounded-body.ts`. The provider runner's exact source guard and
+v2 framed digest include this file in addition to the login tree and package
+inputs. A helper edit changes the digest; a missing or symlinked helper is refused.
+The framing format is unchanged, while the source closure has grown. Historical
+receipts are not reinterpreted as evidence for this extraction; actual provider
+execution remains a separately requested, committed-source qualification.

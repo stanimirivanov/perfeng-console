@@ -359,3 +359,9 @@ test('login delegation admits only its three exact constructors', () => {
   assert.equal(inspect({ ...files, [file]: "import { createCodeExchange } from './code-exchange.ts'; import { makeCodePairVerifier } from './identity/resolved-pair-verifier.ts'; import { makeVerifiedDelegation } from './verified-delegation.ts';" }, roles), '');
   for (const source of ["import * as raw from './code-exchange.ts';", "import('./verified-delegation.ts');", "export { makeVerifiedDelegation } from './verified-delegation.ts';", "import { unknownFactory } from './code-exchange.ts';"]) assert.match(inspect({ ...files, [file]: source }, roles), /OWN-01/);
 });
+
+test('bounded body reader cannot acquire ambient dispatch, abort or timer authority', () => {
+  for (const source of ['fetch("/")', 'new AbortController()', 'setTimeout(() => {}, 1)']) {
+    assert.match(inspect({ 'src/bff/transport/bounded-body.ts': source }), /OWN-03/);
+  }
+});

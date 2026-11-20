@@ -201,7 +201,12 @@ toolchain and proves actual command failures for injected production CLI/server
 type errors, invalid template bindings,
 component assertions, Angular skips and Playwright skips/failures. It never edits
 the working checkout and removes the temporary fixture on completion.
-CI runs it in the browser job with installed pinned Chromium.
+CI runs it in the dedicated harness-self-test job with installed pinned Chromium.
+Aggregate verify probes have a three-minute child execution budget for cold
+checkouts; other probes retain two minutes, and the whole CI job retains its
+ten-minute limit. Application/transport deadlines and fault assertions are
+unchanged. Probe progress includes elapsed time; failure diagnostics include
+exit status, signal and child error code (issue #156).
 
 Browser build inputs are explicitly reviewed in harness/assets.ts. The current
 scaffold permits inline component templates, one local Material Sass import and

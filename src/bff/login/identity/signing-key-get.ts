@@ -1,6 +1,7 @@
 import { maxHeaderSize } from 'node:http';
 import { X509Certificate } from 'node:crypto';
-import { Data, Effect, Stream } from 'effect';
+import { Data, Effect } from 'effect';
+import { readBoundedUtf8 } from '../../transport/bounded-body.ts';
 import { HttpClient, withScope } from 'effect/http/HttpClient';
 import { get as getRequest, setHeader } from 'effect/http/HttpClientRequest';
 import { layerNodeHttpOptions } from '@effect/platform-node/NodeHttpClient';
@@ -56,16 +57,9 @@ export function createSigningKeyGet(config: SigningKeyGetConfig): SigningKeyGet 
             headers['content-encoding']) return yield* fail('invalid_response');
         const lengths = headers['content-length'];
         if (lengths && (lengths.length !== 1 || !/^\d+$/.test(lengths[0]!) || Number(lengths[0]) > maxResponseBytes)) return yield* fail('invalid_response');
-        let size = 0;
-        const chunks: Uint8Array[] = [];
-        yield* Stream.runForEach(response.stream, chunk => {
-          size += chunk.byteLength;
-          if (size > maxResponseBytes) return fail('invalid_response');
-          chunks.push(chunk);
-          return Effect.void;
-        });
-        if (size === 0) return yield* fail('invalid_response');
-        const body = yield* Effect.try({ try: () => new TextDecoder('utf-8', { fatal: true }).decode(Buffer.concat(chunks, size)), catch: () => new SigningKeyFailure({ reason: 'invalid_response' }) });
+        const body = yield* readBoundedUtf8(response.stream, maxResponseBytes).pipe(
+          Effect.catchTag('InvalidResponseBody', () => fail('invalid_response')),
+        );
         return { ok: true as const, stage: 'unverified-jwks' as const, body };
       })).pipe(Effect.provide(layer), Effect.timeout(deadlineMs),Effect.catchTag('TimeoutError', () => fail('deadline')),Effect.catchTag('HttpClientError', () => fail('unavailable')),Effect.catchTag('SigningKeyFailure', error => Effect.succeed({ ok: false as const, reason: error.reason })));
     },

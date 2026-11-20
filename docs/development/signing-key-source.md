@@ -42,6 +42,15 @@ configuration can still cause an Effect defect during acquisition. Do not interp
 failures as eager factory throws. Operational clock refusals and expected wire/admission
 failures use the existing result unions; caller interruption remains interruption.
 
+## Bounded wire body — issue #154
+
+The GET adapter uses the [shared bounded UTF-8 reader](bounded-response-body.md)
+inside its existing scoped total deadline. GET retains its own status, raw-header,
+media/encoding, Content-Length and TLS checks; it does not adopt token POST's
+cache-control/pragma requirements. Refused bodies stay unread. Existing isolated
+qualification bridges invoke this same adapter and therefore the shared reader;
+no fixture implementation or shipped listener source inventory is expanded.
+
 ## Cache lifetime and policy
 
 makeSigningKeyResolver requires a caller-owned Effect scope and returns a named

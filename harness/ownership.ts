@@ -42,6 +42,7 @@ export const roles: Readonly<Record<string, Role>> = {
   'src/bff/login/protocol.ts': 'adapter',
   'src/bff/login/client-assertion.ts': 'adapter',
   'src/bff/login/token-post.ts': 'adapter',
+  'src/bff/transport/bounded-body.ts': 'adapter',
   'src/bff/login/token-response.ts': 'adapter',
   'src/bff/login/token-envelope.ts': 'adapter',
   'src/bff/login/login-contracts.ts': 'port',
@@ -154,7 +155,7 @@ export function checkOwnership(root: string, registry: Readonly<Record<string, R
       }
     }
     const tool = name.startsWith('tools/');
-    const nativeAllowed = (member: string, node: ts.Node) => role === 'adapter' && !name.startsWith('src/bff/login/identity/') && (!tool ||
+    const nativeAllowed = (member: string, node: ts.Node) => role === 'adapter' && !name.startsWith('src/bff/login/identity/') && name !== 'src/bff/transport/bounded-body.ts' && (!tool ||
       toolGlobalAllowed(name, member) || (member === 'setTimeout' && toolListenerTimerAllowed(name, node, checker)));
     const providerBindings = new Set<ts.Symbol>();
     inspectImports(source, (node, specifier) => {
