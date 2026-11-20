@@ -31,6 +31,10 @@ function admitted(config: SigningKeyGetConfig) {
 /** Private lazy GET of one configured Keycloak certs endpoint.
  * Returned text is untrusted wire evidence, not parsed/admitted signing keys.
  * The caller owns Effect execution/interruption; no resolver/cache/retry is installed.
+ *
+ * @param config - Trusted fixed issuer, CA and optional byte/deadline bounds; validated immediately.
+ * @returns A private adapter whose get method builds lazy scoped work returning untrusted response text.
+ * @throws Error synchronously when transport configuration fails admission, before any GET Effect exists.
  */
 export function createSigningKeyGet(config: SigningKeyGetConfig): SigningKeyGet {
   const { endpoint, ca, deadlineMs, maxResponseBytes } = admitted(config);

@@ -13,6 +13,11 @@ export interface CodeExchangeConfig extends LoginProtocolConfig, TokenPostConfig
 
 /** Compose the private code exchange. Caller owns Effect execution/interruption;
  * stop retires authority, not a browser session or a provider-issued credential.
+ *
+ * @param config - Trusted protocol, transport and login signing-key configuration; validated during construction.
+ * @param now - Epoch milliseconds for assertions and exchange observations; protocol elapsed time stays separate.
+ * @returns An owner with synchronous begin/stop and lazy complete Effects carrying private unverified credentials.
+ * @throws Error synchronously on configuration/construction failure, after retiring any partially acquired signer/protocol.
  */
 export function createCodeExchange(config: CodeExchangeConfig, now = () => Date.now()) {
   let protocol: ReturnType<typeof createLoginProtocol> | undefined;

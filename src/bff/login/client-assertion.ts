@@ -29,6 +29,11 @@ const encode = (value: object) => Buffer.from(JSON.stringify(value)).toString('b
 /** Own one client's signing capability. No file/network access or OAuth execution.
  * Claims/algorithm are fixed, not caller input. Returned form fields are secrets
  * for the later token adapter, never a browser response or user-identity proof.
+ *
+ * @param config - Trusted fixed issuer, admitted client ID and server-only RSA private key; validated immediately.
+ * @param now - Wall-clock epoch milliseconds for JWT issuance, not pending-login elapsed time.
+ * @returns A synchronous signer; issue returns credential form fields or undefined after refusal/retirement.
+ * @throws Error synchronously when client authentication configuration fails admission.
  */
 export function createClientAssertion(config: ClientAssertionConfig, now = () => Date.now()) {
   const profile = admitted(config);
