@@ -172,3 +172,13 @@ test('epoch helper admits plain TypeScript without external runtime or native pa
     "import { request } from 'node:https'; request('https://example.com');",
   ]) assert.match(diagnostics({ [epoch]: source }), /package/);
 });
+
+
+test('key freshness policy admits constants without external package authority', () => {
+  const policy = 'src/bff/login/identity/key-policy.ts';
+  assert.equal(diagnostics({ [policy]: 'export const KEY_SNAPSHOT_MAX_AGE_MS = 300000;' }), '');
+  for (const source of [
+    "import { Effect } from 'effect';",
+    "import { request } from 'node:https';",
+  ]) assert.match(diagnostics({ [policy]: source }), /package/);
+});

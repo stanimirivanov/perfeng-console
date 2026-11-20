@@ -1,9 +1,9 @@
 import { Effect, Exit, Fiber, Option, ScopedCache, Semaphore } from 'effect';
 import type { Scope } from 'effect';
 import { createSigningKeySource } from './signing-key-source.ts';
+import { KEY_SNAPSHOT_MAX_AGE_MS } from './key-policy.ts';
 import type { SigningKeySourceConfig, SourceResult, SnapshotStore, SnapshotLoadGate } from './signing-key-contracts.ts';
 
-const MAX_AGE_MS = 300000;
 const MAX_READERS = 32;
 
 /** Owner-local immutable snapshot storage; only the source constructs network authority. */
@@ -29,16 +29,16 @@ export function makeSnapshotStore(config: SigningKeySourceConfig, gate: Snapshot
       lookup: () => Effect.flatMap(Effect.forkScoped(load), Fiber.join),
       capacity: 1,
       // Completion-relative TTL is a second bound, never the freshness authority.
-      timeToLive: exit => Exit.isSuccess(exit) && exit.value.ok ? MAX_AGE_MS : 0,
+      timeToLive: exit => Exit.isSuccess(exit) && exit.value.ok ? KEY_SNAPSHOT_MAX_AGE_MS : 0,
     });
     const readers = Semaphore.makeUnsafe(MAX_READERS);
     let closed = false;
     yield* Effect.addFinalizer(() => Effect.sync(() => { closed = true; }));
     return {
       readTime: Effect.gen(function* () {
-        const now = observe();
-        if (now === undefined) yield* ScopedCache.invalidateAll(cache);
-        return now;
+        const readAt = observe();
+        if (readAt === undefined) yield* ScopedCache.invalidateAll(cache);
+        return readAt;
       }),
       refreshSnapshot(): Effect.Effect<SourceResult, unknown> {
         return Effect.gen(function* () {
@@ -48,8 +48,11 @@ export function makeSnapshotStore(config: SigningKeySourceConfig, gate: Snapshot
           if (closed) return yield* Effect.interrupt;
           if (result.ok) {
             const now = observe();
-            if (now === undefined) { yield* ScopedCache.invalidateAll(cache); return { ok: false as const, reason: 'invalid_clock' as const }; }
-            if (now - result.snapshot.fetchedAtMs > MAX_AGE_MS) return { ok: false as const, reason: 'unavailable' as const };
+            if (now === undefined) {
+              yield* ScopedCache.invalidateAll(cache);
+              return { ok: false as const, reason: 'invalid_clock' as const };
+            }
+            if (now - result.snapshot.fetchedAtMs > KEY_SNAPSHOT_MAX_AGE_MS) return { ok: false as const, reason: 'unavailable' as const };
             yield* ScopedCache.set(cache, 'issuer', result);
           }
           return result;
@@ -66,7 +69,7 @@ export function makeSnapshotStore(config: SigningKeySourceConfig, gate: Snapshot
           // Inspect completed values only: awaiting a pending refusal here would
           // make the subsequent get perform an unintended second retrieval.
           const previous = yield* ScopedCache.getSuccess(cache, 'issuer');
-          if (Option.isSome(previous) && previous.value.ok && before - previous.value.snapshot.fetchedAtMs > MAX_AGE_MS) {
+          if (Option.isSome(previous) && previous.value.ok && before - previous.value.snapshot.fetchedAtMs > KEY_SNAPSHOT_MAX_AGE_MS) {
             yield* ScopedCache.invalidateWhen(cache, 'issuer', value => value === previous.value);
           }
           const result = yield* ScopedCache.get(cache, 'issuer');
@@ -77,7 +80,7 @@ export function makeSnapshotStore(config: SigningKeySourceConfig, gate: Snapshot
             yield* ScopedCache.invalidateAll(cache);
             return { ok: false as const, reason: 'invalid_clock' as const };
           }
-          if (result.ok && after - result.snapshot.fetchedAtMs > MAX_AGE_MS) {
+          if (result.ok && after - result.snapshot.fetchedAtMs > KEY_SNAPSHOT_MAX_AGE_MS) {
             yield* ScopedCache.invalidateWhen(cache, 'issuer', value => value === result);
             return { ok: false as const, reason: 'unavailable' as const };
           }
