@@ -5,6 +5,8 @@ import { spawnSync } from "node:child_process";
 
 const root = process.cwd();
 const target = mkdtempSync(join(tmpdir(), "console-harness-probes-"));
+// Cold aggregate verification approaches two minutes on hosted runners (issue #156).
+const VERIFY_PROBE_TIMEOUT_MS = 180000;
 
 /**
  * Check a disposable harness probe against its expected exit status and diagnostic.
@@ -12,20 +14,26 @@ const target = mkdtempSync(join(tmpdir(), "console-harness-probes-"));
  * @param {string[]} args - Arguments for the probe in the disposable checkout.
  * @param {boolean} expected - Whether success is required; false requires a failing status.
  * @param {RegExp} [evidence] - Required diagnostic pattern for expected failures.
- * @throws {Error} If the probe times out, cannot run, or fails to demonstrate its expected result.
+ * @param {number} [timeoutMs=120000] - Child execution budget; aggregate verification receives cold-checkout headroom.
+ * @throws {Error} If the probe times out, cannot run, or fails to demonstrate its expected result; includes termination metadata.
  */
-function run(command, args, expected, evidence) {
+function run(command, args, expected, evidence, timeoutMs = 120000) {
+  console.log("Checking " + command + " " + args.join(" ") + " (timeout " + timeoutMs + "ms)");
+  const started = performance.now();
   const result = spawnSync(command, args, {
     cwd: target,
     encoding: "utf8",
-    timeout: 120000,
+    timeout: timeoutMs,
     env: { ...process.env, NX_DAEMON: "false" },
   });
+  const elapsedMs = Math.round(performance.now() - started);
   const output = (result.stdout ?? "") + (result.stderr ?? "");
   if (result.error || result.status === null || (result.status === 0) !== expected ||
       (evidence && !evidence.test(output)))
-    throw Error("Unexpected probe result: " + command + " " + args.join(" ") + "\n" + output);
-  console.log("Verified " + args.join(" "));
+    throw Error("Unexpected probe result: " + command + " " + args.join(" ") +
+      " (elapsed=" + elapsedMs + "ms, timeout=" + timeoutMs + "ms, status=" + result.status +
+      ", signal=" + (result.signal ?? "none") + ", error=" + (result.error?.code ?? "none") + ")\n" + output);
+  console.log("Verified " + args.join(" ") + " in " + elapsedMs + "ms");
 }
 try {
   cpSync(root, target, {
@@ -33,7 +41,7 @@ try {
     filter: path => ![".git", "node_modules", "dist", ".nx", ".angular", "test-results", "playwright-report"].includes(basename(path)),
   });
   symlinkSync(join(root, "node_modules"), join(target, "node_modules"), "dir");
-  run("make", ["verify"], true);
+  run("make", ["verify"], true, undefined, VERIFY_PROBE_TIMEOUT_MS);
   // Issue #51: prove the production gate checks tools independently of test imports.
   for (const file of ['tools/serve-console.ts', 'tools/console-server.ts']) {
     const path = join(target, file);
@@ -58,12 +66,12 @@ try {
     writeFileSync(home, changed);
     if (readFileSync(home, 'utf8') !== changed || changed === original) throw Error('Template fault was not injected.');
     // H5 retires the byte fences: aggregate failure must now be the Angular diagnostic.
-    run("make", ["verify"], false, /missingProperty/);
+    run("make", ["verify"], false, /missingProperty/, VERIFY_PROBE_TIMEOUT_MS);
   } finally { writeFileSync(home, original); }
 
   const unit = join(target, "apps/console/src/verification/probe.spec.ts");
   writeFileSync(unit, 'it("harness-probe", () => { expect(1).toBe(2); });');
-  run("make", ["verify"], false, /harness-probe/);
+  run("make", ["verify"], false, /harness-probe/, VERIFY_PROBE_TIMEOUT_MS);
   writeFileSync(unit, 'it.skip("harness-probe", () => {});');
   run("make", ["component-test"], false, /Angular accounting/);
   rmSync(unit);
