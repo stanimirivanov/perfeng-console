@@ -144,7 +144,7 @@ general session coordination and mutation lifetimes remain unimplemented.
 `apps/console/src/runs/run.store.ts` is the sole SignalStore writer for the
 Run-detail observation, safe artifact claims and the bounded session observation
 log. `runs/detail/run-detail.ts` renders readonly inputs. H5 retires H4's temporary mixed
-component registrations/fences and exact assembly exceptions. App and ConsoleHome
+component registrations/fences and exact assembly exceptions. App and RunLookup
 now consume feature-local readonly UI ports. Their metadata installs feature providers;
 Angular scopes each facade and SignalStore to the component injector. Facades inject
 DestroyRef, own execution and reject disposed/superseded results. The Run operation

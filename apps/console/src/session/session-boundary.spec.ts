@@ -3,6 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { provideSessionBoundary, configureSession } from './session.providers';
 import { SESSION_BOUNDARY } from './session-boundary.port';
+import { SESSION_UI } from './session-ui';
 import { provideVerificationAccess } from '../verification/providers';
 import { VERIFICATION_ACCESS } from '../verification/access.port';
 import { provideRunLookup } from '../runs/run.providers';
@@ -20,7 +21,7 @@ it('a shared epoch change aborts Run reads, clears session and capability, and i
   let grant!: (response: Response) => void;
   vi.stubGlobal('fetch', vi.fn((_url: string, options?: RequestInit) => {
     signals.push(options!.signal!);
-    return new Promise<Response>(resolve => { if (_url.endsWith('/access')) grant = resolve; });
+    return new Promise<Response>(resolve => { if (_url.endsWith('/access')) { grant = resolve; } });
   }));
   setup();
   const shell = TestBed.createComponent(App);
@@ -35,7 +36,7 @@ it('a shared epoch change aborts Run reads, clears session and capability, and i
   await vi.waitFor(() => expect(signals.every(signal => signal.aborted)).toBe(true));
   grant(new Response(null, { status: 204 }));
   await Promise.resolve();
-  expect(shell.componentInstance.mode()).toBe('pairing');
+  expect(shell.debugElement.injector.get(SESSION_UI).mode()).toBe('pairing');
   expect(access.granted()).toBe(false);
   expect(run.componentInstance.ui.run()).toBeUndefined();
   expect(run.componentInstance.ui.observations()).toEqual([]);
@@ -66,17 +67,18 @@ it('logout invalidates before dispatch, aborts pending grants and keeps CSRF pri
   setup();
   TestBed.overrideProvider((await import('./session.facade')).SESSION_PREVIEW, { useValue: false });
   const shell = TestBed.createComponent(App);
-  await vi.waitFor(() => expect(shell.componentInstance.mode()).toBe('paired'));
+  const session = shell.debugElement.injector.get(SESSION_UI);
+  await vi.waitFor(() => expect(session.mode()).toBe('paired'));
   await vi.waitFor(() => expect(capabilitySignal).toBeDefined());
   const epoch = TestBed.inject(SESSION_BOUNDARY).epoch();
-  const completion = shell.componentInstance.signOut();
+  const completion = session.signOut();
   await vi.waitFor(() => expect(logout).toBeDefined());
   expect(TestBed.inject(SESSION_BOUNDARY).epoch()).toBeGreaterThan(epoch);
-  expect(shell.componentInstance.mode()).toBe('pairing');
+  expect(session.mode()).toBe('pairing');
   expect(credential).toBe('a'.repeat(43));
   await vi.waitFor(() => expect(capabilitySignal?.aborted).toBe(true));
   expect(TestBed.inject(VERIFICATION_ACCESS).granted()).toBe(false);
   logout(Response.json({}));
   await completion;
-  expect(shell.componentInstance.mode()).toBe('pairing');
+  expect(session.mode()).toBe('pairing');
 });

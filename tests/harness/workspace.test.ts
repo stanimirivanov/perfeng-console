@@ -44,25 +44,28 @@ test("browser resource paths cannot copy server or design files into a build", (
   const root = mkdtempSync(join(tmpdir(), "browser-resources-"));
   try {
     mkdirSync(join(root, "src"));
-    writeFileSync(join(root, "src/main.ts"), "@Component({templateUrl: '../../../src/bff/secret.md'}) class Lab {}");
+    writeFileSync(join(root, "src/main.ts"), "import { Component } from '@angular/core'; @Component({templateUrl: '../../../src/bff/secret.md'}) class Lab {}");
     assert.ok(checkApp(root).length);
   } finally {
     rmSync(root, { recursive: true, force: true });
   }
 });
 
-test('component resources must be static, matching sibling files', () => {
+test('production components require matching external files bundled through the global stylesheet', () => {
   const root = mkdtempSync(join(tmpdir(), 'component-resources-'));
   try {
     const feature = join(root, 'src/feature');
     mkdirSync(feature, { recursive: true });
-    writeFileSync(join(feature, 'view.html'), '<p>View</p>');
-    writeFileSync(join(feature, 'view.scss'), ':host { display: block; }');
+    const styles = join(root, 'src/styles.scss');
+    const html = join(feature, 'view.html');
+    writeFileSync(styles, '@use "./feature/view.css";\n');
+    writeFileSync(html, '<p>View</p>');
+    writeFileSync(join(feature, 'view.css'), 'app-view { display: block; }');
     writeFileSync(join(feature, 'other.html'), '<p>Other</p>');
     const file = join(feature, 'view.ts');
-    const component = (metadata: string) => writeFileSync(file, `@Component({${metadata}}) class View {}`);
+    const component = (metadata: string, name = 'View') => writeFileSync(file,`import { Component as ViewComponent } from '@angular/core'; @ViewComponent({${metadata}}) class ${name} {}`);
 
-    component("templateUrl: './view.html', styleUrl: './view.scss'");
+    component("templateUrl: './view.html'");
     assert.deepEqual(checkApp(root), []);
 
     for (const metadata of [
@@ -71,17 +74,30 @@ test('component resources must be static, matching sibling files', () => {
       "templateUrl: './view%2ehtml'",
       "templateUrl: './view.html?raw'",
       'templateUrl: path',
-      "styleUrl: './view.css'",
-      "styles: ['p { color: red; }']",
+      "template: '<p>Inline</p>'",
+      "templateUrl: './view.html', styleUrl: './view.css'",
+      "templateUrl: './view.html', styleUrls: ['./view.css']",
+      "templateUrl: './view.html', styles: ['p { color: red; }']",
     ]) {
       component(metadata);
       assert.match(checkApp(root).join('\n'), /\[resource\]/, metadata);
     }
 
+    component("templateUrl: './view.html'", 'DifferentName');
+    assert.match(checkApp(root).join('\n'), /class.*basename/i);
     component("templateUrl: './view.html'");
-    rmSync(join(feature, 'view.html'));
+    writeFileSync(styles, '/*\n@use "./feature/view.css";\n*/\n');
+    assert.match(checkApp(root).join('\n'), /styles\.scss/);
+    writeFileSync(styles, '@use "./feature/view.css";\n@use "./feature/view.css";\n@use "./feature/other.css";\n');
+    assert.match(checkApp(root).join('\n'), /Bundle 'feature\/view\.css' exactly once/);
+    assert.match(checkApp(root).join('\n'), /No production component owns 'feature\/other\.css'/);
+    writeFileSync(styles, '@use "./feature/view.css";\n');
+    rmSync(join(feature, 'view.css'));
+    assert.match(checkApp(root).join('\n'), /view\.css/);
+    writeFileSync(join(feature, 'view.css'), '');
+    rmSync(html);
     assert.match(checkApp(root).join('\n'), /\[resource\]/);
-    symlinkSync(join(feature, 'other.html'), join(feature, 'view.html'));
+    symlinkSync(join(feature, 'other.html'), html);
     assert.match(checkApp(root).join('\n'), /\[resource\]/);
   } finally {
     rmSync(root, { recursive: true, force: true });
@@ -91,7 +107,9 @@ test('component resources must be static, matching sibling files', () => {
 test("global Sass cannot import a BFF resource or external stylesheet", async () => {
   const { checkStyles } = await import("#perfeng/harness/assets");
   assert.deepEqual(checkStyles('@use "@angular/material" as mat; body { color: red; }'), []);
+  assert.deepEqual(checkStyles('@use "./feature/view.css";\n'), []);
   assert.ok(checkStyles('@use "../../../src/bff/secret";').length);
+  assert.ok(checkStyles('@use "./feature/../../secret.css";').length);
   assert.ok(checkStyles('body { background: url("https://example.com/image"); }').length);
 });
 

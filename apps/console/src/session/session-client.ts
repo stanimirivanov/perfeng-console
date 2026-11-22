@@ -15,13 +15,19 @@ export function sessionRequest(action?: 'pair' | 'logout', credential?: string) 
         body: action === 'pair' ? JSON.stringify({ code: credential }) : '{}',
       } : { headers: { 'X-Perfeng-CSRF': 'read' } }),
     });
-    if (!response.ok) throw new Error('Session request rejected');
+    if (!response.ok) {
+      throw new Error('Session request rejected');
+    }
     const value: unknown = await response.json();
-    if (!value || typeof value !== 'object') throw new Error('Invalid session reply');
+    if (!value || typeof value !== 'object') {
+      throw new Error('Invalid session reply');
+    }
     if ('csrf' in value && typeof value.csrf === 'string' && /^[A-Za-z0-9_-]{43}$/.test(value.csrf)) {
       return { mode: 'paired', csrf: value.csrf } as const;
     }
-    if (action === 'pair') throw new Error('Missing session grant');
+    if (action === 'pair') {
+      throw new Error('Missing session grant');
+    }
     return { mode: 'pairing' } as const;
   }).pipe(Effect.timeout(3000), Effect.catch(() => Effect.succeed({ mode: 'unavailable' } as const)));
 }

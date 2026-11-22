@@ -1,4 +1,4 @@
-<a [attr.href]="router.url.split('#')[0] + '#main'">Skip to content</a>
+<a [attr.href]="skipTarget">Skip to content</a>
 @if (mode() === 'paired' || mode() === 'preview') {
   <nav aria-label="Workspace">
     <a routerLink="/">Console</a>

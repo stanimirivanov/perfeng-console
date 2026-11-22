@@ -12,12 +12,14 @@ required negative tests; do not treat this documentation as package admission.
 ## Component layout and generation
 
 Co-locate each production component's hyphenated `name.ts`, `name.html`, and
-`name.scss` in its feature. Link the matching sibling files with `templateUrl`
-and `styleUrl`. Keep unit specs beside their subject and shared theme and page
-defaults in `src/styles.scss`. A test-only host can use an inline template.
+`name.css` in its feature. Match the class name to the basename and point
+`templateUrl` at `./name.html`. Scope CSS selectors to the component host and
+bundle the file with `@use "./feature/name.css";` in `src/styles.scss`.
+Keep specs beside their subject. A test-only host can use an inline template.
+See the [style and review checks](../../HARNESS.md#code-style-and-review).
 
 Prefer the workspace Angular CLI to scaffold components, services, directives,
-pipes, and other Angular artifacts. Run the generator from the owning feature
+pipes, guards, and other Angular artifacts. Run the generator from the owning feature
 directory and preview its paths before removing `--dry-run`. These examples run
 from `apps/console/src/runs`.
 
@@ -25,10 +27,13 @@ from `apps/console/src/runs`.
 pnpm exec ng generate component run-card --project console --dry-run
 pnpm exec ng generate service run-format --project console --dry-run
 pnpm exec ng generate directive run-highlight --project console --dry-run
+pnpm exec ng generate pipe run-label --project console --dry-run
+pnpm exec ng generate guard run-access --project console --dry-run
 ```
 
 Review generated files for the feature's role, provider lifetime, and import
-boundaries. Register new production TypeScript paths with the ownership harness.
+boundaries. For components, replace the generated `styleUrl` with the static
+bundle entry. Register new production TypeScript paths with the ownership harness.
 
 ## Feature map and entry rules
 

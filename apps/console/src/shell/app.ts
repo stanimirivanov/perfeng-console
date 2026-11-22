@@ -9,22 +9,28 @@ import { VERIFICATION_ACCESS } from '../verification/access.port';
   providers: provideSession(),
   imports: [RouterOutlet, RouterLink],
   templateUrl: './app.html',
-  styleUrl: './app.scss',
 })
 export class App {
-  readonly router = inject(Router);
+  private readonly router = inject(Router);
   private readonly owner = inject(DestroyRef);
   private readonly session = inject(SESSION_UI);
-  readonly access = inject(VERIFICATION_ACCESS);
-  readonly mode = this.session.mode;
-  readonly pending = this.session.pending;
-  readonly message = this.session.message;
-  async pair(event: Event, input: HTMLInputElement, main: HTMLElement) {
+  protected readonly access = inject(VERIFICATION_ACCESS);
+  protected readonly mode = this.session.mode;
+  protected readonly pending = this.session.pending;
+  protected readonly message = this.session.message;
+
+  protected get skipTarget() { return this.router.url.split('#')[0] + '#main'; }
+
+  protected async pair(event: Event, input: HTMLInputElement, main: HTMLElement) {
     event.preventDefault();
-    if (this.pending()) return;
+    if (this.pending()) {
+      return;
+    }
     const code = input.value;
     input.value = '';
-    if (await this.session.pair(code) && !this.owner.destroyed) main.focus();
+    if (await this.session.pair(code) && !this.owner.destroyed) {
+      main.focus();
+    }
   }
-  signOut() { return this.session.signOut(); }
+  protected signOut() { return this.session.signOut(); }
 }

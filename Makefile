@@ -7,6 +7,7 @@ bootstrap: doctor
 	pnpm install --frozen-lockfile --ignore-scripts
 
 lint: check-imports
+	node harness/workspace.ts
 	NX_DAEMON=false node_modules/.bin/nx graph --file=dist/import-project-graph.json
 	NX_DAEMON=false node_modules/.bin/eslint . --max-warnings 0
 

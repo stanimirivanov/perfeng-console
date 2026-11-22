@@ -12,6 +12,11 @@ test("maintainer opens themed Verification with the runner absent and returns to
   await expect(lab.getByRole("button", { name: "Start campaign" })).toBeDisabled();
   const color = await lab.evaluate(el => getComputedStyle(el).backgroundColor);
   expect(color).not.toBe("rgba(0, 0, 0, 0)");
+  await expect(lab).toHaveCSS('padding-top', '24px');
+  const usesStaticStyles = await page.evaluate(() => Array.from(document.styleSheets).some(sheet =>
+    sheet.href && new URL(sheet.href).origin === location.origin && Array.from(sheet.cssRules).some(rule =>
+      rule instanceof CSSStyleRule && rule.selectorText === 'app-scenario-lab')));
+  expect(usesStaticStyles).toBe(true);
   await lab.getByRole("link", { name: "Return to Console" }).click();
   await expect(page.getByRole("heading", { name: "Perfeng Console" })).toBeVisible();
   await expect(lab).toHaveCount(0);

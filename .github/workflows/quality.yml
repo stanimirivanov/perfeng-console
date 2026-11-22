@@ -14,7 +14,7 @@ jobs:
         with:
           persist-credentials: false
       - uses: ./.github/actions/bootstrap
-      - run: make verify
+      - run: pnpm check
   browser:
     runs-on: ubuntu-24.04
     timeout-minutes: 10

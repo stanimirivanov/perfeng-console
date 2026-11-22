@@ -2,11 +2,18 @@ import { diagnostic } from './diagnostics.ts';
 import { readFileSync, readdirSync, lstatSync, openSync, readSync, closeSync, fstatSync, constants } from "node:fs";
 import { join } from "node:path";
 
+const componentStyleUse = /^@use "\.\/((?:[a-z0-9-]+\/)*[a-z0-9-]+\.css)";[ \t]*$/gm;
+
+export function componentStyleImports(source: string): string[] {
+  const uncommented = source.replace(/\/\*[\s\S]*?\*\//g, '');
+  return Array.from(uncommented.matchAll(componentStyleUse), match => match[1]!);
+}
+
 export function checkStyles(source: string): string[] {
   const errors: string[] = [];
-  const remaining = source.replace('@use "@angular/material" as mat;', "");
+  const remaining = source.replace('@use "@angular/material" as mat;', "").replace(componentStyleUse, "");
   if (/@(?:use|forward|import)|url\s*\(/i.test(remaining))
-    errors.push("Only the reviewed local Material Sass input is admitted.");
+    errors.push("Use the reviewed Material Sass input and matching local component CSS modules.");
   return errors;
 }
 

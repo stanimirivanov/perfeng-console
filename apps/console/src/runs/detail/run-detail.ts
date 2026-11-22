@@ -1,23 +1,26 @@
-import { Component, input, inject, ElementRef, afterNextRender } from '@angular/core';
-import type { RunDetail, ArtifactObservation } from '#perfeng/contracts';
+import { Component, computed, input, inject, ElementRef, afterNextRender } from '@angular/core';
+import type { RunDetail as RunDetailRecord, ArtifactObservation } from '#perfeng/contracts';
 
 @Component({
   selector: 'app-run-detail',
   templateUrl: './run-detail.html',
-  styleUrl: './run-detail.scss',
 })
-export class RunDetailView {
-  constructor() {
-    const host = inject<ElementRef<HTMLElement>>(ElementRef);
-    afterNextRender(() => host.nativeElement.querySelector<HTMLElement>('#detail-title')?.focus());
-  }
-  readonly run = input.required<RunDetail>();
+export class RunDetail {
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+  readonly run = input.required<RunDetailRecord>();
   readonly artifacts = input.required<ArtifactObservation>();
   readonly observations = input.required<readonly {
     revision: number;
     state: string;
     updatedAt: string;
   }[]>();
-  states() { return Object.keys(this.run().transitions); }
-  claims() { const value = this.artifacts(); return value.status === 'available' ? value.artifacts : []; }
+  protected readonly states = computed(() => Object.keys(this.run().transitions));
+  protected readonly claims = computed(() => {
+    const value = this.artifacts();
+    return value.status === 'available' ? value.artifacts : [];
+  });
+
+  constructor() {
+    afterNextRender(() => this.host.nativeElement.querySelector<HTMLElement>('#detail-title')?.focus());
+  }
 }

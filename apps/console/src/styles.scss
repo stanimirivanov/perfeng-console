@@ -1,4 +1,9 @@
 @use "@angular/material" as mat;
+@use "./shell/app.css";
+@use "./runs/run-lookup.css";
+@use "./runs/detail/run-detail.css";
+@use "./verification/lab.css";
+
 body {
   margin: 2rem;
   font: 1rem/1.5 system-ui;
@@ -20,5 +25,3 @@ html {
 .verification-area {
   @include mat.theme((color: mat.$violet-palette, typography: system-ui, density: 0));
 }
-
-input:focus-visible, summary:focus-visible { outline: 3px solid #824100; outline-offset: 3px; }

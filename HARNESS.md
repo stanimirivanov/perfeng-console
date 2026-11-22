@@ -82,11 +82,13 @@ and integration tests live under `tests/`. Follow the
 |---|---|---|
 | Toolchain | `make doctor` | Node or pnpm differs from the exact pins |
 | Bootstrap | `make bootstrap` | Frozen lock/install fails. Lifecycle scripts are disabled |
-| Lint | `make lint` | ESLint error or warning, inline config suppression, forbidden TS directive, eval or focused/skipped method |
+| Lint | `make lint` | Component layout, ESLint error or warning, inline config suppression, forbidden TS directive, eval or focused/skipped method |
+| Angular lint | `pnpm lint:angular` | Component layout or a Console TypeScript/template lint violation |
+| Fast local checks | `pnpm check:fast` | Lint, types or architecture fails |
 | Types | `make typecheck` | Explicit strict production-tools Node program, root Node and e2e programs; qualification packages retain separate configs |
 | Architecture | `make architecture` | Unknown source owner, unadmitted package/edge, computed import, CommonJS loader, source symlink or missing scoped guide |
 | Behavior | `make test` | A Node test fails, the suite is empty, or TAP reports any skipped or todo cases. Boundary tests exercise actual TS syntax on temporary source trees |
-| Local aggregate | `make verify` | Toolchain, offline contracts, lint/imports, types, architecture, Node tests, Angular tests/accounting and production build/distribution scan |
+| Local aggregate | `pnpm check` (`make verify`) | Toolchain, offline contracts, lint/imports, types, architecture, Node tests, Angular tests/accounting and production build/distribution scan |
 | Browser | `make browser-test` | Chromium journeys or browser accounting fail |
 | Installation | `make console-isolation-check` | Product-only build, archive install or startup with verifier absent fails |
 | Stack fixture | `make stack-admission` | Pinned Material/CSP/runtime qualification fixture fails |
@@ -107,6 +109,42 @@ Guide provenance names `perfeng-guide-sha256-framed-v1`; source/browser domains
 use length-framed file records. See the [format and legacy compatibility contract](tools/user-guide/README.md#framed-digest-format-v1--issue-88).
 Unversioned historical guide digests are not v1 evidence.
 The self-test itself invokes verify; making it a verify dependency would recurse.
+
+## Code style and review
+
+Use the [Angular coding style guide](https://angular.dev/style-guide) for Angular
+and the [Google TypeScript style guide](https://google.github.io/styleguide/tsguide.html)
+for handwritten TypeScript. The existing formatter remains ESLint Stylistic with
+two-space indent, semicolon type members and the configured type-member and
+list layout. Keep the surrounding quote style. The repo has no blanket
+single-quote rule. Generated contracts and vendored inputs keep their existing
+format and byte ownership.
+
+| Tool | Scope and enforced conventions |
+|---|---|
+| Angular ESLint TypeScript rules | `apps/console/src/**/*.ts`. Kebab-case `app-*` element selectors and camelCase `app…` attribute directives, `inject()` and injected fields first, standalone and OnPush defaults, signal inputs and modern outputs, readonly outputs, lifecycle interfaces and synchronous lifecycle hooks. |
+| Angular ESLint template rules | External Console templates, excluding the application document `index.html`. Built-in control flow, strict equality, no `$any()`, no inline styles, valid two-way binding syntax and no duplicate attributes. Angular strict template checking also runs during the production build. |
+| Workspace/resource and import checks | Production component names must match hyphenated TypeScript, HTML and CSS sibling filenames. Use literal `templateUrl` metadata and a single `@use` in `apps/console/src/styles.scss` per component CSS file. The checks reject inline production templates, component style metadata, unowned imports and stylesheet dependencies outside the reviewed inputs. Inline test hosts are allowed. The build entry is `apps/console/src/main.ts`. |
+| ESLint and TypeScript | Handwritten TypeScript across the repo uses type-only imports, ECMAScript module syntax, `const` where possible, and restrictions on `var`, namespaces and `const enum`. Existing generated and vendored formatting exclusions also apply to the added TypeScript lint block. The root and browser compiler configs use `verbatimModuleSyntax` to require explicit type-only re-exports. Braces and one variable per declaration apply to Console TypeScript, including specs. |
+
+The existing `typescript-eslint` recommended preset already enforces `no-var`,
+`prefer-const`, `no-namespace` and `no-require-imports`. The handwritten override
+adds type-only imports and restrictions on legacy TypeScript module syntax and
+`const enum`. The Node compiler already used `verbatimModuleSyntax` before it was
+enabled for the browser programs.
+
+Review feature ownership, presentation responsibilities, lifecycle work and
+template complexity. Check meaningful names and narrow public APIs. Mark
+template-only members `protected` and appropriate inputs, outputs and queries
+`readonly`. Review type assertions, runtime validation and useful JSDoc at
+boundaries. Confirm each stylesheet scopes selectors to its component and that
+the browser loads the styles from the static bundle. The browser style check
+exercises Verification. The existing `style-src 'self'` plus per-response
+nonce policy still supports Angular Material styles.
+
+Use the [Console generator examples](apps/console/AGENTS.md#component-layout-and-generation)
+when adding an Angular artifact. Review the generated feature location and
+provider lifetime before committing.
 
 The hook uses the checkout's installed development tools. Rebootstrap after a lock change. CI installs the committed lock on a clean runner. A repository administrator can require the hosted job in branch rules and require human review of sensor changes. Installing the local hook does not change GitHub branch settings.
 
@@ -166,7 +204,7 @@ Run make stack-admission to compile the isolated pinned-stack fixture and exerci
 Material overlays in Chromium under the BFF-owned nonce renderer. CI's browser job
 runs it after the product browser suite. The fixture is outside the production entry;
 the dedicated test config discovers only its own stack.spec.ts. The Angular workspace admits NgRx only in the exact Run, session, epoch and capability stores and Effect
-only in the exact adapters, operation and integrations. App/ConsoleHome render
+only in the exact adapters, operation and integrations. App/RunLookup render
 feature-local readonly ports. Component metadata provides each facade and SignalStore
 in the component injector; facades inject DestroyRef. Main only bootstraps app.config.
 Cross-feature imports use reviewed entries; provider functions are admitted only in
@@ -211,10 +249,10 @@ unchanged. Probe progress includes elapsed time; failure diagnostics include
 exit status, signal and child error code (issue #156).
 
 Browser build inputs are explicitly reviewed in `harness/assets.ts`.
-`harness/workspace.ts` admits literal `templateUrl` and `styleUrl` paths to regular,
-matching `.html` and `.scss` siblings. `harness/project-imports.ts` checks component
-stylesheets for import and URL dependencies. The global theme has one reviewed
-Material Sass import. Extending the resource boundary needs focused negative tests.
+`harness/workspace.ts` checks component layout and static CSS inclusion.
+`harness/project-imports.ts` checks component stylesheets for import and URL
+dependencies. The global theme has one reviewed Material Sass import.
+Extending the resource boundary needs focused negative tests.
 The distribution guard scans lazy chunks, maps and other emitted files for known
 secret/fixture/execution markers in every regular file, including binary data.
 It uses bounded byte reads with overlap, checks raw ASCII and UTF-16LE/BE at both
