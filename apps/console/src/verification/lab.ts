@@ -8,6 +8,6 @@ import { RouterLink } from '@angular/router';
   imports: [MatButton, RouterLink],
   host: { class: 'verification-area' },
   templateUrl: './lab.html',
-  styleUrl: './lab.scss',
+  styleUrl: './lab.css',
 })
-export class ScenarioLab { readonly access = inject(VERIFICATION_ACCESS); }
+export class Lab { protected readonly access = inject(VERIFICATION_ACCESS); }

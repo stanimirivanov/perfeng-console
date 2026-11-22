@@ -1,0 +1,2 @@
+nav { display: flex; gap: 1rem; margin: 1rem 0; }
+#pair-code:focus-visible { outline: 3px solid #824100; outline-offset: 3px; }

@@ -29,14 +29,20 @@ export class RunFacade implements RunUi {
     this.clear({ input: 'Ready to look up this Run.', offline: 'Connection unavailable. Run evidence cleared.',online: 'Connection restored. Look up the Run again.', hidden: 'Look up the Run again to see current evidence.' }[reason]);
   }
   private clear(message: string, preserveObservations = false) {
-    if (this.disposed) return;
+    if (this.disposed) {
+      return;
+    }
     this.generation++;
-    if (this.work) Effect.runFork(Fiber.interrupt(this.work));
+    if (this.work) {
+      Effect.runFork(Fiber.interrupt(this.work));
+    }
     this.store.clear(preserveObservations);
     this.store.setStatus(message);
   }
   find(id: string) {
-    if (this.disposed) return;
+    if (this.disposed) {
+      return;
+    }
     this.clear('Looking up Run…', true);
     if (!navigator.onLine) { this.store.setStatus('Connection unavailable. Try again when connected.'); return; }
     const epoch = this.boundary.epoch();
@@ -44,7 +50,9 @@ export class RunFacade implements RunUi {
     const started = performance.now();
     this.work = Effect.runFork(Effect.gen({ self: this }, function* () {
       const result = yield* readRun(id, this.read, started);
-      if (this.disposed || generation !== this.generation || epoch !== this.boundary.epoch()) return;
+      if (this.disposed || generation !== this.generation || epoch !== this.boundary.epoch()) {
+        return;
+      }
       if (result.kind === 'failed') {
         if (result.sessionDenied) { this.boundary.invalidate(); return; }
         this.store.clear(); this.store.setStatus(result.message); return; }

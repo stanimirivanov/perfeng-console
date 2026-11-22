@@ -38,8 +38,8 @@ it('mounted Verification content disappears when a recheck denies access', async
     .mockResolvedValueOnce(new Response(null, { status: 403 })));
   const access = TestBed.inject(VerificationAccess);
   await access.refresh();
-  const { ScenarioLab } = await import('./lab');
-  const fixture = TestBed.createComponent(ScenarioLab);
+  const { Lab } = await import('./lab');
+  const fixture = TestBed.createComponent(Lab);
   fixture.detectChanges();
   expect(fixture.nativeElement.textContent).toContain('Scenario Lab');
   await access.refresh();

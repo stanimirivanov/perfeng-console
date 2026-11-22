@@ -4,7 +4,7 @@
   border-inline-start: .4rem solid var(--mat-sys-primary);
   background: var(--mat-sys-primary-container);
   color: var(--mat-sys-on-primary-container);
-
-  a { color: inherit; }
-  .workspace-label { font-weight: 650; }
 }
+
+a { color: inherit; }
+.workspace-label { font-weight: 650; }

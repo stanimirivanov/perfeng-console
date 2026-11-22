@@ -62,7 +62,7 @@ owns cross-owner cycle and forbidden graph-edge checks. User approved the pin.
 @nx/eslint-plugin 24.0.4 (MIT) matches Nx 24.0.4 and supplies the requested
 module-boundary lint rule. Registry peers are @typescript-eslint/parser ^8 and
 eslint-config-prettier ^10; the frozen graph resolves the plugin.
-No Angular ESLint or eslint-plugin-import direct dependency was added.
+That issue added neither Angular ESLint nor eslint-plugin-import.
 Both tools are replaceable behind make check-imports / make lint and add no runtime
 authority. Install scripts remain disabled; release-age settings remain unchanged.
 The existing openapi-typescript/TypeScript and optional @emnapi peer warnings remain
@@ -102,6 +102,13 @@ selected JavaScript boundary documentation checks. Its exact Node/ESLint peers,
 matured release date and replacement tests are recorded in the
 [JavaScript documentation guide](javascript-documentation.md). No age exception,
 implicit recommended configuration or runtime dependency admission.
+
+## Angular lint admission — issue #161
+
+[ADR 0006](../decisions/0006-enforce-console-style-guides.md) records the pinned
+Angular ESLint 22.8.0 TypeScript plugin, template plugin, and template parser.
+They resolve against the existing TypeScript 6 and ESLint 10 pins. Their usage is
+scoped to the Console. The existing ESLint command and CI run the selected rules.
 
 ## Historical picomatch risk exception — issue #113; retired in #121
 

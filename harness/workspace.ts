@@ -5,8 +5,27 @@ import ts from "typescript";
 import { inspectImports } from "./boundaries.ts";
 import { angularPackages, effectTypePorts } from "./angular-features.ts";
 
+function componentDecorators(tree: ts.SourceFile) {
+  const names = new Set<string>();
+  const namespaces = new Set<string>();
+  for (const item of tree.statements) {
+    if (!ts.isImportDeclaration(item) || !ts.isStringLiteral(item.moduleSpecifier) || item.moduleSpecifier.text !== '@angular/core') continue;
+    const bindings = item.importClause?.namedBindings;
+    if (bindings && ts.isNamespaceImport(bindings)) namespaces.add(bindings.name.text);
+    if (bindings && ts.isNamedImports(bindings)) {
+      for (const binding of bindings.elements) {
+        if ((binding.propertyName ?? binding.name).text === 'Component') names.add(binding.name.text);
+      }
+    }
+  }
+  return (target: ts.Expression) => ts.isIdentifier(target) ? names.has(target.text) :
+    ts.isPropertyAccessExpression(target) && ts.isIdentifier(target.expression) &&
+    namespaces.has(target.expression.text) && target.name.text === 'Component';
+}
+
 export function checkApp(root: string): string[] {
   const errors: string[] = [];
+  const sourceRoot = resolve(root, 'src');
   function walk(dir: string) {
     for (const entry of readdirSync(dir, { withFileTypes: true })) {
       const file = resolve(dir, entry.name);
@@ -34,19 +53,47 @@ export function checkApp(root: string): string[] {
         const line = tree.getLineAndCharacterOfPosition(node.getStart(tree)).line + 1;
         errors.push(diagnostic(relative(root, file), line, rule, reason));
       };
-      // Only matching resource files beside the source can enter the browser build.
+      const isComponent = componentDecorators(tree);
+      const name = basename(file, '.ts');
+      const isSpec = file.endsWith('.spec.ts');
+      const siblingExists = (suffix: string) => lstatSync(resolve(dirname(file), name + suffix), { throwIfNoEntry: false })?.isFile();
       const checkResources = (node: ts.Node) => {
-        if (ts.isPropertyAssignment(node)) {
-          const name = node.name.getText(tree).replace(/["']/g, "");
-          if (name === "templateUrl" || name === "styleUrl") {
-            const suffix = name === "templateUrl" ? ".html" : ".scss";
-            const sibling = basename(file, ".ts") + suffix;
-            if (!ts.isStringLiteralLike(node.initializer) || node.initializer.text !== "./" + sibling ||
-                !lstatSync(resolve(dirname(file), sibling), { throwIfNoEntry: false })?.isFile()) {
-              report(node, "resource", `Use the regular sibling file './${sibling}' as a literal ${name}.`);
+        if (ts.isClassDeclaration(node)) {
+          for (const decorator of ts.getDecorators(node) ?? []) {
+            const call = decorator.expression;
+            if (!ts.isCallExpression(call) || !isComponent(call.expression)) continue;
+            const metadata = call.arguments[0];
+            if (!metadata || !ts.isObjectLiteralExpression(metadata)) {
+              report(decorator, 'resource', 'Use a literal @Component metadata object.');
+              continue;
             }
-          } else if (name === "styles" || name === "styleUrls") {
-            report(node, "resource", "Use a single matching component stylesheet through styleUrl.");
+            const urls = { templateUrl: [] as ts.Expression[], styleUrl: [] as ts.Expression[] };
+            for (const property of metadata.properties) {
+              if (!ts.isPropertyAssignment(property) || !(ts.isIdentifier(property.name) || ts.isStringLiteral(property.name))) {
+                report(property, 'resource', 'Use explicit, statically named component metadata properties.');
+                continue;
+              }
+              const key = property.name.text;
+              if (key === 'templateUrl' || key === 'styleUrl') urls[key].push(property.initializer);
+              if (key === 'styles' || key === 'styleUrls' || (key === 'template' && !isSpec)) {
+                report(property, 'resource', 'Use a sibling HTML template and a single sibling CSS file.');
+              }
+              if (key === 'encapsulation' && !isSpec) {
+                report(property, 'resource', 'Use default Angular view encapsulation.');
+              }
+            }
+            for (const [key, suffix] of [['templateUrl', '.html'], ['styleUrl', '.css']] as const) {
+              if (isSpec && urls[key].length === 0) continue;
+              const [url] = urls[key];
+              if (urls[key].length !== 1 || !url || !ts.isStringLiteralLike(url) ||
+                  url.text !== './' + name + suffix || !siblingExists(suffix)) {
+                report(decorator, 'resource', `Use the regular sibling file './${name}${suffix}' as a literal ${key}.`);
+              }
+            }
+            if (isSpec) continue;
+            if (!/^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/.test(name) || node.name?.text !== name.split('-').map(part => part[0]!.toUpperCase() + part.slice(1)).join('')) {
+              report(node, 'resource', 'Use a PascalCase component class matching its hyphenated file basename.');
+            }
           }
         }
         ts.forEachChild(node, checkResources);
@@ -72,7 +119,7 @@ export function checkApp(root: string): string[] {
       }, report);
     }
   }
-  walk(resolve(root, "src"));
+  walk(sourceRoot);
   return errors;
 }
 if (process.argv[1]?.endsWith("workspace.ts")) {

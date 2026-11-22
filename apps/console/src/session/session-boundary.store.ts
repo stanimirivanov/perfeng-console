@@ -6,7 +6,9 @@ export const SessionBoundary = signalStore(withState({ epoch: 0 }), withMethods(
   return {
     invalidate() {
       patchState(store, { epoch: store.epoch() + 1 });
-      for (const clear of [...owners]) clear();
+      for (const clear of [...owners]) {
+        clear();
+      }
     },
     subscribe(clear: () => void) {
       owners.add(clear);

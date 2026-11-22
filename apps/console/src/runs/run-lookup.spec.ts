@@ -1,6 +1,7 @@
 import { provideSessionBoundary } from '../session/session.providers';
 import { TestBed } from '@angular/core/testing';
-import { ConsoleHome } from './run-lookup';
+import { RunLookup } from './run-lookup';
+import { RUN_UI } from './run-ui';
 
 beforeEach(() => TestBed.configureTestingModule({ providers: [provideSessionBoundary()] }));
 afterEach(() => { TestBed.resetTestingModule(); vi.unstubAllGlobals(); });
@@ -13,12 +14,16 @@ it('route destruction aborts its pending lookup and clears the Run observation',
       requestSignal?.addEventListener('abort', () => reject(new DOMException('Test lookup aborted', 'AbortError')), { once: true });
     });
   }));
-  const fixture = TestBed.createComponent(ConsoleHome);
+  const fixture = TestBed.createComponent(RunLookup);
+  const ui = fixture.debugElement.injector.get(RUN_UI);
+  const host: HTMLElement = fixture.nativeElement;
   fixture.detectChanges();
-  expect(fixture.nativeElement.textContent).toContain('Ready for exact Run lookup');
-  fixture.componentInstance.find(new Event('submit'), 'perf-20260902-120000-abcdef12');
+  expect(host.textContent).toContain('Ready for exact Run lookup');
+  const input = host.querySelector<HTMLInputElement>('#run-id')!;
+  input.value = 'perf-20260902-120000-abcdef12';
+  input.form!.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
   await vi.waitFor(() => expect(requestSignal).toBeDefined());
   fixture.destroy();
   await vi.waitFor(() => expect(requestSignal?.aborted).toBe(true));
-  expect(fixture.componentInstance.detail.run()).toBeUndefined();
+  expect(ui.run()).toBeUndefined();
 });

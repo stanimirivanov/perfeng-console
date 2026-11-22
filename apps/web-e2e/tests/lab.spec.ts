@@ -4,7 +4,9 @@ const access = "**/console/api/verification/access";
 
 test("maintainer opens themed Verification with the runner absent and returns to Console", async ({ page }) => {
   await page.route(access, route => route.fulfill({ status: 204 }));
-  await page.goto("/");
+  const response = await page.goto("/");
+  const nonce = (await response?.headerValue('content-security-policy'))?.match(/\bstyle-src[^;]*'nonce-([^']+)'/)?.[1];
+  expect(nonce).toBeTruthy();
   await page.getByRole("link", { name: "Verification" }).click();
   const lab = page.locator(".verification-area");
   await expect(lab.getByText("Verification · Maintainer area")).toBeVisible();
@@ -12,6 +14,12 @@ test("maintainer opens themed Verification with the runner absent and returns to
   await expect(lab.getByRole("button", { name: "Start campaign" })).toBeDisabled();
   const color = await lab.evaluate(el => getComputedStyle(el).backgroundColor);
   expect(color).not.toBe("rgba(0, 0, 0, 0)");
+  await expect(lab).toHaveCSS('padding-top', '24px');
+  const hasNoncedComponentStyle = await lab.evaluate((host, expectedNonce) =>
+    Array.from(document.querySelectorAll('style')).some(style => style.nonce === expectedNonce &&
+      Array.from(style.sheet?.cssRules ?? []).some(rule => rule instanceof CSSStyleRule &&
+        rule.style.padding === '1.5rem' && host.matches(rule.selectorText))), nonce);
+  expect(hasNoncedComponentStyle).toBe(true);
   await lab.getByRole("link", { name: "Return to Console" }).click();
   await expect(page.getByRole("heading", { name: "Perfeng Console" })).toBeVisible();
   await expect(lab).toHaveCount(0);

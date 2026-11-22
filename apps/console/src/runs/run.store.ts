@@ -17,7 +17,9 @@ export const RunStore = signalStore(
       const history = store.observations().filter(value => value.id === run.id);
       const last = history.at(-1);
       if (last && (run.revision < last.revision || (run.revision === last.revision &&
-          (run.state !== last.state || run.updatedAt !== last.updatedAt)))) return false;
+          (run.state !== last.state || run.updatedAt !== last.updatedAt)))) {
+        return false;
+      }
       const observations = last?.revision === run.revision ? history : [...history,{ id: run.id, revision: run.revision, state: run.state, updatedAt: run.updatedAt }].slice(-20);
       patchState(store, { run, artifacts, observations });
       return true;

@@ -23,24 +23,34 @@ export class VerificationAccess implements VerificationAccessPort {
   }
   private clear() {
     this.revision++;
-    if (this.work) Effect.runFork(Fiber.interrupt(this.work));
+    if (this.work) {
+      Effect.runFork(Fiber.interrupt(this.work));
+    }
     this.store.setGranted(false);
   }
   private leave() {
-    if (this.router.url.split(/[?#]/)[0] === '/verification') void this.router.navigateByUrl('/');
+    if (this.router.url.split(/[?#]/)[0] === '/verification') {
+      void this.router.navigateByUrl('/');
+    }
   }
   async refresh(): Promise<boolean> {
-    if (this.disposed) return false;
+    if (this.disposed) {
+      return false;
+    }
     this.clear();
     const revision = this.revision;
     const epoch = this.boundary.epoch();
     const work = Effect.runFork(this.read());
     this.work = work;
     const result = await Effect.runPromiseExit(Fiber.join(work));
-    if (this.disposed || revision !== this.revision || epoch !== this.boundary.epoch()) return false;
+    if (this.disposed || revision !== this.revision || epoch !== this.boundary.epoch()) {
+      return false;
+    }
     const granted = Exit.isSuccess(result) && result.value === 'granted';
     this.store.setGranted(granted);
-    if (!granted) this.leave();
+    if (!granted) {
+      this.leave();
+    }
     return granted;
   }
 }

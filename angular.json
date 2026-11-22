@@ -9,7 +9,7 @@
         "@schematics/angular:component": {
           "inlineTemplate": false,
           "inlineStyle": false,
-          "style": "scss"
+          "style": "css"
         }
       },
       "architect": {

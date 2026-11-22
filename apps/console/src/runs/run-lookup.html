@@ -10,5 +10,5 @@
 <p role="status">{{ status() }}</p>
 @if (run(); as record) {
   <button matButton type="button" (click)="find($event, record.id)">Refresh Run detail</button>
-  <app-run-detail [run]="record" [artifacts]="detail.artifacts()" [observations]="detail.observations()" />
+  <app-run-detail [run]="record" [artifacts]="artifacts()" [observations]="observations()" />
 }

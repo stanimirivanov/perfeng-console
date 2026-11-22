@@ -1,2 +1,4 @@
-declare const plugin: import('eslint').ESLint.Plugin;
+import type { ESLint } from 'eslint';
+
+declare const plugin: ESLint.Plugin;
 export default plugin;
