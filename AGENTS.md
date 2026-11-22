@@ -25,6 +25,8 @@ see the [gate map](HARNESS.md#sensors-and-failure-handling) for those CI duties.
 
 ## Architecture and code style
 
+When writing TypeScript or Angular code, follow the [code style guidance](CONTRIBUTING.md#code-style).
+
 Read [runtime ownership](docs/development/runtime-ownership.md) before adding state,
 I/O, concurrency or resource lifetimes. Angular owns rendering and local interaction;
 SignalStore owns shared observations; Effect owns scoped asynchronous operations.

@@ -57,17 +57,18 @@ try {
     }
   }
 
-  const home = join(target, "apps/console/src/runs/run-lookup.ts");
-  const original = readFileSync(home, "utf8");
+  const templateFile = 'apps/console/src/runs/run-lookup.html';
+  const template = join(target, templateFile);
+  const original = readFileSync(template, 'utf8');
   const anchor = '<h1>Perfeng Console';
-  if (original.split(anchor).length !== 2) throw Error('Template probe needs exactly one anchor; refusing a no-op or ambiguous edit.');
+  if (original.split(anchor).length !== 2) throw Error('Template probe needs exactly one anchor in ' + templateFile + '.');
   const changed = original.replace(anchor, '<h1>{{ missingProperty }} Perfeng Console');
   try {
-    writeFileSync(home, changed);
-    if (readFileSync(home, 'utf8') !== changed || changed === original) throw Error('Template fault was not injected.');
+    writeFileSync(template, changed);
+    if (readFileSync(template, 'utf8') !== changed || changed === original) throw Error('Template fault was not injected.');
     // H5 retires the byte fences: aggregate failure must now be the Angular diagnostic.
-    run("make", ["verify"], false, /missingProperty/, VERIFY_PROBE_TIMEOUT_MS);
-  } finally { writeFileSync(home, original); }
+    run('make', ['verify'], false, /TS2339:\s+Property 'missingProperty' does not exist/, VERIFY_PROBE_TIMEOUT_MS);
+  } finally { writeFileSync(template, original); }
 
   const unit = join(target, "apps/console/src/verification/probe.spec.ts");
   writeFileSync(unit, 'it("harness-probe", () => { expect(1).toBe(2); });');

@@ -1,0 +1,10 @@
+.run-summary dd { overflow-wrap: anywhere; }
+
+:host { display: block; max-width: 65rem; }
+table { width: 100%; table-layout: fixed; border-collapse: collapse; }
+th, td { text-align: left; padding: .5rem; border-bottom: 1px solid #9baea9; overflow-wrap: anywhere; }
+dl { margin-block: 1rem; }
+dt { font-weight: 650; }
+dd { margin-inline-start: 1rem; }
+details { padding-block: 1rem; }
+summary { cursor: pointer; }

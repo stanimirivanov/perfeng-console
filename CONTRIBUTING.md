@@ -18,6 +18,16 @@ The owner reviews and merges. Do not merge on the owner's behalf.
 Dependency additions must pass docs/development/dependency-policy.md.
 Design exports are guidelines; implement real Angular components and runtime checks.
 
+## Code style
+
+Follow the [Angular coding style guide](https://angular.dev/style-guide) for Angular
+code and the [Google TypeScript style guide](https://google.github.io/styleguide/tsguide.html)
+for handwritten TypeScript. Apply them when adding or editing code, with repository
+ownership, import, and lint rules taking precedence where they differ. Keep style
+consistent within each file and leave generated and vendored files to their owners.
+See the [console guide](apps/console/AGENTS.md#component-layout-and-generation)
+for component layout and Angular CLI examples.
+
 ## Rationale comments and review
 
 Comments explain a non-obvious invariant or why a decision exists; they do not

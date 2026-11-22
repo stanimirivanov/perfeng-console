@@ -9,6 +9,27 @@ Verification uses the same rendering/state rules but never imports simulator aut
 Use the [pending harness rules](../../docs/development/harness-rules.md) to identify
 required negative tests; do not treat this documentation as package admission.
 
+## Component layout and generation
+
+Co-locate each production component's hyphenated `name.ts`, `name.html`, and
+`name.scss` in its feature. Link the matching sibling files with `templateUrl`
+and `styleUrl`. Keep unit specs beside their subject and shared theme and page
+defaults in `src/styles.scss`. A test-only host can use an inline template.
+
+Prefer the workspace Angular CLI to scaffold components, services, directives,
+pipes, and other Angular artifacts. Run the generator from the owning feature
+directory and preview its paths before removing `--dry-run`. These examples run
+from `apps/console/src/runs`.
+
+```sh
+pnpm exec ng generate component run-card --project console --dry-run
+pnpm exec ng generate service run-format --project console --dry-run
+pnpm exec ng generate directive run-highlight --project console --dry-run
+```
+
+Review generated files for the feature's role, provider lifetime, and import
+boundaries. Register new production TypeScript paths with the ownership harness.
+
 ## Feature map and entry rules
 
 - `src/shell`: application chrome and local pairing UI; consumes session UI/provider entries.

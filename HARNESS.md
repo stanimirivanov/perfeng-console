@@ -198,9 +198,11 @@ https://playwright.dev/docs/api/class-reporter.
 
 make harness-self-test copies source into a temporary directory, links the installed
 toolchain and proves actual command failures for injected production CLI/server
-type errors, invalid template bindings,
-component assertions, Angular skips and Playwright skips/failures. It never edits
-the working checkout and removes the temporary fixture on completion.
+type errors, invalid template bindings, component assertions, Angular skips and
+Playwright skips/failures. The template probe injects a binding into
+`apps/console/src/runs/run-lookup.html`. Run the self-test after moving or editing
+that template's probe heading. The script edits only its temporary checkout and
+removes it on completion.
 CI runs it in the dedicated harness-self-test job with installed pinned Chromium.
 Aggregate verify probes have a three-minute child execution budget for cold
 checkouts; other probes retain two minutes, and the whole CI job retains its
@@ -208,9 +210,11 @@ ten-minute limit. Application/transport deadlines and fault assertions are
 unchanged. Probe progress includes elapsed time; failure diagnostics include
 exit status, signal and child error code (issue #156).
 
-Browser build inputs are explicitly reviewed in harness/assets.ts. The current
-scaffold permits inline component templates, one local Material Sass import and
-no copied asset scripts. Extending that boundary needs focused negative tests.
+Browser build inputs are explicitly reviewed in `harness/assets.ts`.
+`harness/workspace.ts` admits literal `templateUrl` and `styleUrl` paths to regular,
+matching `.html` and `.scss` siblings. `harness/project-imports.ts` checks component
+stylesheets for import and URL dependencies. The global theme has one reviewed
+Material Sass import. Extending the resource boundary needs focused negative tests.
 The distribution guard scans lazy chunks, maps and other emitted files for known
 secret/fixture/execution markers in every regular file, including binary data.
 It uses bounded byte reads with overlap, checks raw ASCII and UTF-16LE/BE at both

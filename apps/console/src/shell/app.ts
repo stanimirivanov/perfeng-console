@@ -5,32 +5,11 @@ import { provideSession } from '../session/session.providers';
 import { VERIFICATION_ACCESS } from '../verification/access.port';
 
 @Component({
-  selector: "app-root",
+  selector: 'app-root',
   providers: provideSession(),
   imports: [RouterOutlet, RouterLink],
-  template: `
-    <a [attr.href]="router.url.split('#')[0] + '#main'">Skip to content</a>
-    @if (mode() === 'paired' || mode() === 'preview') {
-      <nav aria-label="Workspace">
-        <a routerLink="/">Console</a>
-        @if (access.granted()) { <a routerLink="/verification">Verification</a> }
-        @if (mode() === 'paired') { <button type="button" [disabled]="pending()" (click)="signOut()">Sign out</button> }
-      </nav>
-    }
-    <main #main id="main" tabindex="-1">
-      @if (mode() === 'paired' || mode() === 'preview') { <router-outlet /> }
-      @if (mode() === 'pairing') {
-        <h1>Pair local console</h1>
-        <p id="pair-help">Enter the single-use code shown in the console server terminal.</p>
-        <form (submit)="pair($event, code, main)">
-          <label for="pair-code">Pairing code</label>
-          <input #code id="pair-code" type="password" autocomplete="off" maxlength="43" required aria-describedby="pair-help">
-          <button type="submit" [disabled]="pending()">Pair console</button>
-        </form>
-      }
-      @if (message()) { <p role="alert">{{ message() }}</p> }
-    </main>
-  `,
+  templateUrl: './app.html',
+  styleUrl: './app.scss',
 })
 export class App {
   readonly router = inject(Router);
