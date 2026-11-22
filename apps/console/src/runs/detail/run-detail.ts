@@ -4,6 +4,7 @@ import type { RunDetail as RunDetailRecord, ArtifactObservation } from '#perfeng
 @Component({
   selector: 'app-run-detail',
   templateUrl: './run-detail.html',
+  styleUrl: './run-detail.css',
 })
 export class RunDetail {
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);

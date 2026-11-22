@@ -124,7 +124,7 @@ format and byte ownership.
 |---|---|
 | Angular ESLint TypeScript rules | `apps/console/src/**/*.ts`. Kebab-case `app-*` element selectors and camelCase `app…` attribute directives, `inject()` and injected fields first, standalone and OnPush defaults, signal inputs and modern outputs, readonly outputs, lifecycle interfaces and synchronous lifecycle hooks. |
 | Angular ESLint template rules | External Console templates, excluding the application document `index.html`. Built-in control flow, strict equality, no `$any()`, no inline styles, valid two-way binding syntax and no duplicate attributes. Angular strict template checking also runs during the production build. |
-| Workspace/resource and import checks | Production component names must match hyphenated TypeScript, HTML and CSS sibling filenames. Use literal `templateUrl` metadata and a single `@use` in `apps/console/src/styles.scss` per component CSS file. The checks reject inline production templates, component style metadata, unowned imports and stylesheet dependencies outside the reviewed inputs. Inline test hosts are allowed. The build entry is `apps/console/src/main.ts`. |
+| Workspace/resource and import checks | Production component names must match hyphenated TypeScript, HTML and CSS sibling filenames. Use literal `templateUrl` and `styleUrl` paths to regular siblings with default Angular encapsulation. The checks reject inline production templates, inline component styles, and stylesheet dependencies outside reviewed inputs. Inline test hosts are allowed. The build entry is `apps/console/src/main.ts`. |
 | ESLint and TypeScript | Handwritten TypeScript across the repo uses type-only imports, ECMAScript module syntax, `const` where possible, and restrictions on `var`, namespaces and `const enum`. Existing generated and vendored formatting exclusions also apply to the added TypeScript lint block. The root and browser compiler configs use `verbatimModuleSyntax` to require explicit type-only re-exports. Braces and one variable per declaration apply to Console TypeScript, including specs. |
 
 The existing `typescript-eslint` recommended preset already enforces `no-var`,
@@ -137,10 +137,11 @@ Review feature ownership, presentation responsibilities, lifecycle work and
 template complexity. Check meaningful names and narrow public APIs. Mark
 template-only members `protected` and appropriate inputs, outputs and queries
 `readonly`. Review type assertions, runtime validation and useful JSDoc at
-boundaries. Confirm each stylesheet scopes selectors to its component and that
-the browser loads the styles from the static bundle. The browser style check
-exercises Verification. The existing `style-src 'self'` plus per-response
-nonce policy still supports Angular Material styles.
+boundaries. Check that component rules belong to the component and shared theme
+and page defaults live in `styles.scss`. The Verification browser check confirms
+the component styles apply and carry the response's CSP nonce. The existing
+`style-src 'self'` plus per-response nonce policy covers Angular component and
+Material styles. See [Angular CSP guidance](https://angular.dev/best-practices/security#content-security-policy).
 
 Use the [Console generator examples](apps/console/AGENTS.md#component-layout-and-generation)
 when adding an Angular artifact. Review the generated feature location and
@@ -249,7 +250,7 @@ unchanged. Probe progress includes elapsed time; failure diagnostics include
 exit status, signal and child error code (issue #156).
 
 Browser build inputs are explicitly reviewed in `harness/assets.ts`.
-`harness/workspace.ts` checks component layout and static CSS inclusion.
+`harness/workspace.ts` checks component layout and literal sibling resource URLs.
 `harness/project-imports.ts` checks component stylesheets for import and URL
 dependencies. The global theme has one reviewed Material Sass import.
 Extending the resource boundary needs focused negative tests.

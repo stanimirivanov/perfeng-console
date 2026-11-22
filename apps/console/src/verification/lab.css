@@ -1,4 +1,4 @@
-app-scenario-lab {
+:host {
   display: block;
   padding: 1.5rem;
   border-inline-start: .4rem solid var(--mat-sys-primary);
@@ -6,5 +6,5 @@ app-scenario-lab {
   color: var(--mat-sys-on-primary-container);
 }
 
-app-scenario-lab a { color: inherit; }
-app-scenario-lab .workspace-label { font-weight: 650; }
+a { color: inherit; }
+.workspace-label { font-weight: 650; }

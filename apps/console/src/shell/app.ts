@@ -9,6 +9,7 @@ import { VERIFICATION_ACCESS } from '../verification/access.port';
   providers: provideSession(),
   imports: [RouterOutlet, RouterLink],
   templateUrl: './app.html',
+  styleUrl: './app.css',
 })
 export class App {
   private readonly router = inject(Router);

@@ -1,10 +1,9 @@
 import { diagnostic } from './diagnostics.ts';
 import { lstatSync, readdirSync, readFileSync } from "node:fs";
-import { basename, resolve, relative, dirname, sep } from "node:path";
+import { basename, resolve, relative, dirname } from "node:path";
 import ts from "typescript";
 import { inspectImports } from "./boundaries.ts";
 import { angularPackages, effectTypePorts } from "./angular-features.ts";
-import { componentStyleImports } from './assets.ts';
 
 function componentDecorators(tree: ts.SourceFile) {
   const names = new Set<string>();
@@ -27,10 +26,6 @@ function componentDecorators(tree: ts.SourceFile) {
 export function checkApp(root: string): string[] {
   const errors: string[] = [];
   const sourceRoot = resolve(root, 'src');
-  const styleEntry = resolve(sourceRoot, 'styles.scss');
-  const bundledStyles = lstatSync(styleEntry, { throwIfNoEntry: false })?.isFile()
-    ? componentStyleImports(readFileSync(styleEntry, 'utf8')) : [];
-  const usedStyles = new Set<string>();
   function walk(dir: string) {
     for (const entry of readdirSync(dir, { withFileTypes: true })) {
       const file = resolve(dir, entry.name);
@@ -72,34 +67,32 @@ export function checkApp(root: string): string[] {
               report(decorator, 'resource', 'Use a literal @Component metadata object.');
               continue;
             }
-            const externalTemplates: ts.Expression[] = [];
+            const urls = { templateUrl: [] as ts.Expression[], styleUrl: [] as ts.Expression[] };
             for (const property of metadata.properties) {
               if (!ts.isPropertyAssignment(property) || !(ts.isIdentifier(property.name) || ts.isStringLiteral(property.name))) {
                 report(property, 'resource', 'Use explicit, statically named component metadata properties.');
                 continue;
               }
               const key = property.name.text;
-              if (key === 'templateUrl') externalTemplates.push(property.initializer);
-              if (['styles', 'styleUrl', 'styleUrls'].includes(key) || (key === 'template' && !isSpec)) {
-                report(property, 'resource', 'Use a sibling HTML template and bundle component CSS through src/styles.scss.');
+              if (key === 'templateUrl' || key === 'styleUrl') urls[key].push(property.initializer);
+              if (key === 'styles' || key === 'styleUrls' || (key === 'template' && !isSpec)) {
+                report(property, 'resource', 'Use a sibling HTML template and a single sibling CSS file.');
+              }
+              if (key === 'encapsulation' && !isSpec) {
+                report(property, 'resource', 'Use default Angular view encapsulation.');
               }
             }
-            if (!isSpec || externalTemplates.length) {
-              const template = externalTemplates[0];
-              if (externalTemplates.length !== 1 || !template || !ts.isStringLiteralLike(template) ||
-                  template.text !== './' + name + '.html' || !siblingExists('.html')) {
-                report(decorator, 'resource', `Use the regular sibling file './${name}.html' as a literal templateUrl.`);
+            for (const [key, suffix] of [['templateUrl', '.html'], ['styleUrl', '.css']] as const) {
+              if (isSpec && urls[key].length === 0) continue;
+              const [url] = urls[key];
+              if (urls[key].length !== 1 || !url || !ts.isStringLiteralLike(url) ||
+                  url.text !== './' + name + suffix || !siblingExists(suffix)) {
+                report(decorator, 'resource', `Use the regular sibling file './${name}${suffix}' as a literal ${key}.`);
               }
             }
             if (isSpec) continue;
             if (!/^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/.test(name) || node.name?.text !== name.split('-').map(part => part[0]!.toUpperCase() + part.slice(1)).join('')) {
               report(node, 'resource', 'Use a PascalCase component class matching its hyphenated file basename.');
-            }
-            if (!siblingExists('.css')) report(decorator, 'resource', `Add the regular sibling stylesheet '${name}.css'.`);
-            const css = relative(sourceRoot, resolve(dirname(file), name + '.css')).split(sep).join('/');
-            usedStyles.add(css);
-            if (bundledStyles.filter(path => path === css).length !== 1) {
-              report(decorator, 'resource', `Bundle '${css}' exactly once with @use in src/styles.scss.`);
             }
           }
         }
@@ -127,9 +120,6 @@ export function checkApp(root: string): string[] {
     }
   }
   walk(sourceRoot);
-  for (const stylesheet of bundledStyles) {
-    if (!usedStyles.has(stylesheet)) errors.push(diagnostic('src/styles.scss', 1, 'resource', `No production component owns '${stylesheet}'.`));
-  }
   return errors;
 }
 if (process.argv[1]?.endsWith("workspace.ts")) {

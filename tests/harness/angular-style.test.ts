@@ -37,7 +37,7 @@ export { StyleProbe, StyleDirective };`;
 export class StyleProbe { readonly status = 'ready'; readonly element = inject(ElementRef); }`;
   assert.ok((await ruleIds(outOfOrder, sourcePath)).includes('@angular-eslint/inject-at-top'));
   const valid = `import { Component, Directive, ElementRef, inject, input, output } from '@angular/core';
-@Component({ selector: 'app-style-probe', templateUrl: './style-probe.html' })
+@Component({ selector: 'app-style-probe', templateUrl: './style-probe.html', styleUrl: './style-probe.css' })
 export class StyleProbe {
   protected readonly element = inject(ElementRef);
   readonly value = input('');

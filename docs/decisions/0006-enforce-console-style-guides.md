@@ -11,13 +11,13 @@ and external templates. Root dev dependencies are the Console's tooling boundary
 in this workspace. Both the Angular build and backend tooling use TypeScript
 6.0.3 under [ADR 0002](0002-ui-technology-stack.md). Keep that shared pin.
 
-Keep component styles next to their source as CSS and bundle them through
-`apps/console/src/styles.scss`. Sass compiles the local `@use` entries into the
-existing static stylesheet. Component selectors scope the rules by convention.
-The workspace guard validates regular matching siblings, literal template paths,
-and exactly one bundle entry per component. The existing Material Sass input
-and CSP nonce still support Angular Material. A browser test checks a compiled
-component rule in the same-origin stylesheet and asserts that it applies.
+Keep component styles next to their source as CSS and link them with `styleUrl`.
+Angular's default emulated encapsulation scopes the rules to the component.
+The workspace guard validates matching regular siblings and literal template and
+style paths. `apps/console/src/styles.scss` owns the shared Material theme and
+page defaults. Angular uses the existing CSP nonce for both Material and
+component styles. A browser test checks that the lazy Verification component's
+style applies and that its style element carries the nonce from the response.
 
 ## Dependency admission
 

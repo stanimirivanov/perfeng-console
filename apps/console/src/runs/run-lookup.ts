@@ -9,6 +9,7 @@ import { provideRunLookup } from './run.providers';
   providers: provideRunLookup(),
   imports: [RunDetail, MatButtonModule],
   templateUrl: './run-lookup.html',
+  styleUrl: './run-lookup.css',
   host: {
     '(window:offline)': "invalidate('offline')",
     '(window:online)': "invalidate('online')",

@@ -1,10 +1,10 @@
-app-run-detail { display: block; max-width: 65rem; }
-app-run-detail table { width: 100%; table-layout: fixed; border-collapse: collapse; }
-app-run-detail th, app-run-detail td { text-align: left; padding: .5rem; border-bottom: 1px solid #9baea9; overflow-wrap: anywhere; }
-app-run-detail dl { margin-block: 1rem; }
-app-run-detail dt { font-weight: 650; }
-app-run-detail .run-summary dd { overflow-wrap: anywhere; }
-app-run-detail dd { margin-inline-start: 1rem; }
-app-run-detail details { padding-block: 1rem; }
-app-run-detail summary { cursor: pointer; }
-app-run-detail summary:focus-visible { outline: 3px solid #824100; outline-offset: 3px; }
+:host { display: block; max-width: 65rem; }
+table { width: 100%; table-layout: fixed; border-collapse: collapse; }
+th, td { text-align: left; padding: .5rem; border-bottom: 1px solid #9baea9; overflow-wrap: anywhere; }
+dl { margin-block: 1rem; }
+dt { font-weight: 650; }
+.run-summary dd { overflow-wrap: anywhere; }
+dd { margin-inline-start: 1rem; }
+details { padding-block: 1rem; }
+summary { cursor: pointer; }
+summary:focus-visible { outline: 3px solid #824100; outline-offset: 3px; }

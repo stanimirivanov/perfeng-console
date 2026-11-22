@@ -12,9 +12,10 @@ required negative tests; do not treat this documentation as package admission.
 ## Component layout and generation
 
 Co-locate each production component's hyphenated `name.ts`, `name.html`, and
-`name.css` in its feature. Match the class name to the basename and point
-`templateUrl` at `./name.html`. Scope CSS selectors to the component host and
-bundle the file with `@use "./feature/name.css";` in `src/styles.scss`.
+`name.css` in its feature. Match the class name to the basename and set
+`templateUrl: './name.html'` and `styleUrl: './name.css'`. Use Angular's default
+emulated encapsulation. Use `:host` for host styles and keep shared theme and
+page defaults in `src/styles.scss`.
 Keep specs beside their subject. A test-only host can use an inline template.
 See the [style and review checks](../../HARNESS.md#code-style-and-review).
 
@@ -32,8 +33,7 @@ pnpm exec ng generate guard run-access --project console --dry-run
 ```
 
 Review generated files for the feature's role, provider lifetime, and import
-boundaries. For components, replace the generated `styleUrl` with the static
-bundle entry. Register new production TypeScript paths with the ownership harness.
+boundaries. Register new production TypeScript paths with the ownership harness.
 
 ## Feature map and entry rules
 
