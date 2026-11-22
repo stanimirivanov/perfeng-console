@@ -2,7 +2,7 @@
 
 Scenario Lab lives inside the Console under Verification, with a distinct Material theme and a visible maintainer label. Runner installation and acceptance remain independent.
 
-[Plan and release criteria](plan.md) · [Confirmed intent](../docs/intent/perfeng-ui.md) · [Accepted UI stack](../docs/decisions/0002-ui-technology-stack.md). IDs identify proposed PR-sized scopes, not GitHub numbers. Check off only after verifying the full scope. PR1/2 build on existing governance and harness.
+[Plan and release criteria](plan.md) · [Confirmed intent](../docs/intent/perfeng-ui.md) · [Accepted UI stack](../docs/adr/0002-ui-technology-stack.md). IDs identify proposed PR-sized scopes, not GitHub numbers. Check off only after verifying the full scope. PR1/2 build on existing governance and harness.
 
 ## Product
 
@@ -28,7 +28,7 @@ Scenario Lab lives inside the Console under Verification, with a distinct Materi
 - [x] [M05-PR6 — Deliver fresh exact Run lookup](plan.md#m05-pr6-deliver-fresh-exact-run-lookup) · perfeng-console · depends on PR5, PR42 · G6 · verified merged [Console #40](https://github.com/stanimirivanov/perfeng-console/pull/40)
 - [ ] [M05-PR48 — Serve service-authorized comparisons by native Run ID](plan.md#m05-pr48-serve-service-authorized-comparisons-by-native-run-id) · perfeng-control-plane · depends on PR45, PR46, PR47, PR27 · G6
 - [ ] [M05-PR52 — Sign in to the console with a service-scoped identity](plan.md#m05-pr52-sign-in-to-the-console-with-a-service-scoped-identity) · perfeng-console · depends on PR5, PR43, PR58 · G6
-  - PR52v: [accepted scoped runtime-admission decision](../docs/decisions/0004-qualify-jwt-verification-before-runtime-adoption.md) admits the private verifier, key-source/cache and consumed-exchange composition; provider-driven BFF transaction qualified in Environment PR #400; shared-user/session activation remains pending.
+  - PR52v: [accepted scoped runtime-admission decision](../docs/adr/0004-qualify-jwt-verification-before-runtime-adoption.md) admits the private verifier, key-source/cache and consumed-exchange composition; provider-driven BFF transaction qualified in Environment PR #400; shared-user/session activation remains pending.
   - PR52ad: consumed-login custody feeds verified delegation without caller-supplied original identity; actual-provider full-flow/session admission remain pending.
   - PR52ac: private verified delegation joins actual wire and resolved crypto, with original context/expiry fences; consumed-login custody, real-provider and session admission remain pending.
   - PR52ab: private key-resolved delegated verification; actual-provider custody/composition and session admission remain pending.

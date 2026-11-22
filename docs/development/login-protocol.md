@@ -4,7 +4,7 @@
 
 [Issue #71](https://github.com/stanimirivanov/perfeng-console/issues/71) adds a
 consumer of the [pending transaction owner](login-transactions.md) under accepted
-[control-plane ADR 0046](https://github.com/stanimirivanov/perfeng-control-plane/blob/main/docs/decisions/0046-select-issuer-and-bff-delegation-trust.md).
+[control-plane ADR 0046](https://github.com/stanimirivanov/perfeng-control-plane/blob/main/docs/adr/0046-select-issuer-and-bff-delegation-trust.md).
 It is a synchronous BFF protocol adapter, not an incoming HTTP handler, token
 client, authenticated session or shared-user activation. Existing pairing and
 serving remain unchanged. No issuer deployment or credentials are configured.

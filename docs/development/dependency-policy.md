@@ -75,7 +75,7 @@ engine and peer metadata was read from the npm registry for these versions.
 
 ## Private JWT verifier admission — issues #81 and #119
 
-[ADR 0004](../decisions/0004-qualify-jwt-verification-before-runtime-adoption.md)
+[ADR 0004](../adr/0004-qualify-jwt-verification-before-runtime-adoption.md)
 is accepted for the private snapshot verifier. Root dependencies jose 6.2.17 and
 jsonc-parser 3.3.1 have immediate, exact adapter consumers; browser/session/network
 activation remains unadmitted. Both are MIT, declare no engines, peers or runtime
@@ -90,7 +90,7 @@ See [the admission guide](snapshot-verifier.md) for ownership and replacement ga
 
 Development-only @stylistic/eslint-plugin 5.9.0 is pinned for immediately used
 interface/type-member layout, semicolon delimiters, indentation and trailing-space
-rules. [ADR 0005](../decisions/0005-enforce-readable-typescript-formatting.md) records
+rules. [ADR 0005](../adr/0005-enforce-readable-typescript-formatting.md) records
 MIT/Node/ESLint peers, matured release-age evidence, dependency weight, experimental
 rule qualification and replacement boundary. Generated/vendor byte ownership and
 all existing security/import checks remain active. No release-age exception.
@@ -105,7 +105,7 @@ implicit recommended configuration or runtime dependency admission.
 
 ## Angular lint admission — issue #161
 
-[ADR 0006](../decisions/0006-enforce-console-style-guides.md) records the pinned
+[ADR 0006](../adr/0006-enforce-console-style-guides.md) records the pinned
 Angular ESLint 22.8.0 TypeScript plugin, template plugin, and template parser.
 They resolve against the existing TypeScript 6 and ESLint 10 pins. Their usage is
 scoped to the Console. The existing ESLint command and CI run the selected rules.

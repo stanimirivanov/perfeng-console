@@ -6,6 +6,8 @@ Use Linux with the exact Node version in `.node-version` and pnpm version in `pa
 
 Start with the [agent map](AGENTS.md) or the [harness guide](HARNESS.md).
 
+Read the [Console glossary](GLOSSARY.md) for operator and verification terminology.
+
 ## Angular workspace
 
 Nx 24.0.4 builds one Angular 22.2.4 browser app on TypeScript 6.0.3. The Console owns the ordinary Run journey and the lazy Verification → Scenario Lab area. Its violet Material theme and maintainer label distinguish it from ordinary operations. The optional runner remains outside the browser; installing the console never grants fault permissions.

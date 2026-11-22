@@ -4,7 +4,7 @@
 
 Issue [#69](https://github.com/stanimirivanov/perfeng-console/issues/69) implements
 only the pending transaction owner for the accepted
-[ADR 0046 trust profile](https://github.com/stanimirivanov/perfeng-control-plane/blob/main/docs/decisions/0046-select-issuer-and-bff-delegation-trust.md).
+[ADR 0046 trust profile](https://github.com/stanimirivanov/perfeng-control-plane/blob/main/docs/adr/0046-select-issuer-and-bff-delegation-trust.md).
 It is a prerequisite for control-plane #356 and later PR52 callback/exchange
 slices. Shared-user mode is not enabled and local pairing is unchanged.
 

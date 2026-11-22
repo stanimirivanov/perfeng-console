@@ -1,7 +1,7 @@
 # Consumed code exchange to verified observation — PR52v, issue #123
 
-Under accepted ADRs [0004](../decisions/0004-qualify-jwt-verification-before-runtime-adoption.md)
-and [0046](https://github.com/stanimirivanov/perfeng-control-plane/blob/main/docs/decisions/0046-select-issuer-and-bff-delegation-trust.md),
+Under accepted ADRs [0004](../adr/0004-qualify-jwt-verification-before-runtime-adoption.md)
+and [0046](https://github.com/stanimirivanov/perfeng-control-plane/blob/main/docs/adr/0046-select-issuer-and-bff-delegation-trust.md),
 makeVerifiedCodeExchange acquires a private single-use exchange plus the admitted
 key resolver and signature verifier. It creates no session, actor enrollment, grant,
 listener route or shared-user mode. Local pairing and generated validators are unchanged.

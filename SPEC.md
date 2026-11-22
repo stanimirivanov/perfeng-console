@@ -5,7 +5,7 @@ Status: approved intent and architecture, delivered incrementally under M05.
 ## Authority
 
 [Confirmed intent](docs/intent/perfeng-ui.md), [constraints](CONSTRAINTS.md),
-[plan](tasks/plan.md) and [accepted stack ADR](docs/decisions/0002-ui-technology-stack.md)
+[plan](tasks/plan.md) and [accepted stack ADR](docs/adr/0002-ui-technology-stack.md)
 govern implementation. The original proposal supplies scenario detail; its earlier
 verification-first navigation and separate-browser assumptions are superseded.
 

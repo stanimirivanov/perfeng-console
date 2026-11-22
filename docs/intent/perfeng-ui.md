@@ -23,4 +23,4 @@ Confirmed by the project owner on 2026-11-06.
 
 ## Open questions
 
-The hosting arrangement, identity provider, Git repository that owns each configuration type, maintenance capacity and delivery budget remain open.
+The hosting arrangement, identity provider, maintenance capacity and delivery budget remain open. The [configuration ownership ADR](https://github.com/stanimirivanov/perfeng-environment/blob/main/docs/adr/0076-route-configuration-proposals-to-source-owners.md) assigns authored configuration to its service or component owner. Each exact repository and path still needs a reviewed proposal route.

@@ -340,7 +340,7 @@ installation, strict fixture compilation and synthetic JWT tests. The separate
 identity-qualification workflow bootstraps the exact candidates and audits their
 isolated graph. This target is independent of `make verify` and is not production
 admission. See the [qualification contract](tools/qualification/identity-jwt/README.md)
-and [proposed ADR 0004](docs/decisions/0004-qualify-jwt-verification-before-runtime-adoption.md).
+and [proposed ADR 0004](docs/adr/0004-qualify-jwt-verification-before-runtime-adoption.md).
 
 ## Isolated signing-key wire qualification — issue #97
 

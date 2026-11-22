@@ -1,6 +1,6 @@
 # Private snapshot verifier — M05-PR52t, issue #119
 
-The owner accepted [ADR 0004](../decisions/0004-qualify-jwt-verification-before-runtime-adoption.md)
+The owner accepted [ADR 0004](../adr/0004-qualify-jwt-verification-before-runtime-adoption.md)
 on 2026-11-18. This slice admits a private implementation, not shared-user login.
 No listener route, local pairing, key-network source, cache, session or policy changes.
 

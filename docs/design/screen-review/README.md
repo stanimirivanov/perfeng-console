@@ -71,7 +71,7 @@ The product BFF envelope (planned) carries status, observedAt, validUntil on CUR
 
 ## Sources
 
-[Option B plan](../../../tasks/plan.md) · [Accepted UI ADR](../../decisions/0002-ui-technology-stack.md) · [Confirmed intent](../../intent/perfeng-ui.md). Report headings are from workspace research.md §27. Pinned contract references below describe data, not deployed availability.
+[Option B plan](../../../tasks/plan.md) · [Accepted UI ADR](../../adr/0002-ui-technology-stack.md) · [Confirmed intent](../../intent/perfeng-ui.md). Report headings are from workspace research.md §27. Pinned contract references below describe data, not deployed availability.
 
 [run]: https://github.com/stanimirivanov/perfeng-contracts/blob/55d28f4f432825c1dc504ca0f03ee308e66fb62c/api/run-management/v1/openapi.json
 [edges]: https://github.com/stanimirivanov/perfeng-contracts/blob/55d28f4f432825c1dc504ca0f03ee308e66fb62c/api/run-management/v1/transitions.json

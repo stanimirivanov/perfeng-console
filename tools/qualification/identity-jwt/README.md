@@ -102,7 +102,7 @@ Rollback removes this isolated fixture, explicit target and qualification workfl
 Production behavior/lockfiles, identity provider, credentials and persisted state stay intact.
 
 The boundary/maintenance decision is recorded in
-[proposed ADR 0004](../../../docs/decisions/0004-qualify-jwt-verification-before-runtime-adoption.md).
+[proposed ADR 0004](../../../docs/adr/0004-qualify-jwt-verification-before-runtime-adoption.md).
 
 ## PR52h code-response pair qualification — issue #95
 
