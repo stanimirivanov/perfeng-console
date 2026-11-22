@@ -198,9 +198,11 @@ https://playwright.dev/docs/api/class-reporter.
 
 make harness-self-test copies source into a temporary directory, links the installed
 toolchain and proves actual command failures for injected production CLI/server
-type errors, invalid template bindings,
-component assertions, Angular skips and Playwright skips/failures. It never edits
-the working checkout and removes the temporary fixture on completion.
+type errors, invalid template bindings, component assertions, Angular skips and
+Playwright skips/failures. The template probe injects a binding into
+`apps/console/src/runs/run-lookup.html`. Run the self-test after moving or editing
+that template's probe heading. The script edits only its temporary checkout and
+removes it on completion.
 CI runs it in the dedicated harness-self-test job with installed pinned Chromium.
 Aggregate verify probes have a three-minute child execution budget for cold
 checkouts; other probes retain two minutes, and the whole CI job retains its
