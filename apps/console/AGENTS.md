@@ -19,21 +19,9 @@ page defaults in `src/styles.scss`.
 Keep specs beside their subject. A test-only host can use an inline template.
 See the [style and review checks](../../HARNESS.md#code-style-and-review).
 
-Prefer the workspace Angular CLI to scaffold components, services, directives,
-pipes, guards, and other Angular artifacts. Run the generator from the owning feature
-directory and preview its paths before removing `--dry-run`. These examples run
-from `apps/console/src/runs`.
-
-```sh
-pnpm exec ng generate component run-card --project console --dry-run
-pnpm exec ng generate service run-format --project console --dry-run
-pnpm exec ng generate directive run-highlight --project console --dry-run
-pnpm exec ng generate pipe run-label --project console --dry-run
-pnpm exec ng generate guard run-access --project console --dry-run
-```
-
-Review generated files for the feature's role, provider lifetime, and import
-boundaries. Register new production TypeScript paths with the ownership harness.
+Use the workspace Angular CLI from the owning feature when scaffolding.
+Preview generated paths with `--dry-run` and register new production TypeScript
+paths with the ownership harness.
 
 ## Feature map and entry rules
 

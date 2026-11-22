@@ -1,6 +1,6 @@
 # Working with the console harness
 
-Start at [AGENTS.md](AGENTS.md), then read the task and owning layer guide.
+Start at [AGENTS.md](AGENTS.md), then read the owning layer guide.
 This map covers the current Angular Console, BFF, independently released verifier
 boundaries and verification commands. Use the [harness-rule index](docs/development/harness-rules.md)
 for scanner coverage, active admission and remaining hardening; executable policy
@@ -9,7 +9,7 @@ is authoritative for enforcement. Historical receipts below retain their scope/d
 ## Repository map
 
 ```text
-AGENTS.md                    issue-first Plan / Execute / Verify loop
+AGENTS.md                    skills configuration and technical entry point
 CONSTRAINTS.md               project invariants and scenario evidence rules
 HARNESS.md                   commands, ownership and enforcement status
 tasks/{plan,todo}.md         approved task scopes and dependency graph

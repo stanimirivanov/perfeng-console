@@ -1,10 +1,9 @@
 # Contributing
 
-Start with AGENTS.md, CONSTRAINTS.md and the owning M05 task.
-Reuse or create a bounded issue before implementation. Work on feature/issue-N.
-Record scope, dependencies, acceptance criteria and verification requirements.
-Write the failing behavioral regression before its implementation.
-Preserve unrelated changes and provider ownership.
+Use the workflow in [AGENTS.md](AGENTS.md), and read [CONSTRAINTS.md](CONSTRAINTS.md)
+for product and verification requirements. Preserve unrelated changes and provider
+ownership. Link delivery PRs to the issue when applicable and record validation,
+limitations and rollback. The owner reviews and merges.
 
 Run make bootstrap for a frozen install with lifecycle scripts disabled.
 Run make verify and make supply-chain before delivery.
@@ -12,8 +11,6 @@ Browser changes also require make build and make browser-test.
 Narrated journey changes require make guide; generated guides stay outside Git.
 Report failed or unavailable checks with their actual cause.
 Never suppress failures, lower thresholds or edit scenario expectations to obtain green.
-Include issue linkage, validation, limitations and rollback in the pull request.
-The owner reviews and merges. Do not merge on the owner's behalf.
 
 Dependency additions must pass docs/development/dependency-policy.md.
 Design exports are guidelines; implement real Angular components and runtime checks.
@@ -36,13 +33,6 @@ and the review issue/decision. A temporary allowance names its owning issue and
 retirement condition, for example `TODO(issue-49): ...`; avoid unticketed promises.
 Do not add comments to every function or enforce comment counts with a regex.
 This policy is a human review duty, not an active comment-quality linter.
-
-When fixing a recurring agent mistake, record its smallest violating example,
-the regression/sensor that catches it and the local guide that prevents it.
-The [PR template](.github/pull_request_template.md) captures this steering loop.
-Documentation-only work has no behavioral RED/GREEN requirement; review facts,
-links and the applicable gates instead. Do not add artificial tests or claim a
-future sensor is already active.
 
 Reviewers judge scope, misunderstood requirements, unnecessary features and
 abstraction cost alongside deterministic results. Optional isolated AI review is

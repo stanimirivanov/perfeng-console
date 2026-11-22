@@ -2,7 +2,8 @@
 
 Own the local session, server-side credential loading, fixed-origin provider transport and safe error projection. Enforce Host/Origin, CSRF, freshness and route allowlists before dispatch. Keep simulator execution, evaluator logic and Kubernetes clients outside this process.
 
-Read the [layer matrix](../../HARNESS.md) and run `make architecture` after changing dependencies.
+Check dependencies against the [layer matrix](../../HARNESS.md#ownership-and-allowed-edges)
+and run `make architecture` after changing them.
 
 Read [runtime ownership](../../docs/development/runtime-ownership.md) and the
 [harness specification](../../docs/development/harness-rules.md). Effect owns scoped

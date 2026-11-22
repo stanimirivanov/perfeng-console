@@ -8,15 +8,13 @@ Closes #<issue>
 
 ## Verification
 
-- Commands run and actual results (include RED/GREEN for behavior changes):
+- Commands run and actual results:
 - Failed/unavailable checks and cause; distinguish current results from old receipts:
 - Documentation-only: factual/link checks instead of artificial behavior tests:
 
-## Harness steering (when fixing a recurring mistake)
+## Enforcement changes (when applicable)
 
-- Smallest violating example and failing proof:
-- Sensor/regression and permitted/forbidden fixtures, or explicitly pending enforcement:
-- Local guide changed to prevent recurrence:
+- Changed rule, fixtures and remaining enforcement gaps:
 
 ## Review and rollback
 
