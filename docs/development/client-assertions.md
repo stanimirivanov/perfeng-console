@@ -5,7 +5,7 @@
 [Issue #73](https://github.com/stanimirivanov/perfeng-console/issues/73) implements
 a narrow server-side signing capability shared by the later authorization-code
 and audience-restricted exchange operations. Accepted
-[control-plane ADR 0046](https://github.com/stanimirivanov/perfeng-control-plane/blob/main/docs/decisions/0046-select-issuer-and-bff-delegation-trust.md)
+[control-plane ADR 0046](https://github.com/stanimirivanov/perfeng-control-plane/blob/main/docs/adr/0046-select-issuer-and-bff-delegation-trust.md)
 requires separate login/delegate registrations and private-key client
 authentication. The existing environment `keycloak_human.py` fixture uses
 RS256 assertions with a token-endpoint audience and a 60-second lifetime.

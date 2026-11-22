@@ -7,7 +7,7 @@ Proposal updated: 2026-11-18, issue #117 (M05-PR52s).
 
 ## Context
 
-Accepted control-plane [ADR 0046](https://github.com/stanimirivanov/perfeng-control-plane/blob/main/docs/decisions/0046-select-issuer-and-bff-delegation-trust.md)
+Accepted control-plane [ADR 0046](https://github.com/stanimirivanov/perfeng-control-plane/blob/main/docs/adr/0046-select-issuer-and-bff-delegation-trust.md)
 fixes issuer/client/nonce/time and delegation boundaries. The Console's production
 [code exchange](../../src/bff/login/code-exchange.operation.ts) still returns private
 unverified candidates, expected nonce and request-start context. It creates neither

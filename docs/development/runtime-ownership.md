@@ -8,7 +8,7 @@ browser admission below. The matrix describes the target ownership model; the
 
 ## Decision and scope
 
-[ADR 0002](../decisions/0002-ui-technology-stack.md) establishes Angular rendering,
+[ADR 0002](../adr/0002-ui-technology-stack.md) establishes Angular rendering,
 SignalStore presentation state and Effect-managed asynchronous browser reads.
 This document makes those responsibilities actionable and records the approved
 extension to Effect-managed BFF operations. It does not change the M05 product

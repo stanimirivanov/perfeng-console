@@ -4,7 +4,7 @@
 
 [Issue #77](https://github.com/stanimirivanov/perfeng-console/issues/77) adds pure,
 private response decoders for the future code and delegated exchanges under
-accepted [control-plane ADR 0046](https://github.com/stanimirivanov/perfeng-control-plane/blob/main/docs/decisions/0046-select-issuer-and-bff-delegation-trust.md).
+accepted [control-plane ADR 0046](https://github.com/stanimirivanov/perfeng-control-plane/blob/main/docs/adr/0046-select-issuer-and-bff-delegation-trust.md).
 The [qualified POST adapter](token-post-transport.md) establishes wire bounds;
 these decoders establish envelope bounds. Neither establishes identity.
 

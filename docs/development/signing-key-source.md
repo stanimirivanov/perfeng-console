@@ -1,7 +1,7 @@
 # Private signing-key source and cache — M05-PR52u, issue #121
 
-Following accepted ADRs [0004](../decisions/0004-qualify-jwt-verification-before-runtime-adoption.md)
-and [0046](https://github.com/stanimirivanov/perfeng-control-plane/blob/main/docs/decisions/0046-select-issuer-and-bff-delegation-trust.md),
+Following accepted ADRs [0004](../adr/0004-qualify-jwt-verification-before-runtime-adoption.md)
+and [0046](https://github.com/stanimirivanov/perfeng-control-plane/blob/main/docs/adr/0046-select-issuer-and-bff-delegation-trust.md),
 the login identity feature now owns its qualified wire, strict JWKS admission,
 source, snapshot store/cache and bounded key resolver. This is private implementation
 admission: no login route, session, delegated token exchange or shared-user activation.
