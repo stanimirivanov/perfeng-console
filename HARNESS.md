@@ -208,9 +208,11 @@ ten-minute limit. Application/transport deadlines and fault assertions are
 unchanged. Probe progress includes elapsed time; failure diagnostics include
 exit status, signal and child error code (issue #156).
 
-Browser build inputs are explicitly reviewed in harness/assets.ts. The current
-scaffold permits inline component templates, one local Material Sass import and
-no copied asset scripts. Extending that boundary needs focused negative tests.
+Browser build inputs are explicitly reviewed in `harness/assets.ts`.
+`harness/workspace.ts` admits literal `templateUrl` and `styleUrl` paths to regular,
+matching `.html` and `.scss` siblings. `harness/project-imports.ts` checks component
+stylesheets for import and URL dependencies. The global theme has one reviewed
+Material Sass import. Extending the resource boundary needs focused negative tests.
 The distribution guard scans lazy chunks, maps and other emitted files for known
 secret/fixture/execution markers in every regular file, including binary data.
 It uses bounded byte reads with overlap, checks raw ASCII and UTF-16LE/BE at both

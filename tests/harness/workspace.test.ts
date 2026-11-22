@@ -51,6 +51,43 @@ test("browser resource paths cannot copy server or design files into a build", (
   }
 });
 
+test('component resources must be static, matching sibling files', () => {
+  const root = mkdtempSync(join(tmpdir(), 'component-resources-'));
+  try {
+    const feature = join(root, 'src/feature');
+    mkdirSync(feature, { recursive: true });
+    writeFileSync(join(feature, 'view.html'), '<p>View</p>');
+    writeFileSync(join(feature, 'view.scss'), ':host { display: block; }');
+    writeFileSync(join(feature, 'other.html'), '<p>Other</p>');
+    const file = join(feature, 'view.ts');
+    const component = (metadata: string) => writeFileSync(file, `@Component({${metadata}}) class View {}`);
+
+    component("templateUrl: './view.html', styleUrl: './view.scss'");
+    assert.deepEqual(checkApp(root), []);
+
+    for (const metadata of [
+      "templateUrl: './other.html'",
+      "templateUrl: '../feature/view.html'",
+      "templateUrl: './view%2ehtml'",
+      "templateUrl: './view.html?raw'",
+      'templateUrl: path',
+      "styleUrl: './view.css'",
+      "styles: ['p { color: red; }']",
+    ]) {
+      component(metadata);
+      assert.match(checkApp(root).join('\n'), /\[resource\]/, metadata);
+    }
+
+    component("templateUrl: './view.html'");
+    rmSync(join(feature, 'view.html'));
+    assert.match(checkApp(root).join('\n'), /\[resource\]/);
+    symlinkSync(join(feature, 'other.html'), join(feature, 'view.html'));
+    assert.match(checkApp(root).join('\n'), /\[resource\]/);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
 test("global Sass cannot import a BFF resource or external stylesheet", async () => {
   const { checkStyles } = await import("#perfeng/harness/assets");
   assert.deepEqual(checkStyles('@use "@angular/material" as mat; body { color: red; }'), []);

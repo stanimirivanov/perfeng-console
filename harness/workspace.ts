@@ -1,6 +1,6 @@
 import { diagnostic } from './diagnostics.ts';
-import { readdirSync, readFileSync } from "node:fs";
-import { resolve, relative, dirname } from "node:path";
+import { lstatSync, readdirSync, readFileSync } from "node:fs";
+import { basename, resolve, relative, dirname } from "node:path";
 import ts from "typescript";
 import { inspectImports } from "./boundaries.ts";
 import { angularPackages, effectTypePorts } from "./angular-features.ts";
@@ -34,10 +34,21 @@ export function checkApp(root: string): string[] {
         const line = tree.getLineAndCharacterOfPosition(node.getStart(tree)).line + 1;
         errors.push(diagnostic(relative(root, file), line, rule, reason));
       };
-      // The scaffold uses inline templates and one reviewed global Material theme.
+      // Only matching resource files beside the source can enter the browser build.
       const checkResources = (node: ts.Node) => {
-        if (ts.isPropertyAssignment(node) && /^(templateUrl|styleUrls?|styles)$/.test(node.name.getText(tree).replace(/["']/g, "")))
-          report(node, "resource", "Use the reviewed browser template and theme inputs.");
+        if (ts.isPropertyAssignment(node)) {
+          const name = node.name.getText(tree).replace(/["']/g, "");
+          if (name === "templateUrl" || name === "styleUrl") {
+            const suffix = name === "templateUrl" ? ".html" : ".scss";
+            const sibling = basename(file, ".ts") + suffix;
+            if (!ts.isStringLiteralLike(node.initializer) || node.initializer.text !== "./" + sibling ||
+                !lstatSync(resolve(dirname(file), sibling), { throwIfNoEntry: false })?.isFile()) {
+              report(node, "resource", `Use the regular sibling file './${sibling}' as a literal ${name}.`);
+            }
+          } else if (name === "styles" || name === "styleUrls") {
+            report(node, "resource", "Use a single matching component stylesheet through styleUrl.");
+          }
+        }
         ts.forEachChild(node, checkResources);
       };
       checkResources(tree);
